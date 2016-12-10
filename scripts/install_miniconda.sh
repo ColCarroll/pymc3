@@ -7,6 +7,8 @@ if conda --version > /dev/null 2>&1; then
    exit 0
  fi
 
+echo $PYTHON_VERSION
+echo $TRAVIS_PYTHON_VERSION
 PYTHON_VERSION=${PYTHON_VERSION:-3.5} # if no python specified, use 3.5
 
 if [ "$(uname)" == "Darwin" ]; then
