@@ -12,14 +12,12 @@ install:
   - . ./scripts/create_testenv.sh
   - pip install coveralls
 
-matrix:
-  PYTHON_VERSION=2.7
-  PYTHON_VERSION=3.5
-
 env:
   - TESTCMD=" -vv --with-timer --with-coverage --cover-package=pymc3 -e test_examples -e test_distributions"
   - TESTCMD=" -vv --with-timer --with-coverage --cover-package=pymc3 pymc3.tests.test_distributions pymc3.tests.test_examples"
   - TESTCMD=" -vv --with-timer --with-coverage --cover-package=pymc3 pymc3.tests.test_distributions_random"
+  - PYTHON_VERSION=2.7
+  - PYTHON_VERSION=3.5
 
 script:
   - . ./scripts/test.sh
