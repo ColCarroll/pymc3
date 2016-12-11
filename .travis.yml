@@ -16,6 +16,8 @@ env:
   - TESTCMD=" -vv --with-timer --with-coverage --cover-package=pymc3 -e test_examples -e test_distributions"
   - TESTCMD=" -vv --with-timer --with-coverage --cover-package=pymc3 pymc3.tests.test_distributions pymc3.tests.test_examples"
   - TESTCMD=" -vv --with-timer --with-coverage --cover-package=pymc3 pymc3.tests.test_distributions_random"
+
+matrix:
   - PYTHON_VERSION=2.7
   - PYTHON_VERSION=3.5
 
