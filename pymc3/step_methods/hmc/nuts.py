@@ -60,7 +60,6 @@ class NUTS(BaseHMC):
         p0 = self.potential.random()
         E0 = self.compute_energy(q0, p0)
 
-        u = nr.uniform()
         q = qn = qp = q0
         p = pn = pp = p0
 
@@ -71,10 +70,10 @@ class NUTS(BaseHMC):
 
             if v == -1:
                 qn, pn, _, _, q1, n1, s1, a, na = buildtree(
-                    self.leapfrog, qn, pn, u, v, j, e, Emax, E0)
+                    self.leapfrog, qn, pn, v, j, e, Emax, E0)
             else:
                 _, _, qp, pp, q1, n1, s1, a, na = buildtree(
-                    self.leapfrog, qp, pp, u, v, j, e, Emax, E0)
+                    self.leapfrog, qp, pp, v, j, e, Emax, E0)
 
             if s1 == 1 and bern(min(1, n1 * 1. / n)):
                 q = q1
@@ -103,22 +102,24 @@ class NUTS(BaseHMC):
         return Competence.INCOMPATIBLE
 
 
-def buildtree(leapfrog, q, p, u, v, j, e, Emax, E0):
-    if j == 0:
+def buildtree(leapfrog, q, p, v, depth, e, Emax, E0):
+    if depth == 0:
         q1, p1, E = leapfrog(q, p, np.array(v * e))
         dE = E - E0
-
+        u = nr.uniform()
         n1 = int(np.log(u) + dE <= 0)
         s1 = int(np.log(u) + dE < Emax)
         return q1, p1, q1, p1, q1, n1, s1, min(1, np.exp(-dE)), 1
-    qn, pn, qp, pp, q1, n1, s1, a1, na1 = buildtree(leapfrog, q, p, u, v, j - 1, e, Emax, E0)
+    else:
+        depth -= 1
+    qn, pn, qp, pp, q1, n1, s1, a1, na1 = buildtree(leapfrog, q, p, v, depth, e, Emax, E0)
     if s1 == 1:
         if v == -1:
             qn, pn, _, _, q11, n11, s11, a11, na11 = buildtree(
-                leapfrog, qn, pn, u, v, j - 1, e, Emax, E0)
+                leapfrog, qn, pn, v, depth, e, Emax, E0)
         else:
             _, _, qp, pp, q11, n11, s11, a11, na11 = buildtree(
-                leapfrog, qp, pp, u, v, j - 1, e, Emax, E0)
+                leapfrog, qp, pp, v, depth, e, Emax, E0)
 
         if bern(n11 * 1. / (max(n1 + n11, 1))):
             q1 = q11
