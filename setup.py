@@ -61,7 +61,6 @@ if __name__ == "__main__":
                     'pymc3.external',
                     'pymc3.gp',
                     'docs',
-                    '.',
           ],
           classifiers=classifiers,
           install_requires=install_reqs,
