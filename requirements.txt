@@ -11,5 +11,5 @@ recommonmark==0.4.0
 sphinx==1.5.3
 nbsphinx==0.2.13
 numdifftools==0.9.20
-numpydoc
+numpydoc==0.6.0
 six
