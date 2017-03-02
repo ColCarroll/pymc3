@@ -12,4 +12,4 @@ sphinx==1.5.3
 nbsphinx==0.2.13
 numdifftools==0.9.20
 numpydoc==0.6.0
-six
+six==1.10.0
