@@ -7,7 +7,7 @@ patsy>=0.4.0
 joblib>=0.9
 tqdm>=4.8.4
 CommonMark==0.7.3
-recommonmark
+recommonmark==0.4.0
 sphinx
 nbsphinx
 numdifftools
