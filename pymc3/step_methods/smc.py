@@ -99,7 +99,7 @@ class SMC(atext.ArrayStepSharedLLK):
         Initial Covariance matrix for proposal distribution,
         if None - identity matrix taken
     likelihood_name : string
-        name of the :class:`pymc3.determinsitic` variable that contains the
+        name of the :class:`pymc3.Determinstic` variable that contains the
         model likelihood - defaults to 'like'
     proposal_name :
         Type of proposal distribution, see
@@ -154,26 +154,19 @@ class SMC(atext.ArrayStepSharedLLK):
 
         out_varnames = [out_var.name for out_var in out_vars]
 
-        if covariance is None and proposal_name == 'MultivariateNormal':
-            self.covariance = np.eye(sum(v.dsize for v in vars))
-            scale = self.covariance
-        elif covariance is None:
-            scale = np.ones(sum(v.dsize for v in vars))
-        else:
-            scale = covariance
+        if covariance is None:
+            covariance = np.eye(sum(v.dsize for v in vars))
+
+        self.proposal_name = proposal_name
+        self.proposal_dist = choose_proposal(self.proposal_name, scale=covariance)
+        self.proposal_samples_array = self.proposal_dist(n_chains)
 
         self.scaling = np.atleast_1d(scaling)
         self.tune = tune
         self.check_bnd = check_bound
         self.tune_interval = tune_interval
-        self.steps_until_tune = tune_interval
 
-        self.proposal_name = proposal_name
-        self.proposal_dist = choose_proposal(self.proposal_name, scale=scale)
-
-        self.proposal_samples_array = self.proposal_dist(n_chains)
-
-        self.stage_sample = 0
+        self.samples = 0
         self.accepted = 0
 
         self.beta = 0
@@ -201,7 +194,7 @@ class SMC(atext.ArrayStepSharedLLK):
 
         shared = make_shared_replacements(vars, model)
         self.logp_forw = logp_forw(out_vars, vars, shared)
-        self.check_bnd = logp_forw([model.varlogpt], vars, shared)
+        self.bound_check = logp_forw([model.varlogpt], vars, shared)
 
         super(SMC, self).__init__(vars, out_vars, shared)
 
@@ -211,17 +204,15 @@ class SMC(atext.ArrayStepSharedLLK):
             q_new = q0
 
         else:
-            if not self.stage_sample:
+            if self.samples % self.n_steps == 0:
                 self.proposal_samples_array = self.proposal_dist(self.n_steps)
 
-            if not self.steps_until_tune and self.tune:
+            if self.tune and (self.samples % self.tune_interval == 0):
                 # Tune scaling parameter
                 self.scaling = tune(self.accepted / float(self.tune_interval))
-                # Reset counter
-                self.steps_until_tune = self.tune_interval
                 self.accepted = 0
 
-            delta = self.proposal_samples_array[self.stage_sample, :] * self.scaling
+            delta = self.proposal_samples_array[self.samples % self.n_steps, :] * self.scaling
 
             if self.any_discrete:
                 if self.all_discrete:
@@ -238,7 +229,7 @@ class SMC(atext.ArrayStepSharedLLK):
             l0 = self.chain_previous_lpoint[self.chain_index]
 
             if self.check_bnd:
-                varlogp = self.check_bnd(q)
+                varlogp = self.bound_check(q)
 
                 if np.isfinite(varlogp):
                     logp = self.logp_forw(q)
@@ -267,12 +258,7 @@ class SMC(atext.ArrayStepSharedLLK):
                 else:
                     l_new = l0
 
-            self.steps_until_tune -= 1
-            self.stage_sample += 1
-
-            # reset sample counter
-            if self.stage_sample == self.n_steps:
-                self.stage_sample = 0
+            self.samples += 1
 
         return q_new, l_new
 
@@ -543,15 +529,11 @@ def ATMIP_sample(n_steps, step=None, start=None, homepath=None, chain=0, stage=N
         else:
             # continue sampling intermediate
             stage = int(stage)
-            pm._log.info(
-                'Loading parameters from completed stage_%i' % (stage - 1))
+            pm._log.info('Loading parameters from completed stage_%i' % (stage - 1))
             project_dir = os.path.dirname(homepath)
             mode = os.path.basename(homepath)
-            step = atext.load_atmip_params(
-                project_dir, str(stage - 1), mode)
-
+            step = atext.load_atmip_params(project_dir, str(stage - 1), mode)
             step.stage += 1
-
             stage_path = os.path.join(homepath, 'stage_%i' % step.stage)
             draws = step.n_steps
 
@@ -642,9 +624,7 @@ def ATMIP_sample(n_steps, step=None, start=None, homepath=None, chain=0, stage=N
                     chains = None
                 break
 
-            step.covariance = step.calc_covariance()
-            step.proposal_dist = choose_proposal(
-                step.proposal_name, scale=step.covariance)
+            step.proposal_dist = choose_proposal(step.proposal_name, scale=step.calc_covariance())
             step.resampling_indexes = step.resample()
             step.chain_previous_lpoint = step.get_chain_previous_lpoint(mtrace)
 
@@ -661,9 +641,7 @@ def ATMIP_sample(n_steps, step=None, start=None, homepath=None, chain=0, stage=N
         stage_path = os.path.join(homepath, 'stage_final')
         temp = np.exp((1 - step.old_beta) * (step.likelihoods - step.likelihoods.max()))
         step.weights = temp / np.sum(temp)
-        step.covariance = step.calc_covariance()
-        step.proposal_dist = choose_proposal(
-                step.proposal_name, scale=step.covariance)
+        step.proposal_dist = choose_proposal(step.proposal_name, scale=step.calc_covariance())
         step.resampling_indexes = step.resample()
         step.chain_previous_lpoint = step.get_chain_previous_lpoint(mtrace)
 

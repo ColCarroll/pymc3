@@ -33,6 +33,10 @@ from ..step_methods.arraystep import BlockedStep
 
 import multiprocessing
 
+class Filename(object):
+    def __init__(self, key):
+        self.pattern = key
+
 
 def paripool(function, work, nprocs=None, chunksize=1):
     """Initialise a pool of workers and execute a function in parallel by
@@ -61,7 +65,7 @@ def paripool(function, work, nprocs=None, chunksize=1):
         iterables = pack_one_worker(work)
         kwargs = {}
 
-        while(True):
+        while True:
             args = [next(it) for it in iterables]
             yield function(*args, **kwargs)
 
@@ -320,10 +324,8 @@ def get_highest_sampled_stage(homedir, return_final=False):
         try:
             stagenumbers.append(int(stage_ending))
         except ValueError:
-            pm._log.debug('string - Thats the final stage!')
             if return_final:
                 return stage_ending
-
     return max(stagenumbers)
 
 
@@ -385,6 +387,11 @@ def load(name, model=None):
     return base.MultiTrace(straces)
 
 
+def get_filename(directory, chain):
+    """Consistent file naming for chains."""
+    return os.path.join(name, 'chain-{}.csv'.format(chain))
+
+
 def dump(name, trace, chains=None):
     """Store values from NDArray trace as CSV files.
 
@@ -406,9 +413,8 @@ def dump(name, trace, chains=None):
     flat_names = {v: ttab.create_flat_names(v, shape) for v, shape in var_shapes.items()}
 
     for chain in chains:
-        filename = os.path.join(name, 'chain-{}.csv'.format(chain))
         df = ttab.trace_to_dataframe(trace, chains=chain, flat_names=flat_names)
-        df.to_csv(filename, index=False)
+        df.to_csv(get_filename(name, chain), index=False)
 
 
 def dump_objects(outpath, outlist):
