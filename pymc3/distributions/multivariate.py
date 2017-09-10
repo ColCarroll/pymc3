@@ -505,19 +505,11 @@ class Multinomial(Discrete):
     def _random(self, n, p, size=None):
         original_dtype = p.dtype
         # Set float type to float64 for numpy. This change is related to numpy issue #8317 (https://github.com/numpy/numpy/issues/8317)
-        p = p.astype('float64')
-        # Now, re-normalize all of the values in float64 precision. This is done inside the conditionals
-        if size == p.shape:
-            size = None
-        if p.ndim == 1:
-            p = p / p.sum()
-            randnum = np.random.multinomial(n, p.squeeze(), size=size)
-        elif p.ndim == 2:
-            p = p / p.sum(axis=1, keepdims=True)
-            randnum = np.asarray([np.random.multinomial(n, pp, size=size) for pp in p])
-        else:
-            raise ValueError('Outcome probabilities must be 1- or 2-dimensional '
-                             '(supplied `p` has {} dimensions)'.format(p.ndim))
+        n = np.atleast_2d(n)
+        p = np.atleast_2d(p.astype('float64'))
+        # Now, re-normalize all of the values in float64 precision
+        p = p / p.sum(axis=1, keepdims=True)
+        randnum = np.asarray([np.random.multinomial(nn, pp, size=size) for nn, pp in zip(n, p)])
         return randnum.astype(original_dtype)
 
     def random(self, point=None, size=None):
@@ -654,11 +646,11 @@ class Wishart(Continuous):
                               (nu - p - 1) * V,
                               np.nan)
 
-    def random(self, point=None, size=None): 
-        nu, V = draw_values([self.nu, self.V], point=point) 
+    def random(self, point=None, size=None):
+        nu, V = draw_values([self.nu, self.V], point=point)
         size= 1 if size is None else size
-        return generate_samples(stats.wishart.rvs, np.asscalar(nu), V, 
-                                    broadcast_shape=(size,)) 
+        return generate_samples(stats.wishart.rvs, np.asscalar(nu), V,
+                                    broadcast_shape=(size,))
 
     def logp(self, X):
         nu = self.nu
@@ -1028,7 +1020,7 @@ class LKJCorr(Continuous):
         self.tri_index[np.triu_indices(n, k=1)[::-1]] = np.arange(shape)
 
     def _random(self, n, eta, size=None):
-        size = size if isinstance(size, tuple) else (size,) 
+        size = size if isinstance(size, tuple) else (size,)
         # original implementation in R see:
         # https://github.com/rmcelreath/rethinking/blob/master/R/distributions.r
         beta = eta - 1 + n/2
@@ -1044,13 +1036,13 @@ class LKJCorr(Continuous):
                 z = z / np.sqrt(np.einsum('ij,ij->j', z, z))
                 P[0:m+1, m+1] = np.sqrt(y) * z
                 P[m+1, m+1] = np.sqrt(1 - y)
-        Pt = np.transpose(P, (2, 0 ,1))
+        Pt = np.transpose(P, (2, 0, 1))
         C = np.einsum('...ji,...jk->...ik', Pt, Pt)
         return C.transpose((1, 2, 0))[np.triu_indices(n, k=1)].T
 
     def random(self, point=None, size=None):
         n, eta = draw_values([self.n, self.eta], point=point)
-        size= 1 if size is None else size
+        size = 1 if size is None else size
         samples = generate_samples(self._random, n, eta,
                                    broadcast_shape=(size,))
         return samples
