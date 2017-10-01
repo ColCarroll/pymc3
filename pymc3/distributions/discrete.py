@@ -1,7 +1,7 @@
 from functools import partial
 import numpy as np
-import theano
-import theano.tensor as tt
+# import theano
+# import theano.tensor as tt
 from scipy import stats
 import warnings
 

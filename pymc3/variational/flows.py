@@ -1,9 +1,10 @@
 import numpy as np
-import theano
-from theano import tensor as tt
+import torch
+# import theano
+# from theano import tensor as tt
+# from theano.configparser import change_flags
 
 from pymc3.distributions.dist_math import rho2sd
-from pymc3.theanof import change_flags
 from .opvi import node_property, collect_shared_to_list
 from . import opvi
 
@@ -188,7 +189,7 @@ class AbstractFlow(object):
         return params
 
     @property
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def sum_logdets(self):
         dets = [self.logdet]
         current = self
@@ -205,7 +206,7 @@ class AbstractFlow(object):
     def logdet(self):
         raise NotImplementedError
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def forward_pass(self, z0):
         ret = theano.clone(self.forward, {self.root.z0: z0})
         try:
@@ -279,7 +280,7 @@ class FlowFn(object):
 class LinearFlow(AbstractFlow):
     __param_spec__ = dict(u=('d', ), w=('d', ), b=())
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def __init__(self, h, u=None, w=None, b=None, **kwargs):
         self.h = h
         super(LinearFlow, self).__init__(**kwargs)
@@ -351,8 +352,10 @@ class LinearFlow(AbstractFlow):
 
 
 class Tanh(FlowFn):
-    fn = tt.tanh
-    inv = tt.arctanh
+    #  THEANO fn = tt.tanh
+    #  THEANO inv = tt.arctanh
+    fn = torch.tanh
+    inv = None
 
     @staticmethod
     def deriv(*args):
@@ -396,7 +399,7 @@ class PlanarFlow(LinearFlow):
 class ReferencePointFlow(AbstractFlow):
     __param_spec__ = dict(a=(), b=(), z_ref=('d', ))
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def __init__(self, h, a=None, b=None, z_ref=None, **kwargs):
         super(ReferencePointFlow, self).__init__(**kwargs)
         a = self.add_param(a, 'a')
@@ -532,7 +535,7 @@ class ScaleFlow(AbstractFlow):
     __param_spec__ = dict(rho=('d', ))
     short_name = 'scale'
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def __init__(self, rho=None, **kwargs):
         super(ScaleFlow, self).__init__(**kwargs)
         rho = self.add_param(rho, 'rho')
@@ -557,7 +560,7 @@ class HouseholderFlow(AbstractFlow):
     __param_spec__ = dict(v=('d', ))
     short_name = 'hh'
 
-    @change_flags(compute_test_value='raise')
+    #  THEANO @change_flags(compute_test_value='raise')
     def __init__(self, v=None, **kwargs):
         super(HouseholderFlow, self).__init__(**kwargs)
         v = self.add_param(v, 'v')

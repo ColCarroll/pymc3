@@ -1,10 +1,11 @@
 import numpy as np
-import theano
-from theano import theano, scalar, tensor as tt
-from theano.configparser import change_flags
-from theano.gof import Op
-from theano.gof.graph import inputs
-from theano.sandbox.rng_mrg import MRG_RandomStreams
+import torch
+# import theano
+# from theano import theano, scalar, tensor as tt
+# from theano.configparser import change_flags
+# from theano.gof import Op
+# from theano.gof.graph import inputs
+# from theano.sandbox.rng_mrg import MRG_RandomStreams
 
 from .blocking import ArrayOrdering
 from .data import GeneratorAdapter
@@ -65,12 +66,13 @@ def floatX(X):
         return X.astype(theano.config.floatX)
     except AttributeError:
         # Scalar passed
-        return np.asarray(X, dtype=theano.config.floatX)
+        #  THEANO return np.asarray(X, dtype=theano.config.floatX)
+        return np.asarray(X)
 
 
 def smartfloatX(x):
     """
-    Convert non int types to floatX 
+    Convert non int types to floatX
     """
     if str(x.dtype).startswith('float'):
         x = floatX(x)
@@ -85,7 +87,8 @@ def gradient1(f, v):
     """flat gradient of f wrt v"""
     return tt.flatten(tt.grad(f, v, disconnected_inputs='warn'))
 
-empty_gradient = tt.zeros(0, dtype='float32')
+#  THEANO empty_gradient = tt.zeros(0, dtype='float32')
+empty_gradient = torch.zeros(0)
 
 
 @memoize
@@ -133,12 +136,12 @@ def jacobian_diag(f, x):
 
 
 @memoize
-@change_flags(compute_test_value='ignore')
+#  THEANO @change_flags(compute_test_value='ignore')
 def hessian(f, vars=None):
     return -jacobian(gradient(f, vars), vars)
 
 
-@change_flags(compute_test_value='ignore')
+#  THEANO @change_flags(compute_test_value='ignore')
 def hessian_diag1(f, v):
     g = gradient1(f, v)
     idx = tt.arange(g.shape[0], dtype='int32')
@@ -150,7 +153,7 @@ def hessian_diag1(f, v):
 
 
 @memoize
-@change_flags(compute_test_value='ignore')
+#  THEANO @change_flags(compute_test_value='ignore')
 def hessian_diag(f, vars=None):
     if vars is None:
         vars = cont_inputs(f)
@@ -168,7 +171,8 @@ def makeiter(a):
         return [a]
 
 
-class IdentityOp(scalar.UnaryScalarOp):
+#  THEANO class IdentityOp(scalar.UnaryScalarOp):
+class IdentityOp(object):
 
     @staticmethod
     def st_impl(x):
@@ -276,11 +280,15 @@ class CallableTensor(object):
         oldinput, = inputvars(self.tensor)
         return theano.clone(self.tensor, {oldinput: input}, strict=False)
 
-scalar_identity = IdentityOp(scalar.upgrade_to_float, name='scalar_identity')
-identity = tt.Elemwise(scalar_identity, name='identity')
+#  THEANO scalar_identity = IdentityOp(scalar.upgrade_to_float, name='scalar_identity')
+scalar_identity = None
+
+#  THEANO identity = tt.Elemwise(scalar_identity, name='identity')
+identity = None
 
 
-class GeneratorOp(Op):
+#  THEANO class GeneratorOp(Op):
+class GeneratorOp(object):
     """
     Generator Op is designed for storing python generators inside theano graph.
 
@@ -320,7 +328,8 @@ class GeneratorOp(Op):
     def do_constant_folding(self, node):
         return False
 
-    __call__ = change_flags(compute_test_value='off')(Op.__call__)
+    #  THEANO __call__ = change_flags(compute_test_value='off')(Op.__call__)
+    __call__ = None
 
     def set_gen(self, gen):
         if not isinstance(gen, GeneratorAdapter):
@@ -364,7 +373,8 @@ def generator(gen, default=None):
     return GeneratorOp(gen, default)()
 
 
-_tt_rng = MRG_RandomStreams()
+#  THEANO _tt_rng = MRG_RandomStreams()
+_tt_rng = None
 
 
 def tt_rng(random_seed=None):

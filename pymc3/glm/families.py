@@ -1,7 +1,7 @@
 import numbers
 from copy import copy
 
-import theano.tensor as tt
+# import theano.tensor as tt
 from ..model import modelcontext
 from .. import distributions as pm_dists
 
@@ -19,9 +19,12 @@ class Identity():
         return x
 
 identity = Identity()
-logit = tt.nnet.sigmoid
-inverse = tt.inv
-exp = tt.exp
+#  THEANO logit = tt.nnet.sigmoid
+#  THEANO inverse = tt.inv
+#  THEANO exp = tt.exp
+logit = None
+inverse = None
+exp = None
 
 
 class Family(object):

@@ -1,5 +1,5 @@
-import theano
-import theano.tensor as tt
+# import theano
+# import theano.tensor as tt
 
 from ..model import FreeRV
 from ..theanof import gradient, floatX
@@ -250,7 +250,8 @@ class StickBreaking(Transform):
 
     name = "stickbreaking"
 
-    def __init__(self, eps=floatX(np.finfo(theano.config.floatX).eps)):
+    #  THEANO def __init__(self, eps=floatX(np.finfo(theano.config.floatX).eps)):
+    def __init__(self, eps=1e-8):
         self.eps = eps
 
     def forward(self, x_):

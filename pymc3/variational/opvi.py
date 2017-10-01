@@ -36,8 +36,9 @@ import itertools
 import warnings
 
 import numpy as np
-import theano
-import theano.tensor as tt
+# import theano
+# import theano.tensor as tt
+# from theano.configparser import change_flags
 
 import pymc3 as pm
 from pymc3.util import get_transformed
@@ -46,7 +47,7 @@ from ..blocking import (
     ArrayOrdering, DictToArrayBijection, VarMap
 )
 from ..model import modelcontext
-from ..theanof import tt_rng, memoize, change_flags, identity
+from ..theanof import tt_rng, memoize, identity
 from ..util import get_default_varnames
 
 __all__ = [
@@ -89,10 +90,11 @@ class LocalGroupError(BatchedGroupError, AEVBInferenceError):
 def node_property(f):
     """A shortcut for wrapping method to accessible tensor
     """
-    return property(memoize(change_flags(compute_test_value='off')(f)))
+    #  THEANO return property(memoize(change_flags(compute_test_value='off')(f)))
+    return None
 
 
-@change_flags(compute_test_value='ignore')
+#  THEANO @change_flags(compute_test_value='ignore')
 def try_to_set_test_value(node_in, node_out, s):
     _s = s
     if s is None:
@@ -114,7 +116,8 @@ def try_to_set_test_value(node_in, node_out, s):
                 o.tag.test_value = tv
 
 
-class ObjectiveUpdates(theano.OrderedUpdates):
+#  THEANO class ObjectiveUpdates(theano.OrderedUpdates):
+class ObjectiveUpdates(object):
     """OrderedUpdates extension for storing loss
     """
     loss = None
@@ -239,7 +242,7 @@ class ObjectiveFunction(object):
         if self.op.returns_loss:
             updates.loss = obj_target
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def step_function(self, obj_n_mc=None, tf_n_mc=None,
                       obj_optimizer=adagrad_window, test_optimizer=adagrad_window,
                       more_obj_params=None, more_tf_params=None,
@@ -302,7 +305,7 @@ class ObjectiveFunction(object):
             step_fn = theano.function([], None, updates=updates, **fn_kwargs)
         return step_fn
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def score_function(self, sc_n_mc=None, more_replacements=None, fn_kwargs=None):   # pragma: no cover
         R"""Compile scoring function that operates which takes no inputs and returns Loss
 
@@ -328,7 +331,7 @@ class ObjectiveFunction(object):
         loss = self(sc_n_mc, more_replacements=more_replacements)
         return theano.function([], loss, **fn_kwargs)
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def __call__(self, nmc, **kwargs):
         if 'more_tf_params' in kwargs:
             m = -1.
@@ -841,7 +844,7 @@ class Group(object):
         else:
             return tt.vector(name)
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def __init_group__(self, group):
         if not group:
             raise GroupError('Got empty group')
@@ -1029,7 +1032,7 @@ class Group(object):
         else:
             return self.symbolic_random
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def set_size_and_deterministic(self, node, s, d, more_replacements=None):
         """*Dev* - after node is sampled via :func:`symbolic_sample_over_posterior` or
         :func:`symbolic_single_sample` new random generator can be allocated and applied to node
@@ -1340,7 +1343,7 @@ class Approximation(object):
         flat2rand.update(more_replacements)
         return flat2rand
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def set_size_and_deterministic(self, node, s, d, more_replacements=None):
         """*Dev* - after node is sampled via :func:`symbolic_sample_over_posterior` or
         :func:`symbolic_single_sample` new random generator can be allocated and applied to node
@@ -1407,7 +1410,7 @@ class Approximation(object):
             repl[self.logp] = self.single_symbolic_logp
         return repl
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def sample_node(self, node, size=None,
                     deterministic=False,
                     more_replacements=None):
@@ -1458,7 +1461,7 @@ class Approximation(object):
 
     @property
     @memoize
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def sample_dict_fn(self):
         s = tt.iscalar()
         names = [v.name for v in self.model.free_RVs]

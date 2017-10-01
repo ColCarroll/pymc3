@@ -1,5 +1,5 @@
 import numpy as np
-import theano.tensor as tt
+# import theano.tensor as tt
 
 import pymc3 as pm
 from pymc3.gp.cov import Covariance, Constant

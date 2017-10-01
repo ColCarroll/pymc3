@@ -7,7 +7,7 @@ import itertools as itl
 
 import numpy as np
 import warnings
-import theano.tensor as tt
+# import theano.tensor as tt
 
 from ..model import modelcontext
 

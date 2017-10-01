@@ -4,13 +4,13 @@
 import warnings
 import numpy as np
 import scipy
-import theano
-import theano.tensor as tt
+# import theano
+# import theano.tensor as tt
 
 from scipy import stats, linalg
 
-from theano.tensor.nlinalg import det, matrix_inverse, trace
-import theano.tensor.slinalg
+# from theano.tensor.nlinalg import det, matrix_inverse, trace
+# import theano.tensor.slinalg
 import pymc3 as pm
 
 from pymc3.theanof import floatX
@@ -580,7 +580,8 @@ def posdef(AA):
         return 0
 
 
-class PosDefMatrix(theano.Op):
+#  THEANO class PosDefMatrix(theano.Op):
+class PosDefMatrix(object):
     """
     Check if input is positive definite. Input should be a square matrix.
 

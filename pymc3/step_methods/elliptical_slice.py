@@ -1,6 +1,6 @@
 import numpy as np
 import numpy.random as nr
-import theano.tensor as tt
+# import theano.tensor as tt
 
 from .arraystep import ArrayStep, Competence
 from ..model import modelcontext

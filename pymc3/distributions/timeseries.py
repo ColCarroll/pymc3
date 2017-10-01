@@ -1,5 +1,5 @@
-import theano.tensor as tt
-from theano import scan
+#  import theano.tensor as tt
+#  from theano import scan
 
 from pymc3.util import get_variable_name
 from .continuous import get_tau_sd, Normal, Flat
@@ -76,13 +76,13 @@ class AR(distribution.Continuous):
     Parameters
     ----------
     rho : tensor
-        Vector of autoregressive coefficients. 
-    sd : float 
+        Vector of autoregressive coefficients.
+    sd : float
         Standard deviation of innovation (sd > 0).
     tau : float
         Precision of innovation (tau > 0).
     constant: bool (optional, default = False)
-        Whether to include a constant. 
+        Whether to include a constant.
     init : distribution
         distribution for initial values (Defaults to Flat())
     """

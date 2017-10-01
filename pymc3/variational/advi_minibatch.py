@@ -1,10 +1,10 @@
 from collections import OrderedDict
 
 import numpy as np
-import theano
-import theano.tensor as tt
-from theano.sandbox.rng_mrg import MRG_RandomStreams
-from theano.configparser import change_flags
+# import theano
+# import theano.tensor as tt
+# from theano.sandbox.rng_mrg import MRG_RandomStreams
+# from theano.configparser import change_flags
 import tqdm
 
 import pymc3 as pm
@@ -223,7 +223,7 @@ def _make_elbo_t(
     return elbo, uw_l, uw_g
 
 
-@change_flags(compute_test_value='ignore')
+#  THEANO @change_flags(compute_test_value='ignore')
 def advi_minibatch(vars=None, start=None, model=None, n=5000, n_mcsamples=1,
                    minibatch_RVs=None, minibatch_tensors=None,
                    minibatches=None, global_RVs=None, local_RVs=None,

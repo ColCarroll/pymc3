@@ -2,7 +2,7 @@ import numpy as np
 from numpy.random import normal
 import scipy.linalg
 from scipy.sparse import issparse
-import theano
+# import theano
 
 from pymc3.theanof import floatX
 

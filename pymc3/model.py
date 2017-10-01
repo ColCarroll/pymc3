@@ -6,9 +6,9 @@ import six
 
 import numpy as np
 import scipy.sparse as sps
-import theano.sparse as sparse
-from theano import theano, tensor as tt
-from theano.tensor.var import TensorVariable
+# import theano.sparse as sparse
+# from theano import theano, tensor as tt
+# from theano.tensor.var import TensorVariable
 
 from pymc3.theanof import set_theano_conf
 import pymc3 as pm
@@ -1094,7 +1094,8 @@ def _get_scaling(total_size, shape, ndim):
     return tt.as_tensor(pm.floatX(coef))
 
 
-class FreeRV(Factor, TensorVariable):
+#  THEANO class FreeRV(Factor, TensorVariable):
+class FreeRV(Factor):
     """Unobserved random variable that a model is specified in terms of."""
 
     def __init__(self, type=None, owner=None, index=None, name=None,
@@ -1196,7 +1197,8 @@ def as_tensor(data, name, model, distribution):
         return data
 
 
-class ObservedRV(Factor, TensorVariable):
+#  THEANO class ObservedRV(Factor, TensorVariable):
+class ObservedRV(Factor):
     """Observed random variable that a model is specified in terms of.
     Potentially partially observed.
     """
@@ -1353,7 +1355,8 @@ def Potential(name, var, model=None):
     return var
 
 
-class TransformedRV(TensorVariable):
+#  THEANO class TransformedRV(TensorVariable):
+class TransformedRV(object):
 
     def __init__(self, type=None, owner=None, index=None, name=None,
                  distribution=None, model=None, transform=None,

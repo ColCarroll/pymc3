@@ -1,5 +1,5 @@
 import numpy as np
-import theano.tensor as tt
+# import theano.tensor as tt
 from functools import reduce
 from operator import mul, add
 

@@ -1,13 +1,16 @@
 from scipy.cluster.vq import kmeans
 import numpy as np
 import pymc3 as pm
-import theano.tensor as tt
+# import theano.tensor as tt
 
 
 cholesky = pm.distributions.dist_math.Cholesky(nofail=True, lower=True)
-solve_lower = tt.slinalg.Solve(A_structure='lower_triangular')
-solve_upper = tt.slinalg.Solve(A_structure='upper_triangular')
-solve = tt.slinalg.Solve(A_structure='general')
+#  THEANO solve_lower = tt.slinalg.Solve(A_structure='lower_triangular')
+#  THEANO solve_upper = tt.slinalg.Solve(A_structure='upper_triangular')
+#  THEANO solve = tt.slinalg.Solve(A_structure='general')
+solve_lower = None
+solve_upper = None
+solve = None
 
 
 def infer_shape(X, n_points=None):

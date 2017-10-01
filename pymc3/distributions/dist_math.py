@@ -7,8 +7,8 @@ from __future__ import division
 
 import numpy as np
 import scipy.linalg
-import theano.tensor as tt
-import theano
+# import theano.tensor as tt
+# import theano
 
 from .special import gammaln
 from pymc3.theanof import floatX
@@ -229,7 +229,8 @@ def MvNormalLogp():
         [cov, delta], [logp], grad_overrides=dlogp, inline=True)
 
 
-class Cholesky(theano.Op):
+#  THEANO class Cholesky(theano.Op):
+class Cholesky(object):
     """
     Return a triangular matrix square root of positive semi-definite `x`.
 
@@ -311,7 +312,8 @@ class Cholesky(theano.Op):
         return [tt.switch(ok, grad, floatX(np.nan))]
 
 
-class SplineWrapper(theano.Op):
+#  THEANO class SplineWrapper(theano.Op):
+class SplineWrapper(object):
     """
     Creates a theano operation from scipy.interpolate.UnivariateSpline
     """

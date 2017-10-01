@@ -16,7 +16,7 @@ import numpy as np
 import pymc3 as pm
 from tqdm import tqdm
 
-import theano
+# import theano
 import copy
 import warnings
 
@@ -508,7 +508,7 @@ def sample_smc(n_steps, n_chains=100, step=None, start=None, homepath=None, stag
                         'as defined in `step`.' % step.likelihood_name)
 
     step.n_steps = int(n_steps)
-    
+
     stage_handler = atext.TextStage(homepath)
 
     if progressbar and n_jobs > 1:

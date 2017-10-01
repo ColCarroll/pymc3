@@ -1,18 +1,18 @@
 from __future__ import division
 import sys
-import theano.tensor as tt
+# import theano.tensor as tt
 # pylint: disable=unused-import
-import theano
-from theano.tensor import (
-    constant, flatten, zeros_like, ones_like, stack, concatenate, sum, prod,
-    lt, gt, le, ge, eq, neq, switch, clip, where, and_, or_, abs_, exp, log,
-    cos, sin, tan, cosh, sinh, tanh, sqr, sqrt, erf, erfc, erfinv, erfcinv, dot,
-    maximum, minimum, sgn, ceil, floor)
-from theano.tensor.nlinalg import det, matrix_inverse, extract_diag, matrix_dot, trace
-import theano.tensor.slinalg
-import theano.sparse
-from theano.tensor.nnet import sigmoid
-from theano.gof import Op, Apply
+# import theano
+# from theano.tensor import (
+    # constant, flatten, zeros_like, ones_like, stack, concatenate, sum, prod,
+    # lt, gt, le, ge, eq, neq, switch, clip, where, and_, or_, abs_, exp, log,
+    # cos, sin, tan, cosh, sinh, tanh, sqr, sqrt, erf, erfc, erfinv, erfcinv, dot,
+    # maximum, minimum, sgn, ceil, floor)
+# from theano.tensor.nlinalg import det, matrix_inverse, extract_diag, matrix_dot, trace
+# import theano.tensor.slinalg
+# import theano.sparse
+# from theano.tensor.nnet import sigmoid
+# from theano.gof import Op, Apply
 import numpy as np
 import scipy as sp
 import scipy.sparse
@@ -38,8 +38,8 @@ def logsumexp(x, axis=None):
 
 def logaddexp(a, b):
     diff = b - a
-    return tt.switch(diff > 0, 
-                    b + tt.log1p(tt.exp(-diff)), 
+    return tt.switch(diff > 0,
+                    b + tt.log1p(tt.exp(-diff)),
                     a + tt.log1p(tt.exp(diff)))
 
 def invlogit(x, eps=sys.float_info.epsilon):
@@ -54,7 +54,8 @@ def flatten_list(tensors):
     return tt.concatenate([var.ravel() for var in tensors])
 
 
-class LogDet(Op):
+#  THEANO class LogDet(Op):
+class LogDet(object):
     """Compute the logarithm of the absolute determinant of a square
     matrix M, log(abs(det(M))) on the CPU. Avoids det(M) overflow/
     underflow.
@@ -143,7 +144,8 @@ def expand_packed_triangular(n, packed, lower=True, diagonal_only=False):
         return tt.set_subtensor(out[idxs], packed)
 
 
-class BatchedDiag(tt.Op):
+#  THEANO class BatchedDiag(tt.Op):
+class BatchedDiag(object):
     """
     Fast BatchedDiag allocation
     """
@@ -191,7 +193,8 @@ def batched_diag(C):
         raise ValueError('Input should be 2 or 3 dimensional')
 
 
-class BlockDiagonalMatrix(Op):
+#  THEANO class BlockDiagonalMatrix(Op):
+class BlockDiagonalMatrix(object):
     __props__ = ('sparse', 'format')
 
     def __init__(self, sparse=False, format='csr'):

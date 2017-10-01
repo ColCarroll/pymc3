@@ -1,7 +1,7 @@
 import six
 import pandas as pd
 import numpy as np
-import theano.tensor as tt
+# import theano.tensor as tt
 
 
 def any_to_tensor_and_labels(x, labels=None):

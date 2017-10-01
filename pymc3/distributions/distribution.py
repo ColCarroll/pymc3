@@ -1,8 +1,9 @@
 import numbers
 import numpy as np
-import theano.tensor as tt
-from theano import function
-import theano
+# import theano.tensor as tt
+# from theano import function
+# import theano
+import torch
 from ..memoize import memoize
 from ..model import Model, get_named_nodes, FreeRV, ObservedRV
 from ..vartypes import string_types
@@ -119,7 +120,8 @@ class Distribution(object):
 def TensorType(dtype, shape, broadcastable=None):
     if broadcastable is None:
         broadcastable = np.atleast_1d(shape) == 1
-    return tt.TensorType(str(dtype), broadcastable)
+    #  THEANO return tt.TensorType(str(dtype), broadcastable)
+    return None
 
 
 class NoDistribution(Distribution):
@@ -170,7 +172,8 @@ class Continuous(Distribution):
     def __init__(self, shape=(), dtype=None, defaults=('median', 'mean', 'mode'),
                  *args, **kwargs):
         if dtype is None:
-            dtype = theano.config.floatX
+            #  THEANO dtype = theano.config.floatX
+            dtype = torch.FloatTensor
         super(Continuous, self).__init__(
             shape, dtype, defaults=defaults, *args, **kwargs)
 
@@ -180,7 +183,8 @@ class DensityDist(Distribution):
 
     def __init__(self, logp, shape=(), dtype=None, testval=0, *args, **kwargs):
         if dtype is None:
-            dtype = theano.config.floatX
+            #  THEANO dtype = theano.config.floatX
+            dtype = torch.FloatTensor
         super(DensityDist, self).__init__(
             shape, dtype, testval, *args, **kwargs)
         self.logp = logp

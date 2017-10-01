@@ -1,6 +1,6 @@
 import numpy as np
 import numpy.random as nr
-import theano
+# import theano
 import scipy.linalg
 
 from ..distributions import draw_values

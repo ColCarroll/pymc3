@@ -5,8 +5,8 @@ import pkgutil
 
 import numpy as np
 import pymc3 as pm
-import theano.tensor as tt
-import theano
+# import theano.tensor as tt
+# import theano
 
 __all__ = [
     'get_data',
@@ -30,7 +30,8 @@ def get_data(filename):
     return io.BytesIO(pkgutil.get_data(data_pkg, os.path.join('data', filename)))
 
 
-class GenTensorVariable(tt.TensorVariable):
+# class GenTensorVariable(tt.TensorVariable):
+class GenTensorVariable(object):
     def __init__(self, op, type, name=None):
         super(GenTensorVariable, self).__init__(type=type, name=name)
         self.op = op
@@ -90,7 +91,8 @@ class GeneratorAdapter(object):
         return hash(id(self))
 
 
-class Minibatch(tt.TensorVariable):
+# class Minibatch(tt.TensorVariable):
+class Minibatch(object):
     """Multidimensional minibatch that is pure TensorVariable
 
     Parameters
@@ -98,7 +100,7 @@ class Minibatch(tt.TensorVariable):
     data : :class:`ndarray`
         initial data
     batch_size : `int` or `List[int|tuple(size, random_seed)]`
-        batch size for inference, random seed is needed 
+        batch size for inference, random seed is needed
         for child random generators
     dtype : `str`
         cast data to specific type
@@ -109,10 +111,10 @@ class Minibatch(tt.TensorVariable):
     random_seed : `int`
         random seed that is used by default
     update_shared_f : `callable`
-        returns :class:`ndarray` that will be carefully 
+        returns :class:`ndarray` that will be carefully
         stored to underlying shared variable
-        you can use it to change source of 
-        minibatches programmatically 
+        you can use it to change source of
+        minibatches programmatically
     in_memory_size : `int` or `List[int|slice|Ellipsis]`
         data size for storing in theano.shared
 
@@ -132,7 +134,7 @@ class Minibatch(tt.TensorVariable):
     >>> x = Minibatch(data, batch_size=10)
 
     Note, that your data is cast to `floatX` if it is not integer type
-    But you still can add `dtype` kwarg for :class:`Minibatch` 
+    But you still can add `dtype` kwarg for :class:`Minibatch`
 
     in case we want 10 sampled rows and columns
     `[(size, seed), (size, seed)]` it is
@@ -173,7 +175,7 @@ class Minibatch(tt.TensorVariable):
     >>> x.update_shared()
 
     To be more concrete about how we get minibatch, here is a demo
-    1) create shared variable 
+    1) create shared variable
     >>> shared = theano.shared(data)
 
     2) create random slice of size 10
@@ -182,7 +184,7 @@ class Minibatch(tt.TensorVariable):
     3) take that slice
     >>> minibatch = shared[ridx]
 
-    That's done. Next you can use this minibatch somewhere else. 
+    That's done. Next you can use this minibatch somewhere else.
     You can see that implementation does not require fixed shape
     for shared variable. Feel free to use that if needed.
 
@@ -213,7 +215,7 @@ class Minibatch(tt.TensorVariable):
     We take slice only for the first and last dimension
     >>> assert x.eval().shape == (2, 20, 30, 40, 10)
 
-    2) Skipping particular dimension, `total_size = (10, None, 30)` 
+    2) Skipping particular dimension, `total_size = (10, None, 30)`
     >>> x = Minibatch(moredata, [2, None, 20])
     >>> assert x.eval().shape == (2, 20, 20, 40, 50)
 
@@ -221,7 +223,7 @@ class Minibatch(tt.TensorVariable):
     >>> x = Minibatch(moredata, [2, None, 20, Ellipsis, 10])
     >>> assert x.eval().shape == (2, 20, 20, 40, 10)
     """
-    @theano.configparser.change_flags(compute_test_value='raise')
+    # @theano.configparser.change_flags(compute_test_value='raise')
     def __init__(self, data, batch_size=128, dtype=None, broadcastable=None, name='Minibatch',
                  random_seed=42, update_shared_f=None, in_memory_size=None):
         if dtype is None:

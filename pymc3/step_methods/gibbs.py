@@ -9,8 +9,8 @@ from numpy import array, max, exp, cumsum, nested_iters, empty, searchsorted, on
 from numpy.random import uniform
 from warnings import warn
 
-from theano.gof.graph import inputs
-from theano.tensor import add
+# from theano.gof.graph import inputs
+# from theano.tensor import add
 from ..model import modelcontext
 __all__ = ['ElemwiseCategorical']
 

@@ -99,8 +99,8 @@ from functools import partial
 from collections import OrderedDict
 import numpy as np
 
-import theano
-import theano.tensor as tt
+# import theano
+# import theano.tensor as tt
 import pymc3 as pm
 
 
@@ -535,7 +535,7 @@ def adagrad(loss_or_grads=None, params=None, learning_rate=1.0, epsilon=1e-6):
 def adagrad_window(loss_or_grads=None, params=None,
                    learning_rate=0.001, epsilon=.1, n_win=10):
     """Returns a function that returns parameter updates.
-    Instead of accumulated estimate, uses running window 
+    Instead of accumulated estimate, uses running window
 
     Parameters
     ----------

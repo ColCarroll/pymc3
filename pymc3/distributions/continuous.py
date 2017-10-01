@@ -8,7 +8,7 @@ nodes in PyMC.
 from __future__ import division
 
 import numpy as np
-import theano.tensor as tt
+# import theano.tensor as tt
 from scipy import stats
 from scipy.interpolate import InterpolatedUnivariateSpline
 import warnings
@@ -274,10 +274,14 @@ class Normal(Continuous):
 
     def __init__(self, mu=0, sd=None, tau=None, **kwargs):
         tau, sd = get_tau_sd(tau=tau, sd=sd)
-        self.sd = tt.as_tensor_variable(sd)
-        self.tau = tt.as_tensor_variable(tau)
+        #  THEANO self.sd = tt.as_tensor_variable(sd)
+        #  THEANO self.tau = tt.as_tensor_variable(tau)
 
-        self.mean = self.median = self.mode = self.mu = mu = tt.as_tensor_variable(mu)
+        #  THEANO self.mean = self.median = self.mode = self.mu = mu = tt.as_tensor_variable(mu)
+        self.sd = sd
+        self.tau = tau
+
+        self.mean = self.median = self.mode = self.mu = mu
         self.variance = 1. / self.tau
 
         assert_negative_support(sd, 'sd', 'Normal')
@@ -1170,9 +1174,12 @@ class HalfCauchy(PositiveContinuous):
 
     def __init__(self, beta, *args, **kwargs):
         super(HalfCauchy, self).__init__(*args, **kwargs)
-        self.mode = tt.as_tensor_variable(0)
-        self.median = tt.as_tensor_variable(beta)
-        self.beta = tt.as_tensor_variable(beta)
+        #  THEANO self.mode = tt.as_tensor_variable(0)
+        #  THEANO self.median = tt.as_tensor_variable(beta)
+        #  THEANO self.beta = tt.as_tensor_variable(beta)
+        self.mode = 0
+        self.median = beta
+        self.beta = beta
 
         assert_negative_support(beta, 'beta', 'HalfCauchy')
 

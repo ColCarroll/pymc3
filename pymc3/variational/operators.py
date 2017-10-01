@@ -1,5 +1,5 @@
-from theano import tensor as tt
-from pymc3.theanof import change_flags
+# from theano import tensor as tt
+# from theano.configparser import change_flags
 from . import opvi
 from pymc3.variational.opvi import Operator, ObjectiveFunction
 from pymc3.variational.stein import Stein
@@ -41,7 +41,7 @@ class KSDObjective(ObjectiveFunction):
             raise opvi.ParametrizationError('Op should be KSD')
         ObjectiveFunction.__init__(self, op, tf)
 
-    @change_flags(compute_test_value='off')
+    #  THEANO @change_flags(compute_test_value='off')
     def __call__(self, nmc, **kwargs):
         op = self.op  # type: KSD
         grad = op.apply(self.tf)
