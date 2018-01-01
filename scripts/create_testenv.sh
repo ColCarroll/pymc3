@@ -15,7 +15,7 @@ do
     shift
 done
 
-command -v conda >/dev/null 2>&1 || {
+command -v ${HOME}/miniconda3/bin/conda >/dev/null 2>&1 || {
   echo "Requires conda but it is not installed.  Run install_miniconda.sh." >&2;
   exit 1;
 }
