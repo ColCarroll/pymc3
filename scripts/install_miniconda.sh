@@ -43,6 +43,6 @@ else
   echo "Miniconda already installed at ${INSTALL_FOLDER}.  Updating, adding to path and exiting"
 fi
 
-echo 'export PATH="$INSTALL_FOLDER/bin:$PATH"' >> $BASH_ENV
+echo 'export PATH="'${INSTALL_FOLDER}'/bin:$PATH"' >> $BASH_ENV
 echo "Adding $INSTALL_FOLDER to PATH.  Consider adding it in your .rc file as well."
 ${INSTALL_FOLDER}/bin/conda update -q -y conda
