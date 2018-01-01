@@ -21,6 +21,8 @@ jobs:
           name: install dependencies
           command: |
               source $BASH_ENV
+              echo $BASH_ENV
+              cat $BASH_ENV
               . ./scripts/create_testenv.sh
               pip install coveralls pylint
               pip install travis-sphinx==2.0.0
