@@ -6,8 +6,8 @@ jobs:
       - image: circleci/python:3.6.1
     environment:
       - PYTHON_VERSION: 3.6
-	  - FLOATX: float32
-	  - RUN_PYLINT: true
+      - FLOATX: float32
+      - RUN_PYLINT: true
     steps:
       - checkout
       - run:
@@ -15,8 +15,8 @@ jobs:
           command: ./scripts/install_miniconda.sh
       - restore_cache:
           keys: 
-	          - v1-dependencies-{{ checksum "requirements.txt" }}
-	          - v1-dependencies-
+              - v1-dependencies-{{ checksum "requirements.txt" }}
+              - v1-dependencies-
       - run: 
           name: install dependencies
           command: |
