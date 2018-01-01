@@ -44,5 +44,6 @@ else
 fi
 
 echo 'export PATH="$INSTALL_FOLDER/bin:$PATH"' >> $BASH_ENV
+source $BASH_ENV
 echo "Adding $INSTALL_FOLDER to PATH.  Consider adding it in your .rc file as well."
 conda update -q -y conda
