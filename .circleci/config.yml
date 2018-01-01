@@ -1,0 +1,35 @@
+version: 2
+
+jobs:
+  python3:
+    docker:
+      - image: circleci/python:3.6.1
+    environment:
+      - PYTHON_VERSION: 3.6
+	  - FLOATX: float32
+	  - RUN_PYLINT: true
+    steps:
+      - checkout
+      - run:
+          name: install miniconda
+          command: ./scripts/install_miniconda.sh
+      - restore_cache:
+          keys: 
+	          - v1-dependencies-{{ checksum "requirements.txt" }}
+	          - v1-dependencies-
+      - run: 
+          name: install dependencies
+          command: |
+              . ./scripts/create_testenv.sh
+              pip install coveralls pylint
+              pip install travis-sphinx==2.0.0
+              pip install -r requirements-dev.txt
+      - save_cache:
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          paths:
+            - ~/miniconda3
+      - run: 
+          name: run tests 
+          command: | 
+              source activate testenv
+              python -m pytest -v --cov=pymc3 --durations=10 pymc3/tests/
