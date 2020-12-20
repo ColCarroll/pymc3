@@ -1,0 +1,3277 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conditional Autoregressive (CAR) model &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">arviz</span> <span class="k">as</span> <span class="nn">az</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+<span class="kn">import</span> <span class="nn">theano</span>
+<span class="kn">import</span> <span class="nn">theano.tensor</span> <span class="k">as</span> <span class="nn">tt</span>
+
+<span class="kn">from</span> <span class="nn">pymc3.distributions</span> <span class="kn">import</span> <span class="n">continuous</span><span class="p">,</span> <span class="n">distribution</span>
+<span class="kn">from</span> <span class="nn">theano</span> <span class="kn">import</span> <span class="n">scan</span><span class="p">,</span> <span class="n">shared</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">config</span> InlineBackend.figure_format = &#39;retina&#39;
+<span class="n">RANDOM_SEED</span> <span class="o">=</span> <span class="mi">8927</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+<span class="n">az</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;arviz-darkgrid&quot;</span><span class="p">)</span>
+<span class="n">floatX</span> <span class="o">=</span> <span class="s2">&quot;float32&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Conditional-Autoregressive-(CAR)-model">
+<h1>Conditional Autoregressive (CAR) model<a class="headerlink" href="#Conditional-Autoregressive-(CAR)-model" title="Permalink to this headline">¶</a></h1>
+<p>A walkthrough of implementing a Conditional Autoregressive (CAR) model in <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code>, with <code class="docutils literal notranslate"><span class="pre">WinBUGS</span></code>/<code class="docutils literal notranslate"><span class="pre">PyMC2</span></code> and <code class="docutils literal notranslate"><span class="pre">Stan</span></code> code as references.</p>
+<p>As a probabilistic language, there are some fundamental differences between <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code> and other alternatives such as <code class="docutils literal notranslate"><span class="pre">WinBUGS</span></code>, <code class="docutils literal notranslate"><span class="pre">JAGS</span></code>, and <code class="docutils literal notranslate"><span class="pre">Stan</span></code>. In this notebook, I will summarise some heuristics and intuition I got over the past two years using <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code>. I will outline some thinking in how I approach a modelling problem using <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code>, and how thinking in linear algebra solves most of the programming problems. I hope this notebook will shed some light onto the design and features of
+<code class="docutils literal notranslate"><span class="pre">PyMC3</span></code>, and similar languages that are built on linear algebra packages with a static world view (e.g., Edward, which is based on Tensorflow).</p>
+<p>For more resources comparing between PyMC3 codes and other probabilistic languages: * <a class="reference external" href="https://github.com/aloctavodia/Doing_bayesian_data_analysis">PyMC3 port of “Doing Bayesian Data Analysis” - PyMC3 vs WinBUGS/JAGS/Stan</a> * <a class="reference external" href="https://github.com/junpenglao/Bayesian-Cognitive-Modeling-in-Pymc3">PyMC3 port of “Bayesian Cognitive Modeling” - PyMC3 vs WinBUGS/JAGS/Stan</a> * <a class="reference external" href="https://github.com/aloctavodia/Statistical-Rethinking-with-Python-and-PyMC3">PyMC3 port of “Statistical Rethinking” - PyMC3 vs
+Stan</a></p>
+<div class="section" id="Background-information">
+<h2>Background information<a class="headerlink" href="#Background-information" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Suppose we want to implement a <a class="reference external" href="http://www.statsref.com/HTML/index.html?car_models.html">Conditional Autoregressive (CAR) model</a> with examples in <a class="reference external" href="http://glau.ca/?p=340">WinBUGS/PyMC2</a> and <a class="reference external" href="http://mc-stan.org/documentation/case-studies/mbjoseph-CARStan.html">Stan</a>.</div>
+<div class="line">For the sake of brevity, I will not go into the details of the CAR model. The essential idea is autocorrelation, which is informally “correlation with itself”. In a CAR model, the probability of values estimated at any given location <span class="math notranslate nohighlight">\(y_i\)</span> are conditional on some neighboring values <span class="math notranslate nohighlight">\(y_j, _{j \neq i}\)</span> (in another word, correlated/covariated with these values):</div>
+</div>
+<div class="math notranslate nohighlight">
+\[y_i \mid y_j, j \neq i \sim \mathcal{N}(\alpha \sum_{j = 1}^n b_{ij} y_j, \sigma_i^{2})\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sigma_i^{2}\)</span> is a spatially varying covariance parameter, and <span class="math notranslate nohighlight">\(b_{ii} = 0\)</span>.</p>
+<p>Here we will demonstrate the implementation of a CAR model using a canonical example: the lip cancer risk data in Scotland between 1975 and 1980. The original data is from (Kemp et al. 1985). This dataset includes observed lip cancer case counts at 56 spatial units in Scotland, with the expected number of cases as intercept, and an area-specific continuous variable coded for the proportion of the population employed in agriculture, fishing, or forestry (AFF). We want to model how lip cancer
+rates (<code class="docutils literal notranslate"><span class="pre">O</span></code> below) relate to AFF (<code class="docutils literal notranslate"><span class="pre">aff</span></code> below), as exposure to sunlight is a risk factor.</p>
+<div class="math notranslate nohighlight">
+\[O_i \sim \mathcal{Poisson}(\text{exp}(\beta_0 + \beta_1*aff + \phi_i + \log(\text{E}_i)))\]</div>
+<div class="math notranslate nohighlight">
+\[\phi_i \mid \phi_j, j \neq i \sim \mathcal{N}(\alpha \sum_{j = 1}^n b_{ij} \phi_j, \sigma_i^{2})\]</div>
+<p>Setting up the data:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Read the data from file containing columns: NAME, CANCER, CEXP, AFF, ADJ, WEIGHTS</span>
+<span class="n">df_scot_cancer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;scotland_lips_cancer.csv&quot;</span><span class="p">))</span>
+
+<span class="c1"># name of the counties</span>
+<span class="n">county</span> <span class="o">=</span> <span class="n">df_scot_cancer</span><span class="p">[</span><span class="s2">&quot;NAME&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+<span class="c1"># observed</span>
+<span class="n">O</span> <span class="o">=</span> <span class="n">df_scot_cancer</span><span class="p">[</span><span class="s2">&quot;CANCER&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">O</span><span class="p">)</span>
+
+<span class="c1"># expected (E) rates, based on the age of the local population</span>
+<span class="n">E</span> <span class="o">=</span> <span class="n">df_scot_cancer</span><span class="p">[</span><span class="s2">&quot;CEXP&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">logE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+
+<span class="c1"># proportion of the population engaged in agriculture, forestry, or fishing (AFF)</span>
+<span class="n">aff</span> <span class="o">=</span> <span class="n">df_scot_cancer</span><span class="p">[</span><span class="s2">&quot;AFF&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">/</span> <span class="mf">10.0</span>
+
+<span class="c1"># Spatial adjacency information: column (ADJ) contains list entries which are preprocessed to obtain adj as list of lists</span>
+<span class="n">adj</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_scot_cancer</span><span class="p">[</span><span class="s2">&quot;ADJ&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;][&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)])</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="c1"># Change to Python indexing (i.e. -1)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">adj</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">adj</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+        <span class="n">adj</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">adj</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="c1"># spatial weight: column (WEIGHTS) contains list entries which are preprocessed to obtain weigths as list of lists</span>
+<span class="n">weights</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_scot_cancer</span><span class="p">[</span><span class="s2">&quot;WEIGHTS&quot;</span><span class="p">]</span>
+    <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;][&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)])</span>
+    <span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">Wplus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="A-WinBUGS/PyMC2-implementation">
+<h2>A WinBUGS/PyMC2 implementation<a class="headerlink" href="#A-WinBUGS/PyMC2-implementation" title="Permalink to this headline">¶</a></h2>
+<p>The classical <code class="docutils literal notranslate"><span class="pre">WinBUGS</span></code> implementation (more information <a class="reference external" href="http://glau.ca/?p=340">here</a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span>
+<span class="p">{</span>
+   <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">regions</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">O</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">~</span> <span class="n">dpois</span><span class="p">(</span><span class="n">mu</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+      <span class="n">log</span><span class="p">(</span><span class="n">mu</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&lt;-</span> <span class="n">log</span><span class="p">(</span><span class="n">E</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">beta0</span> <span class="o">+</span> <span class="n">beta1</span><span class="o">*</span><span class="n">aff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="mi">10</span> <span class="o">+</span> <span class="n">phi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">theta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+      <span class="n">theta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">~</span> <span class="n">dnorm</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="n">tau</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
+   <span class="p">}</span>
+   <span class="n">phi</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">regions</span><span class="p">]</span> <span class="o">~</span> <span class="n">car</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">adj</span><span class="p">[],</span> <span class="n">weights</span><span class="p">[],</span> <span class="n">Wplus</span><span class="p">[],</span> <span class="n">tau</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
+
+   <span class="n">beta0</span> <span class="o">~</span> <span class="n">dnorm</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0E-5</span><span class="p">)</span>  <span class="c1"># vague prior on grand intercept</span>
+   <span class="n">beta1</span> <span class="o">~</span> <span class="n">dnorm</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0E-5</span><span class="p">)</span>  <span class="c1"># vague prior on covariate effect</span>
+
+   <span class="n">tau</span><span class="o">.</span><span class="n">h</span> <span class="o">~</span> <span class="n">dgamma</span><span class="p">(</span><span class="mf">3.2761</span><span class="p">,</span> <span class="mf">1.81</span><span class="p">)</span>
+   <span class="n">tau</span><span class="o">.</span><span class="n">c</span> <span class="o">~</span> <span class="n">dgamma</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+   <span class="n">sd</span><span class="o">.</span><span class="n">h</span> <span class="o">&lt;-</span> <span class="n">sd</span><span class="p">(</span><span class="n">theta</span><span class="p">[])</span> <span class="c1"># marginal SD of heterogeneity effects</span>
+   <span class="n">sd</span><span class="o">.</span><span class="n">c</span> <span class="o">&lt;-</span> <span class="n">sd</span><span class="p">(</span><span class="n">phi</span><span class="p">[])</span>   <span class="c1"># marginal SD of clustering (spatial) effects</span>
+
+   <span class="n">alpha</span> <span class="o">&lt;-</span> <span class="n">sd</span><span class="o">.</span><span class="n">c</span> <span class="o">/</span> <span class="p">(</span><span class="n">sd</span><span class="o">.</span><span class="n">h</span> <span class="o">+</span> <span class="n">sd</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The main challenge to porting this model to <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code> is the <code class="docutils literal notranslate"><span class="pre">car.normal</span></code> function in <code class="docutils literal notranslate"><span class="pre">WinBUGS</span></code>. It is a likelihood function that conditions each realization on some neigbour realization (a smoothed property). In <code class="docutils literal notranslate"><span class="pre">PyMC2</span></code>, it could be implemented as a <cite>custom likelihood function (a ``&#64;stochastic`</cite> node) <code class="docutils literal notranslate"><span class="pre">mu_phi</span></code> &lt;<a class="reference external" href="http://glau.ca/?p=340">http://glau.ca/?p=340</a>&gt;`__:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@stochastic</span>
+<span class="k">def</span> <span class="nf">mu_phi</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="n">tau_c</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">)):</span>
+    <span class="c1"># Calculate mu based on average of neighbours</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">value</span><span class="p">[</span><span class="n">adj</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span><span class="o">/</span><span class="n">Wplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
+    <span class="c1"># Scale precision to the number of neighbours</span>
+    <span class="n">taux</span> <span class="o">=</span> <span class="n">tau</span><span class="o">*</span><span class="n">Wplus</span>
+    <span class="k">return</span> <span class="n">normal_like</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">taux</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can just define <code class="docutils literal notranslate"><span class="pre">mu_phi</span></code> similarly and wrap it in a <code class="docutils literal notranslate"><span class="pre">pymc3.DensityDist</span></code>, however, doing so usually results in a very slow model (both in compling and sampling). In general, porting pymc2 code into pymc3 (or even generally porting <code class="docutils literal notranslate"><span class="pre">WinBUGS</span></code>, <code class="docutils literal notranslate"><span class="pre">JAGS</span></code>, or <code class="docutils literal notranslate"><span class="pre">Stan</span></code> code into <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code>) that use a <code class="docutils literal notranslate"><span class="pre">for</span></code> loops tend to perform poorly in <code class="docutils literal notranslate"><span class="pre">theano</span></code>, the backend of <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code>.</p>
+<p>The underlying mechanism in <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code> is very different compared to <code class="docutils literal notranslate"><span class="pre">PyMC2</span></code>, using <code class="docutils literal notranslate"><span class="pre">for</span></code> loops to generate RV or stacking multiple RV with arguments such as <code class="docutils literal notranslate"><span class="pre">[pm.Binomial('obs%'%i,</span> <span class="pre">p[i],</span> <span class="pre">n)</span> <span class="pre">for</span> <span class="pre">i</span> <span class="pre">in</span> <span class="pre">range(K)]</span></code> generate unnecessary large number of nodes in <code class="docutils literal notranslate"><span class="pre">theano</span></code> graph, which then slows down compilation appreciably.</p>
+<p>The easiest way is to move the loop out of <code class="docutils literal notranslate"><span class="pre">pm.Model</span></code>. And usually is not difficult to do. For example, in <code class="docutils literal notranslate"><span class="pre">Stan</span></code> you can have a <code class="docutils literal notranslate"><span class="pre">transformed</span> <span class="pre">data{}</span></code> block; in <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code> you just need to compute it before defining your Model.</p>
+<p>If it is absolutely necessary to use a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop, you can use a theano loop (i.e., <code class="docutils literal notranslate"><span class="pre">theano.scan</span></code>), which you can find some introduction on the <a class="reference external" href="http://deeplearning.net/software/theano/tutorial/loop.html">theano website</a> and see a usecase in PyMC3 <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/distributions/timeseries.py#L125-L130">timeseries distribution</a>.</p>
+</div>
+<div class="section" id="PyMC3-implementation-using-theano.scan">
+<h2>PyMC3 implementation using <code class="docutils literal notranslate"><span class="pre">theano.scan</span></code><a class="headerlink" href="#PyMC3-implementation-using-theano.scan" title="Permalink to this headline">¶</a></h2>
+<p>So lets try to implement the CAR model using <code class="docutils literal notranslate"><span class="pre">theano.scan</span></code>. First we create a <code class="docutils literal notranslate"><span class="pre">theano</span></code> function with <code class="docutils literal notranslate"><span class="pre">theano.scan</span></code> and check if it really works by comparing its result to the for-loop.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span>
+        <span class="n">N</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="n">theano</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">floatX</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">maxwz</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">])</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+<span class="n">wmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">maxwz</span><span class="p">))</span>
+<span class="n">amat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">maxwz</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">weights</span><span class="p">):</span>
+    <span class="n">wmat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">))]</span> <span class="o">=</span> <span class="n">w</span>
+    <span class="n">amat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">))]</span> <span class="o">=</span> <span class="n">adj</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<span class="c1"># defining the tensor variables</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">vector</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">x</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span> <span class="o">=</span> <span class="n">value</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="c1"># provide Theano with a default test-value</span>
+<span class="n">w</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span> <span class="o">=</span> <span class="n">wmat</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
+<span class="n">a</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span> <span class="o">=</span> <span class="n">amat</span>
+
+
+<span class="k">def</span> <span class="nf">get_mu</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">&quot;int32&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">a1</span><span class="p">])</span> <span class="o">/</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+
+<span class="n">results</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">get_mu</span><span class="p">,</span> <span class="n">sequences</span><span class="o">=</span><span class="p">[</span><span class="n">w</span><span class="p">,</span> <span class="n">a</span><span class="p">])</span>
+<span class="n">compute_elementwise</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">a</span><span class="p">],</span> <span class="n">outputs</span><span class="o">=</span><span class="n">results</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">compute_elementwise</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">wmat</span><span class="p">,</span> <span class="n">amat</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">mu_phi</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="c1"># Calculate mu based on average of neighbours</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">value</span><span class="p">[</span><span class="n">adj</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="o">/</span> <span class="n">Wplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">mu</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">mu_phi</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[-0.03256903  1.15369772 -0.88367923  0.19739633  0.2086316  -0.60637122
+  0.0821804  -1.37764807 -0.29132894  0.05172231 -0.14216446  0.08377788
+  0.39272752 -0.44500841  0.09997776  0.26546058  0.66625458  0.02811006
+  0.28666674  0.78806007 -0.13624863  0.03447581  0.07280037 -0.57371348
+ -0.14919659 -0.03653583 -0.39487311  1.04195921  0.14203152 -0.01594515
+ -0.01352197  0.00947096  0.37859961 -0.38082245  0.55939024 -0.10175728
+ -0.02190934  0.34201749 -0.41573475 -0.07256629  0.39001316  0.06973286
+  0.0839806   0.3099865  -0.27618815 -0.55965603  0.39102644 -0.4616728
+ -0.78256164  0.11348734  0.29724215  0.37958576  0.22718645  0.09669855
+  0.0420775   0.26230918]
+[-0.03256903  1.15369772 -0.88367923  0.19739633  0.2086316  -0.60637122
+  0.0821804  -1.37764807 -0.29132894  0.05172231 -0.14216446  0.08377788
+  0.39272752 -0.44500841  0.09997776  0.26546058  0.66625458  0.02811006
+  0.28666674  0.78806007 -0.13624863  0.03447581  0.07280037 -0.57371348
+ -0.14919659 -0.03653583 -0.39487311  1.04195921  0.14203152 -0.01594515
+ -0.01352197  0.00947096  0.37859961 -0.38082245  0.55939024 -0.10175728
+ -0.02190934  0.34201749 -0.41573475 -0.07256629  0.39001316  0.06973286
+  0.0839806   0.3099865  -0.27618815 -0.55965603  0.39102644 -0.4616728
+ -0.78256164  0.11348734  0.29724215  0.37958576  0.22718645  0.09669855
+  0.0420775   0.26230918]
+</pre></div></div>
+</div>
+<p>Since it produces the same result as the orignial for-loop, we will wrap it as a new distribution with a log-likelihood function in <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">CAR</span><span class="p">(</span><span class="n">distribution</span><span class="o">.</span><span class="n">Continuous</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Conditional Autoregressive (CAR) distribution</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    a : list of adjacency information</span>
+<span class="sd">    w : list of weight information</span>
+<span class="sd">    tau : precision at each location</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span> <span class="nf">get_mu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">weigth_mu</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+            <span class="n">a1</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">&quot;int32&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">a1</span><span class="p">])</span> <span class="o">/</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+        <span class="n">mu_w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">scan</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">weigth_mu</span><span class="p">,</span> <span class="n">sequences</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">mu_w</span>
+
+    <span class="k">def</span> <span class="nf">logp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">mu_w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mu</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span>
+        <span class="k">return</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">continuous</span><span class="o">.</span><span class="n">Normal</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu_w</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span><span class="o">.</span><span class="n">logp</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>We then use it in our <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code> version of the CAR model:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model1</span><span class="p">:</span>
+    <span class="c1"># Vague prior on intercept</span>
+    <span class="n">beta0</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta0&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">1.0e-5</span><span class="p">)</span>
+    <span class="c1"># Vague prior on covariate effect</span>
+    <span class="n">beta1</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta1&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">1.0e-5</span><span class="p">)</span>
+
+    <span class="c1"># Random effects (hierarchial) prior</span>
+    <span class="n">tau_h</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;tau_h&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">3.2761</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">1.81</span><span class="p">)</span>
+    <span class="c1"># Spatial clustering prior</span>
+    <span class="n">tau_c</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;tau_c&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Regional random effects</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;theta&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau_h</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">mu_phi</span> <span class="o">=</span> <span class="n">CAR</span><span class="p">(</span><span class="s2">&quot;mu_phi&quot;</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">wmat</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">amat</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau_c</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+
+    <span class="c1"># Zero-centre phi</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="n">mu_phi</span> <span class="o">-</span> <span class="n">tt</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mu_phi</span><span class="p">))</span>
+
+    <span class="c1"># Mean model</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">logE</span> <span class="o">+</span> <span class="n">beta0</span> <span class="o">+</span> <span class="n">beta1</span> <span class="o">*</span> <span class="n">aff</span> <span class="o">+</span> <span class="n">theta</span> <span class="o">+</span> <span class="n">phi</span><span class="p">))</span>
+
+    <span class="c1"># Likelihood</span>
+    <span class="n">Yi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Poisson</span><span class="p">(</span><span class="s2">&quot;Yi&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">O</span><span class="p">)</span>
+
+    <span class="c1"># Marginal SD of heterogeniety effects</span>
+    <span class="n">sd_h</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;sd_h&quot;</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+    <span class="c1"># Marginal SD of clustering (spatial) effects</span>
+    <span class="n">sd_c</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;sd_c&quot;</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span>
+    <span class="c1"># Proportion sptial variance</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="n">sd_c</span> <span class="o">/</span> <span class="p">(</span><span class="n">sd_h</span> <span class="o">+</span> <span class="n">sd_c</span><span class="p">))</span>
+
+    <span class="n">infdata1</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+        <span class="mi">1000</span><span class="p">,</span>
+        <span class="n">tune</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">init</span><span class="o">=</span><span class="s2">&quot;advi&quot;</span><span class="p">,</span>
+        <span class="n">target_accept</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="n">max_treedepth</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+        <span class="n">return_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='16398' class='' max='200000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  8.20% [16398/200000 00:16<03:03 Average Loss = 203.36]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Convergence achieved at 16500
+Interrupted at 16,499 [8%]: Average Loss = 345.94
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [mu_phi, theta, tau_c, tau_h, beta1, beta0]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [6000/6000 05:00<00:00 Sampling 4 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 4 chains for 500 tune and 1_000 draw iterations (2_000 + 4_000 draws total) took 301 seconds.
+The rhat statistic is larger than 1.4 for some parameters. The sampler did not converge.
+The estimated number of effective samples is smaller than 200 for some parameters.
+</pre></div></div>
+</div>
+<p>Note: there are some hidden problems with the model, some regions of the parameter space are quite difficult to sample from. Here I am using ADVI as initialization, which gives a smaller variance of the mass matrix. It keeps the sampler around the mode.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_trace</span><span class="p">(</span><span class="n">infdata1</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">&quot;sd_h&quot;</span><span class="p">,</span> <span class="s2">&quot;sd_c&quot;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_14_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_14_0.png" style="width: 1211px; height: 611px;" />
+</div>
+</div>
+<p>We also got a lot of Rhat warning, that’s because the Zero-centre phi introduce unidentification to the model:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">summary1</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">infdata1</span><span class="p">)</span>
+<span class="n">summary1</span><span class="p">[</span><span class="n">summary1</span><span class="p">[</span><span class="s2">&quot;r_hat&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1.05</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_mean</th>
+      <th>ess_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>mu_phi[0]</th>
+      <td>175.365</td>
+      <td>368.522</td>
+      <td>-217.156</td>
+      <td>799.593</td>
+      <td>178.151</td>
+      <td>137.750</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[1]</th>
+      <td>175.264</td>
+      <td>368.514</td>
+      <td>-217.062</td>
+      <td>799.332</td>
+      <td>178.147</td>
+      <td>137.744</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[2]</th>
+      <td>175.289</td>
+      <td>368.512</td>
+      <td>-217.037</td>
+      <td>799.785</td>
+      <td>178.148</td>
+      <td>137.745</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[3]</th>
+      <td>174.516</td>
+      <td>368.515</td>
+      <td>-217.975</td>
+      <td>798.649</td>
+      <td>178.148</td>
+      <td>137.719</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[4]</th>
+      <td>175.343</td>
+      <td>368.515</td>
+      <td>-217.005</td>
+      <td>799.412</td>
+      <td>178.148</td>
+      <td>137.746</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[5]</th>
+      <td>175.188</td>
+      <td>368.503</td>
+      <td>-217.167</td>
+      <td>799.809</td>
+      <td>178.143</td>
+      <td>137.738</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[6]</th>
+      <td>175.139</td>
+      <td>368.513</td>
+      <td>-217.232</td>
+      <td>799.189</td>
+      <td>178.147</td>
+      <td>137.739</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[7]</th>
+      <td>175.207</td>
+      <td>368.504</td>
+      <td>-217.303</td>
+      <td>799.763</td>
+      <td>178.145</td>
+      <td>137.741</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[8]</th>
+      <td>175.007</td>
+      <td>368.516</td>
+      <td>-217.048</td>
+      <td>799.499</td>
+      <td>178.149</td>
+      <td>137.736</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[9]</th>
+      <td>175.007</td>
+      <td>368.508</td>
+      <td>-217.321</td>
+      <td>799.023</td>
+      <td>178.145</td>
+      <td>137.733</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[10]</th>
+      <td>175.326</td>
+      <td>368.514</td>
+      <td>-217.090</td>
+      <td>799.384</td>
+      <td>178.148</td>
+      <td>137.746</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[11]</th>
+      <td>175.310</td>
+      <td>368.511</td>
+      <td>-217.104</td>
+      <td>799.357</td>
+      <td>178.147</td>
+      <td>137.744</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[12]</th>
+      <td>175.198</td>
+      <td>368.518</td>
+      <td>-217.064</td>
+      <td>799.598</td>
+      <td>178.149</td>
+      <td>137.742</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[13]</th>
+      <td>174.180</td>
+      <td>368.509</td>
+      <td>-218.106</td>
+      <td>798.798</td>
+      <td>178.146</td>
+      <td>137.705</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[14]</th>
+      <td>174.533</td>
+      <td>368.503</td>
+      <td>-217.864</td>
+      <td>798.439</td>
+      <td>178.143</td>
+      <td>137.716</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[15]</th>
+      <td>174.772</td>
+      <td>368.511</td>
+      <td>-217.671</td>
+      <td>798.663</td>
+      <td>178.146</td>
+      <td>137.726</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[16]</th>
+      <td>174.974</td>
+      <td>368.513</td>
+      <td>-217.195</td>
+      <td>799.203</td>
+      <td>178.147</td>
+      <td>137.733</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[17]</th>
+      <td>174.299</td>
+      <td>368.513</td>
+      <td>-218.131</td>
+      <td>798.458</td>
+      <td>178.147</td>
+      <td>137.711</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[18]</th>
+      <td>175.184</td>
+      <td>368.521</td>
+      <td>-217.285</td>
+      <td>799.266</td>
+      <td>178.151</td>
+      <td>137.743</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[19]</th>
+      <td>174.391</td>
+      <td>368.511</td>
+      <td>-218.213</td>
+      <td>798.576</td>
+      <td>178.147</td>
+      <td>137.714</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[20]</th>
+      <td>174.487</td>
+      <td>368.509</td>
+      <td>-218.084</td>
+      <td>798.590</td>
+      <td>178.146</td>
+      <td>137.716</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[21]</th>
+      <td>174.706</td>
+      <td>368.510</td>
+      <td>-217.803</td>
+      <td>798.459</td>
+      <td>178.145</td>
+      <td>137.723</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[22]</th>
+      <td>174.255</td>
+      <td>368.506</td>
+      <td>-218.227</td>
+      <td>798.131</td>
+      <td>178.145</td>
+      <td>137.708</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[23]</th>
+      <td>173.866</td>
+      <td>368.511</td>
+      <td>-218.869</td>
+      <td>797.673</td>
+      <td>178.147</td>
+      <td>137.695</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[24]</th>
+      <td>174.513</td>
+      <td>368.508</td>
+      <td>-217.918</td>
+      <td>798.342</td>
+      <td>178.145</td>
+      <td>137.716</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[25]</th>
+      <td>174.244</td>
+      <td>368.505</td>
+      <td>-218.070</td>
+      <td>798.446</td>
+      <td>178.143</td>
+      <td>137.706</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[26]</th>
+      <td>174.052</td>
+      <td>368.511</td>
+      <td>-218.570</td>
+      <td>798.030</td>
+      <td>178.146</td>
+      <td>137.701</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[27]</th>
+      <td>174.277</td>
+      <td>368.517</td>
+      <td>-218.181</td>
+      <td>798.366</td>
+      <td>178.149</td>
+      <td>137.711</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[28]</th>
+      <td>174.437</td>
+      <td>368.507</td>
+      <td>-217.987</td>
+      <td>798.423</td>
+      <td>178.145</td>
+      <td>137.714</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[29]</th>
+      <td>173.827</td>
+      <td>368.507</td>
+      <td>-218.562</td>
+      <td>797.972</td>
+      <td>178.144</td>
+      <td>137.691</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[30]</th>
+      <td>173.997</td>
+      <td>368.510</td>
+      <td>-218.535</td>
+      <td>797.960</td>
+      <td>178.146</td>
+      <td>137.699</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[31]</th>
+      <td>174.095</td>
+      <td>368.508</td>
+      <td>-218.345</td>
+      <td>798.311</td>
+      <td>178.145</td>
+      <td>137.702</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[32]</th>
+      <td>174.113</td>
+      <td>368.515</td>
+      <td>-218.415</td>
+      <td>798.264</td>
+      <td>178.148</td>
+      <td>137.705</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[33]</th>
+      <td>173.855</td>
+      <td>368.507</td>
+      <td>-218.763</td>
+      <td>797.645</td>
+      <td>178.144</td>
+      <td>137.693</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[34]</th>
+      <td>174.056</td>
+      <td>368.506</td>
+      <td>-218.382</td>
+      <td>798.185</td>
+      <td>178.145</td>
+      <td>137.701</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[35]</th>
+      <td>174.049</td>
+      <td>368.506</td>
+      <td>-218.506</td>
+      <td>798.046</td>
+      <td>178.145</td>
+      <td>137.701</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[36]</th>
+      <td>174.002</td>
+      <td>368.500</td>
+      <td>-218.261</td>
+      <td>798.144</td>
+      <td>178.142</td>
+      <td>137.697</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[37]</th>
+      <td>173.679</td>
+      <td>368.508</td>
+      <td>-218.934</td>
+      <td>797.950</td>
+      <td>178.146</td>
+      <td>137.688</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[38]</th>
+      <td>173.925</td>
+      <td>368.506</td>
+      <td>-218.584</td>
+      <td>797.757</td>
+      <td>178.144</td>
+      <td>137.696</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[39]</th>
+      <td>173.744</td>
+      <td>368.511</td>
+      <td>-218.538</td>
+      <td>798.085</td>
+      <td>178.147</td>
+      <td>137.691</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[40]</th>
+      <td>173.782</td>
+      <td>368.508</td>
+      <td>-218.434</td>
+      <td>797.948</td>
+      <td>178.146</td>
+      <td>137.692</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[41]</th>
+      <td>173.789</td>
+      <td>368.502</td>
+      <td>-218.704</td>
+      <td>797.772</td>
+      <td>178.142</td>
+      <td>137.688</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.42</td>
+    </tr>
+    <tr>
+      <th>mu_phi[42]</th>
+      <td>173.979</td>
+      <td>368.506</td>
+      <td>-218.531</td>
+      <td>798.007</td>
+      <td>178.143</td>
+      <td>137.696</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[43]</th>
+      <td>173.670</td>
+      <td>368.505</td>
+      <td>-218.977</td>
+      <td>797.518</td>
+      <td>178.144</td>
+      <td>137.686</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[44]</th>
+      <td>173.936</td>
+      <td>368.505</td>
+      <td>-218.600</td>
+      <td>797.965</td>
+      <td>178.143</td>
+      <td>137.694</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[45]</th>
+      <td>173.785</td>
+      <td>368.508</td>
+      <td>-218.366</td>
+      <td>798.158</td>
+      <td>178.146</td>
+      <td>137.692</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[46]</th>
+      <td>173.668</td>
+      <td>368.508</td>
+      <td>-218.812</td>
+      <td>797.661</td>
+      <td>178.147</td>
+      <td>137.688</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[47]</th>
+      <td>173.610</td>
+      <td>368.513</td>
+      <td>-219.018</td>
+      <td>797.681</td>
+      <td>178.148</td>
+      <td>137.687</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[48]</th>
+      <td>173.568</td>
+      <td>368.507</td>
+      <td>-219.224</td>
+      <td>797.455</td>
+      <td>178.146</td>
+      <td>137.684</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[49]</th>
+      <td>174.281</td>
+      <td>368.503</td>
+      <td>-218.298</td>
+      <td>798.272</td>
+      <td>178.142</td>
+      <td>137.706</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[50]</th>
+      <td>173.636</td>
+      <td>368.503</td>
+      <td>-219.057</td>
+      <td>797.613</td>
+      <td>178.143</td>
+      <td>137.683</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[51]</th>
+      <td>173.595</td>
+      <td>368.507</td>
+      <td>-218.613</td>
+      <td>797.867</td>
+      <td>178.145</td>
+      <td>137.684</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[52]</th>
+      <td>173.574</td>
+      <td>368.506</td>
+      <td>-218.595</td>
+      <td>798.050</td>
+      <td>178.145</td>
+      <td>137.683</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[53]</th>
+      <td>173.548</td>
+      <td>368.510</td>
+      <td>-218.972</td>
+      <td>797.742</td>
+      <td>178.147</td>
+      <td>137.684</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[54]</th>
+      <td>174.022</td>
+      <td>368.511</td>
+      <td>-218.659</td>
+      <td>798.018</td>
+      <td>178.146</td>
+      <td>137.700</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+    <tr>
+      <th>mu_phi[55]</th>
+      <td>173.948</td>
+      <td>368.511</td>
+      <td>-218.511</td>
+      <td>797.932</td>
+      <td>178.146</td>
+      <td>137.697</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>11.0</td>
+      <td>2.41</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_forest</span><span class="p">(</span>
+    <span class="n">infdata1</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;ridgeplot&quot;</span><span class="p">,</span>
+    <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">],</span>
+    <span class="n">combined</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">ridgeplot_overlap</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">ridgeplot_alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_17_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_17_0.png" style="width: 911px; height: 711px;" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">infdata1</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_18_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_18_0.png" style="width: 731px; height: 491px;" />
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">theano.scan</span></code> is much faster than using a python for loop, but it is still quite slow. One approach for improving it is to use linear algebra. That is, we should try to find a way to use matrix multiplication instead of looping (if you have experience in using MATLAB, it is the same philosophy). In our case, we can totally do that.</p>
+<p>For a similar problem, you can also have a look of <a class="reference external" href="https://github.com/junpenglao/Bayesian-Cognitive-Modeling-in-Pymc3">my port of Lee and Wagenmakers’ book</a>. For example, in Chapter 19, the Stan code use <a class="reference external" href="https://github.com/stan-dev/example-models/blob/master/Bayesian_Cognitive_Modeling/CaseStudies/NumberConcepts/NumberConcept_1_Stan.R#L28-L59">a for loop to generate the likelihood function</a>, and I <a class="reference external" href="http://nbviewer.jupyter.org/github/junpenglao/Bayesian-Cognitive-Modeling-in-Pymc3/blob/master/CaseStudies/NumberConceptDevelopment.ipynb#19.1-Knower-level-model-for-Give-N">generate the matrix outside and use matrix multiplication
+etc</a> to archive the same purpose.</p>
+</div>
+<div class="section" id="PyMC3-implementation-using-matrix-“trick”">
+<h2>PyMC3 implementation using matrix “trick”<a class="headerlink" href="#PyMC3-implementation-using-matrix-“trick”" title="Permalink to this headline">¶</a></h2>
+<p>Again, we try on some simulated data to make sure the implementation is correct.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">maxwz</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">])</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+<span class="n">wmat2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+<span class="n">amat2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">adj</span><span class="p">):</span>
+    <span class="n">amat2</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">wmat2</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span>
+        <span class="n">N</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="n">theano</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">floatX</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">amat2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">wmat2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">mu_phi</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="c1"># Calculate mu based on average of neighbours</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">value</span><span class="p">[</span><span class="n">adj</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="o">/</span> <span class="n">Wplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">mu</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">mu_phi</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[ 2.25588227e-01 -8.20210477e-01  7.14165670e-01  3.07251143e-01
+  2.92335128e-01 -5.55562972e-01 -7.35797893e-01  5.94110931e-01
+ -2.72989587e-01 -6.21479051e-01  2.82642230e-01 -7.27562577e-01
+  9.72894293e-03  2.15441546e-01  3.16608110e-01 -5.38879039e-01
+  1.94526179e-01  1.19573877e-01 -2.02771767e-01  3.22618936e-01
+ -1.65824491e-01 -1.21021601e+00  3.18736883e-01 -4.98013820e-01
+  6.09599805e-02  2.40591863e-01 -6.29610020e-04  4.11071335e-02
+ -2.92231409e-01 -4.30276690e-01  2.06124487e-01 -6.86948082e-02
+ -1.26157102e-01 -9.18024137e-02  6.81225357e-01 -3.23761738e-01
+  5.23813476e-01 -1.10626670e-01 -6.48965436e-01 -9.01164776e-01
+  2.04888768e-01 -2.66684442e-01 -2.17412828e-01 -1.33620266e-01
+ -1.46843946e-01 -2.11092061e-01  1.34030315e-01 -3.39439739e-01
+ -7.96140962e-01  2.34936057e-01 -1.86926585e-01 -4.09354076e-01
+ -1.03251174e-01 -5.12496749e-01 -4.13624363e-01  1.80577442e-02]
+[ 2.25588227e-01 -8.20210477e-01  7.14165670e-01  3.07251143e-01
+  2.92335128e-01 -5.55562972e-01 -7.35797893e-01  5.94110931e-01
+ -2.72989587e-01 -6.21479051e-01  2.82642230e-01 -7.27562577e-01
+  9.72894293e-03  2.15441546e-01  3.16608110e-01 -5.38879039e-01
+  1.94526179e-01  1.19573877e-01 -2.02771767e-01  3.22618936e-01
+ -1.65824491e-01 -1.21021601e+00  3.18736883e-01 -4.98013820e-01
+  6.09599805e-02  2.40591863e-01 -6.29610020e-04  4.11071335e-02
+ -2.92231409e-01 -4.30276690e-01  2.06124487e-01 -6.86948082e-02
+ -1.26157102e-01 -9.18024137e-02  6.81225357e-01 -3.23761738e-01
+  5.23813476e-01 -1.10626670e-01 -6.48965436e-01 -9.01164776e-01
+  2.04888768e-01 -2.66684442e-01 -2.17412828e-01 -1.33620266e-01
+ -1.46843946e-01 -2.11092061e-01  1.34030315e-01 -3.39439739e-01
+ -7.96140962e-01  2.34936057e-01 -1.86926585e-01 -4.09354076e-01
+ -1.03251174e-01 -5.12496749e-01 -4.13624363e-01  1.80577442e-02]
+</pre></div></div>
+</div>
+<p>Now create a new CAR distribution with the matrix multiplication instead of <code class="docutils literal notranslate"><span class="pre">theano.scan</span></code> to get the <code class="docutils literal notranslate"><span class="pre">mu</span></code></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">CAR2</span><span class="p">(</span><span class="n">distribution</span><span class="o">.</span><span class="n">Continuous</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Conditional Autoregressive (CAR) distribution</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    a : adjacency matrix</span>
+<span class="sd">    w : weight matrix</span>
+<span class="sd">    tau : precision at each location</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span> <span class="nf">logp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
+
+        <span class="n">mu_w</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">continuous</span><span class="o">.</span><span class="n">Normal</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu_w</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span><span class="o">.</span><span class="n">logp</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model2</span><span class="p">:</span>
+    <span class="c1"># Vague prior on intercept</span>
+    <span class="n">beta0</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta0&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">1.0e-5</span><span class="p">)</span>
+    <span class="c1"># Vague prior on covariate effect</span>
+    <span class="n">beta1</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta1&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">1.0e-5</span><span class="p">)</span>
+
+    <span class="c1"># Random effects (hierarchial) prior</span>
+    <span class="n">tau_h</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;tau_h&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">3.2761</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">1.81</span><span class="p">)</span>
+    <span class="c1"># Spatial clustering prior</span>
+    <span class="n">tau_c</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;tau_c&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Regional random effects</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;theta&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau_h</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">mu_phi</span> <span class="o">=</span> <span class="n">CAR2</span><span class="p">(</span><span class="s2">&quot;mu_phi&quot;</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">wmat2</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">amat2</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau_c</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+
+    <span class="c1"># Zero-centre phi</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="n">mu_phi</span> <span class="o">-</span> <span class="n">tt</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mu_phi</span><span class="p">))</span>
+
+    <span class="c1"># Mean model</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">logE</span> <span class="o">+</span> <span class="n">beta0</span> <span class="o">+</span> <span class="n">beta1</span> <span class="o">*</span> <span class="n">aff</span> <span class="o">+</span> <span class="n">theta</span> <span class="o">+</span> <span class="n">phi</span><span class="p">))</span>
+
+    <span class="c1"># Likelihood</span>
+    <span class="n">Yi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Poisson</span><span class="p">(</span><span class="s2">&quot;Yi&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">O</span><span class="p">)</span>
+
+    <span class="c1"># Marginal SD of heterogeniety effects</span>
+    <span class="n">sd_h</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;sd_h&quot;</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+    <span class="c1"># Marginal SD of clustering (spatial) effects</span>
+    <span class="n">sd_c</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;sd_c&quot;</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span>
+    <span class="c1"># Proportion sptial variance</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="n">sd_c</span> <span class="o">/</span> <span class="p">(</span><span class="n">sd_h</span> <span class="o">+</span> <span class="n">sd_c</span><span class="p">))</span>
+
+    <span class="n">infdata2</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+        <span class="mi">1000</span><span class="p">,</span>
+        <span class="n">tune</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">init</span><span class="o">=</span><span class="s2">&quot;advi&quot;</span><span class="p">,</span>
+        <span class="n">target_accept</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="n">max_treedepth</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+        <span class="n">return_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='16487' class='' max='200000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  8.24% [16487/200000 00:03<00:39 Average Loss = 202.66]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Convergence achieved at 16900
+Interrupted at 16,899 [8%]: Average Loss = 338.61
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [mu_phi, theta, tau_c, tau_h, beta1, beta0]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [6000/6000 00:56<00:00 Sampling 4 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 4 chains for 500 tune and 1_000 draw iterations (2_000 + 4_000 draws total) took 57 seconds.
+The rhat statistic is larger than 1.4 for some parameters. The sampler did not converge.
+The estimated number of effective samples is smaller than 200 for some parameters.
+</pre></div></div>
+</div>
+<p><strong>As you can see, it is appreciably faster using matrix multiplication.</strong></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">summary2</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">infdata2</span><span class="p">)</span>
+<span class="n">summary2</span><span class="p">[</span><span class="n">summary2</span><span class="p">[</span><span class="s2">&quot;r_hat&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1.05</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_mean</th>
+      <th>ess_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>mu_phi[0]</th>
+      <td>29.076</td>
+      <td>245.989</td>
+      <td>-425.818</td>
+      <td>388.013</td>
+      <td>111.959</td>
+      <td>84.513</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[1]</th>
+      <td>29.000</td>
+      <td>245.980</td>
+      <td>-425.952</td>
+      <td>387.926</td>
+      <td>111.954</td>
+      <td>84.510</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[2]</th>
+      <td>28.994</td>
+      <td>246.000</td>
+      <td>-425.650</td>
+      <td>388.224</td>
+      <td>111.966</td>
+      <td>84.519</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[3]</th>
+      <td>28.252</td>
+      <td>245.971</td>
+      <td>-426.657</td>
+      <td>387.110</td>
+      <td>111.949</td>
+      <td>84.506</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[4]</th>
+      <td>29.056</td>
+      <td>245.992</td>
+      <td>-425.765</td>
+      <td>387.904</td>
+      <td>111.960</td>
+      <td>84.514</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[5]</th>
+      <td>28.908</td>
+      <td>245.997</td>
+      <td>-425.880</td>
+      <td>388.138</td>
+      <td>111.966</td>
+      <td>84.519</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[6]</th>
+      <td>28.859</td>
+      <td>245.983</td>
+      <td>-425.961</td>
+      <td>387.830</td>
+      <td>111.957</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[7]</th>
+      <td>28.940</td>
+      <td>245.993</td>
+      <td>-425.777</td>
+      <td>387.958</td>
+      <td>111.964</td>
+      <td>84.517</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[8]</th>
+      <td>28.720</td>
+      <td>245.987</td>
+      <td>-426.006</td>
+      <td>387.682</td>
+      <td>111.958</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[9]</th>
+      <td>28.735</td>
+      <td>245.982</td>
+      <td>-426.243</td>
+      <td>387.557</td>
+      <td>111.956</td>
+      <td>84.511</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[10]</th>
+      <td>29.044</td>
+      <td>245.990</td>
+      <td>-425.548</td>
+      <td>388.004</td>
+      <td>111.960</td>
+      <td>84.514</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[11]</th>
+      <td>29.028</td>
+      <td>245.995</td>
+      <td>-425.704</td>
+      <td>388.058</td>
+      <td>111.963</td>
+      <td>84.516</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[12]</th>
+      <td>28.917</td>
+      <td>245.987</td>
+      <td>-425.954</td>
+      <td>387.818</td>
+      <td>111.957</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[13]</th>
+      <td>27.902</td>
+      <td>245.984</td>
+      <td>-426.922</td>
+      <td>386.918</td>
+      <td>111.956</td>
+      <td>84.511</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[14]</th>
+      <td>28.230</td>
+      <td>245.988</td>
+      <td>-426.431</td>
+      <td>387.230</td>
+      <td>111.960</td>
+      <td>84.515</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[15]</th>
+      <td>28.487</td>
+      <td>245.988</td>
+      <td>-426.110</td>
+      <td>387.548</td>
+      <td>111.960</td>
+      <td>84.515</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[16]</th>
+      <td>28.688</td>
+      <td>245.981</td>
+      <td>-426.016</td>
+      <td>387.680</td>
+      <td>111.955</td>
+      <td>84.510</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[17]</th>
+      <td>28.020</td>
+      <td>245.977</td>
+      <td>-426.864</td>
+      <td>386.932</td>
+      <td>111.953</td>
+      <td>84.509</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[18]</th>
+      <td>28.892</td>
+      <td>245.986</td>
+      <td>-425.857</td>
+      <td>387.955</td>
+      <td>111.957</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[19]</th>
+      <td>28.115</td>
+      <td>245.985</td>
+      <td>-426.847</td>
+      <td>386.944</td>
+      <td>111.955</td>
+      <td>84.511</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[20]</th>
+      <td>28.191</td>
+      <td>245.989</td>
+      <td>-426.539</td>
+      <td>387.026</td>
+      <td>111.963</td>
+      <td>84.517</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[21]</th>
+      <td>28.426</td>
+      <td>245.984</td>
+      <td>-426.382</td>
+      <td>387.549</td>
+      <td>111.958</td>
+      <td>84.513</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[22]</th>
+      <td>27.969</td>
+      <td>245.993</td>
+      <td>-426.554</td>
+      <td>387.104</td>
+      <td>111.961</td>
+      <td>84.515</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[23]</th>
+      <td>27.590</td>
+      <td>245.987</td>
+      <td>-427.080</td>
+      <td>386.605</td>
+      <td>111.957</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[24]</th>
+      <td>28.220</td>
+      <td>245.986</td>
+      <td>-426.470</td>
+      <td>387.350</td>
+      <td>111.961</td>
+      <td>84.515</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[25]</th>
+      <td>27.973</td>
+      <td>245.988</td>
+      <td>-426.703</td>
+      <td>387.040</td>
+      <td>111.960</td>
+      <td>84.514</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[26]</th>
+      <td>27.774</td>
+      <td>245.988</td>
+      <td>-427.010</td>
+      <td>386.806</td>
+      <td>111.955</td>
+      <td>84.510</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[27]</th>
+      <td>28.003</td>
+      <td>245.978</td>
+      <td>-426.589</td>
+      <td>387.169</td>
+      <td>111.952</td>
+      <td>84.508</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[28]</th>
+      <td>28.155</td>
+      <td>245.985</td>
+      <td>-426.398</td>
+      <td>387.266</td>
+      <td>111.958</td>
+      <td>84.513</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[29]</th>
+      <td>27.551</td>
+      <td>245.989</td>
+      <td>-426.999</td>
+      <td>386.797</td>
+      <td>111.958</td>
+      <td>84.513</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[30]</th>
+      <td>27.717</td>
+      <td>245.985</td>
+      <td>-427.012</td>
+      <td>386.761</td>
+      <td>111.955</td>
+      <td>84.510</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[31]</th>
+      <td>27.819</td>
+      <td>245.986</td>
+      <td>-426.992</td>
+      <td>386.784</td>
+      <td>111.956</td>
+      <td>84.511</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[32]</th>
+      <td>27.835</td>
+      <td>245.984</td>
+      <td>-427.027</td>
+      <td>386.634</td>
+      <td>111.957</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[33]</th>
+      <td>27.570</td>
+      <td>245.986</td>
+      <td>-427.049</td>
+      <td>386.650</td>
+      <td>111.958</td>
+      <td>84.513</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[34]</th>
+      <td>27.776</td>
+      <td>245.983</td>
+      <td>-427.043</td>
+      <td>386.654</td>
+      <td>111.955</td>
+      <td>84.510</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[35]</th>
+      <td>27.759</td>
+      <td>245.994</td>
+      <td>-426.826</td>
+      <td>386.938</td>
+      <td>111.960</td>
+      <td>84.515</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[36]</th>
+      <td>27.717</td>
+      <td>245.990</td>
+      <td>-426.968</td>
+      <td>386.638</td>
+      <td>111.960</td>
+      <td>84.514</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[37]</th>
+      <td>27.395</td>
+      <td>245.990</td>
+      <td>-427.283</td>
+      <td>386.474</td>
+      <td>111.959</td>
+      <td>84.513</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[38]</th>
+      <td>27.640</td>
+      <td>245.994</td>
+      <td>-427.011</td>
+      <td>386.533</td>
+      <td>111.961</td>
+      <td>84.515</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[39]</th>
+      <td>27.450</td>
+      <td>245.985</td>
+      <td>-427.123</td>
+      <td>386.452</td>
+      <td>111.956</td>
+      <td>84.511</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[40]</th>
+      <td>27.489</td>
+      <td>245.992</td>
+      <td>-427.026</td>
+      <td>386.447</td>
+      <td>111.959</td>
+      <td>84.514</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[41]</th>
+      <td>27.510</td>
+      <td>245.989</td>
+      <td>-427.096</td>
+      <td>386.690</td>
+      <td>111.958</td>
+      <td>84.513</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[42]</th>
+      <td>27.707</td>
+      <td>245.993</td>
+      <td>-427.099</td>
+      <td>386.600</td>
+      <td>111.962</td>
+      <td>84.516</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[43]</th>
+      <td>27.388</td>
+      <td>245.986</td>
+      <td>-427.276</td>
+      <td>386.562</td>
+      <td>111.957</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[44]</th>
+      <td>27.655</td>
+      <td>245.985</td>
+      <td>-426.991</td>
+      <td>386.699</td>
+      <td>111.958</td>
+      <td>84.513</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[45]</th>
+      <td>27.500</td>
+      <td>245.987</td>
+      <td>-427.099</td>
+      <td>386.421</td>
+      <td>111.957</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[46]</th>
+      <td>27.378</td>
+      <td>245.983</td>
+      <td>-427.165</td>
+      <td>386.493</td>
+      <td>111.956</td>
+      <td>84.511</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[47]</th>
+      <td>27.323</td>
+      <td>245.983</td>
+      <td>-427.393</td>
+      <td>386.392</td>
+      <td>111.955</td>
+      <td>84.511</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[48]</th>
+      <td>27.281</td>
+      <td>245.989</td>
+      <td>-427.254</td>
+      <td>386.360</td>
+      <td>111.958</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[49]</th>
+      <td>27.981</td>
+      <td>245.992</td>
+      <td>-426.561</td>
+      <td>386.968</td>
+      <td>111.964</td>
+      <td>84.518</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[50]</th>
+      <td>27.347</td>
+      <td>245.990</td>
+      <td>-427.411</td>
+      <td>386.545</td>
+      <td>111.959</td>
+      <td>84.514</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[51]</th>
+      <td>27.307</td>
+      <td>245.984</td>
+      <td>-427.552</td>
+      <td>386.183</td>
+      <td>111.957</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[52]</th>
+      <td>27.282</td>
+      <td>245.991</td>
+      <td>-427.218</td>
+      <td>386.431</td>
+      <td>111.960</td>
+      <td>84.514</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[53]</th>
+      <td>27.261</td>
+      <td>245.989</td>
+      <td>-427.296</td>
+      <td>386.452</td>
+      <td>111.958</td>
+      <td>84.513</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[54]</th>
+      <td>27.743</td>
+      <td>245.989</td>
+      <td>-427.031</td>
+      <td>386.763</td>
+      <td>111.958</td>
+      <td>84.512</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+    <tr>
+      <th>mu_phi[55]</th>
+      <td>27.669</td>
+      <td>245.984</td>
+      <td>-426.962</td>
+      <td>386.760</td>
+      <td>111.956</td>
+      <td>84.511</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>14.0</td>
+      <td>1.86</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_forest</span><span class="p">(</span>
+    <span class="n">infdata2</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;ridgeplot&quot;</span><span class="p">,</span>
+    <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">],</span>
+    <span class="n">combined</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">ridgeplot_overlap</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">ridgeplot_alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_27_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_27_0.png" style="width: 911px; height: 711px;" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_trace</span><span class="p">(</span><span class="n">infdata2</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">&quot;sd_h&quot;</span><span class="p">,</span> <span class="s2">&quot;sd_c&quot;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_28_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_28_0.png" style="width: 1211px; height: 611px;" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">infdata2</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_29_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_29_0.png" style="width: 731px; height: 491px;" />
+</div>
+</div>
+</div>
+<div class="section" id="PyMC3-implementation-using-Matrix-multiplication">
+<h2>PyMC3 implementation using Matrix multiplication<a class="headerlink" href="#PyMC3-implementation-using-Matrix-multiplication" title="Permalink to this headline">¶</a></h2>
+<p>There are almost always multiple ways to formulate a particular model. Some approaches work better than the others under different contexts (size of your dataset, properties of the sampler, etc).</p>
+<p>In this case, we can express the CAR prior as:</p>
+<div class="math notranslate nohighlight">
+\[\phi \sim \mathcal{N}(0, [D_\tau (I - \alpha B)]^{-1}).\]</div>
+<p>You can find more details in the original <a class="reference external" href="http://mc-stan.org/documentation/case-studies/mbjoseph-CARStan.html">Stan case study</a>. You might come across similar constructs in Gaussian Process, which result in a zero-mean Gaussian distribution conditioned on a covariance function.</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">Stan</span></code> Code, matrix D is generated in the model using a <code class="docutils literal notranslate"><span class="pre">transformed</span> <span class="pre">data{}</span></code> block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transformed</span> <span class="n">data</span><span class="p">{</span>
+  <span class="n">vector</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="n">zeros</span><span class="p">;</span>
+  <span class="n">matrix</span><span class="o">&lt;</span><span class="n">lower</span> <span class="o">=</span> <span class="mi">0</span><span class="o">&gt;</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="n">D</span><span class="p">;</span>
+  <span class="p">{</span>
+    <span class="n">vector</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="n">W_rowsums</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">W_rowsums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">]);</span>
+    <span class="p">}</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">diag_matrix</span><span class="p">(</span><span class="n">W_rowsums</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">zeros</span> <span class="o">=</span> <span class="n">rep_vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We can generate the same matrix quite easily:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">stats</span><span class="o">.</span><span class="n">zscore</span><span class="p">(</span><span class="n">aff</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]))</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">wmat2</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">W</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">log_offset</span> <span class="o">=</span> <span class="n">logE</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Then in the <code class="docutils literal notranslate"><span class="pre">Stan</span></code> model:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="p">{</span>
+  <span class="n">phi</span> <span class="o">~</span> <span class="n">multi_normal_prec</span><span class="p">(</span><span class="n">zeros</span><span class="p">,</span> <span class="n">tau</span> <span class="o">*</span> <span class="p">(</span><span class="n">D</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">W</span><span class="p">));</span>
+  <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>since the precision matrix just generated by some matrix multiplication, we can do just that in <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model3</span><span class="p">:</span>
+    <span class="c1"># Vague prior on intercept and effect</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Priors for spatial random effects</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;tau&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MvNormal</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span> <span class="o">*</span> <span class="p">(</span><span class="n">D</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">W</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+
+    <span class="c1"># Mean model</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span> <span class="o">+</span> <span class="n">phi</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">log_offset</span><span class="p">))</span>
+
+    <span class="c1"># Likelihood</span>
+    <span class="n">Yi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Poisson</span><span class="p">(</span><span class="s2">&quot;Yi&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">observed</span><span class="o">=</span><span class="n">O</span><span class="p">)</span>
+
+    <span class="n">infdata3</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">target_accept</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">return_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [phi, alpha, tau, beta]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='12000' class='' max='12000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [12000/12000 02:10<00:00 Sampling 4 chains, 21 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 4 chains for 2_000 tune and 1_000 draw iterations (8_000 + 4_000 draws total) took 131 seconds.
+There were 21 divergences after tuning. Increase `target_accept` or reparameterize.
+The acceptance probability does not match the target. It is 0.9207219941260574, but should be close to 0.85. Try to increase the number of tuning steps.
+The rhat statistic is larger than 1.05 for some parameters. This indicates slight problems during sampling.
+The estimated number of effective samples is smaller than 200 for some parameters.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_trace</span><span class="p">(</span><span class="n">infdata3</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">&quot;tau&quot;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_34_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_34_0.png" style="width: 1211px; height: 811px;" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">infdata3</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_35_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_35_0.png" style="width: 731px; height: 491px;" />
+</div>
+</div>
+<p>Notice that since the model parameterization is different than in the <code class="docutils literal notranslate"><span class="pre">WinBUGS</span></code> model, the <code class="docutils literal notranslate"><span class="pre">alpha</span></code> can’t be interpreted in the same way.</p>
+</div>
+<div class="section" id="PyMC3-implementation-using-Sparse-Matrix">
+<h2>PyMC3 implementation using Sparse Matrix<a class="headerlink" href="#PyMC3-implementation-using-Sparse-Matrix" title="Permalink to this headline">¶</a></h2>
+<p>Note that in the node <span class="math notranslate nohighlight">\(\phi \sim \mathcal{N}(0, [D_\tau (I - \alpha B)]^{-1})\)</span>, we are computing the log-likelihood for a multivariate Gaussian distribution, which might not scale well in high-dimensions. We can take advantage of the fact that the covariance matrix here <span class="math notranslate nohighlight">\([D_\tau (I - \alpha B)]^{-1}\)</span> is <strong>sparse</strong>, and there are faster ways to compute its log-likelihood.</p>
+<p>For example, a more efficient sparse representation of the CAR in <code class="docutils literal notranslate"><span class="pre">Stan</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">functions</span> <span class="p">{</span>
+  <span class="o">/**</span>
+  <span class="o">*</span> <span class="n">Return</span> <span class="n">the</span> <span class="n">log</span> <span class="n">probability</span> <span class="n">of</span> <span class="n">a</span> <span class="n">proper</span> <span class="n">conditional</span> <span class="n">autoregressive</span> <span class="p">(</span><span class="n">CAR</span><span class="p">)</span> <span class="n">prior</span>
+  <span class="o">*</span> <span class="k">with</span> <span class="n">a</span> <span class="n">sparse</span> <span class="n">representation</span> <span class="k">for</span> <span class="n">the</span> <span class="n">adjacency</span> <span class="n">matrix</span>
+  <span class="o">*</span>
+  <span class="o">*</span> <span class="nd">@param</span> <span class="n">phi</span> <span class="n">Vector</span> <span class="n">containing</span> <span class="n">the</span> <span class="n">parameters</span> <span class="k">with</span> <span class="n">a</span> <span class="n">CAR</span> <span class="n">prior</span>
+  <span class="o">*</span> <span class="nd">@param</span> <span class="n">tau</span> <span class="n">Precision</span> <span class="n">parameter</span> <span class="k">for</span> <span class="n">the</span> <span class="n">CAR</span> <span class="n">prior</span> <span class="p">(</span><span class="n">real</span><span class="p">)</span>
+  <span class="o">*</span> <span class="nd">@param</span> <span class="n">alpha</span> <span class="n">Dependence</span> <span class="p">(</span><span class="n">usually</span> <span class="n">spatial</span><span class="p">)</span> <span class="n">parameter</span> <span class="k">for</span> <span class="n">the</span> <span class="n">CAR</span> <span class="n">prior</span> <span class="p">(</span><span class="n">real</span><span class="p">)</span>
+  <span class="o">*</span> <span class="nd">@param</span> <span class="n">W_sparse</span> <span class="n">Sparse</span> <span class="n">representation</span> <span class="n">of</span> <span class="n">adjacency</span> <span class="n">matrix</span> <span class="p">(</span><span class="nb">int</span> <span class="n">array</span><span class="p">)</span>
+  <span class="o">*</span> <span class="nd">@param</span> <span class="n">n</span> <span class="n">Length</span> <span class="n">of</span> <span class="n">phi</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+  <span class="o">*</span> <span class="nd">@param</span> <span class="n">W_n</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">adjacent</span> <span class="n">pairs</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+  <span class="o">*</span> <span class="nd">@param</span> <span class="n">D_sparse</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">neighbors</span> <span class="k">for</span> <span class="n">each</span> <span class="n">location</span> <span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+  <span class="o">*</span> <span class="nd">@param</span> <span class="k">lambda</span> <span class="n">Eigenvalues</span> <span class="n">of</span> <span class="n">D</span><span class="o">^</span><span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">}</span><span class="o">*</span><span class="n">W</span><span class="o">*</span><span class="n">D</span><span class="o">^</span><span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">}</span> <span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+  <span class="o">*</span>
+  <span class="o">*</span> <span class="nd">@return</span> <span class="n">Log</span> <span class="n">probability</span> <span class="n">density</span> <span class="n">of</span> <span class="n">CAR</span> <span class="n">prior</span> <span class="n">up</span> <span class="n">to</span> <span class="n">additive</span> <span class="n">constant</span>
+  <span class="o">*/</span>
+  <span class="n">real</span> <span class="n">sparse_car_lpdf</span><span class="p">(</span><span class="n">vector</span> <span class="n">phi</span><span class="p">,</span> <span class="n">real</span> <span class="n">tau</span><span class="p">,</span> <span class="n">real</span> <span class="n">alpha</span><span class="p">,</span>
+    <span class="nb">int</span><span class="p">[,]</span> <span class="n">W_sparse</span><span class="p">,</span> <span class="n">vector</span> <span class="n">D_sparse</span><span class="p">,</span> <span class="n">vector</span> <span class="k">lambda</span><span class="p">,</span> <span class="nb">int</span> <span class="n">n</span><span class="p">,</span> <span class="nb">int</span> <span class="n">W_n</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">row_vector</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="n">phit_D</span><span class="p">;</span> <span class="o">//</span> <span class="n">phi</span><span class="s1">&#39; * D</span>
+      <span class="n">row_vector</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="n">phit_W</span><span class="p">;</span> <span class="o">//</span> <span class="n">phi</span><span class="s1">&#39; * W</span>
+      <span class="n">vector</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="n">ldet_terms</span><span class="p">;</span>
+
+      <span class="n">phit_D</span> <span class="o">=</span> <span class="p">(</span><span class="n">phi</span> <span class="o">.*</span> <span class="n">D_sparse</span><span class="p">)</span><span class="s1">&#39;;</span>
+      <span class="n">phit_W</span> <span class="o">=</span> <span class="n">rep_row_vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">W_n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">phit_W</span><span class="p">[</span><span class="n">W_sparse</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">phit_W</span><span class="p">[</span><span class="n">W_sparse</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="n">phi</span><span class="p">[</span><span class="n">W_sparse</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]];</span>
+        <span class="n">phit_W</span><span class="p">[</span><span class="n">W_sparse</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">phit_W</span><span class="p">[</span><span class="n">W_sparse</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">+</span> <span class="n">phi</span><span class="p">[</span><span class="n">W_sparse</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]];</span>
+      <span class="p">}</span>
+
+      <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)</span> <span class="n">ldet_terms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">log1m</span><span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="k">lambda</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+      <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ldet_terms</span><span class="p">)</span>
+                    <span class="o">-</span> <span class="n">tau</span> <span class="o">*</span> <span class="p">(</span><span class="n">phit_D</span> <span class="o">*</span> <span class="n">phi</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">phit_W</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)));</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>with the data transformed in the model:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transformed</span> <span class="n">data</span> <span class="p">{</span>
+  <span class="nb">int</span> <span class="n">W_sparse</span><span class="p">[</span><span class="n">W_n</span><span class="p">,</span> <span class="mi">2</span><span class="p">];</span>   <span class="o">//</span> <span class="n">adjacency</span> <span class="n">pairs</span>
+  <span class="n">vector</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="n">D_sparse</span><span class="p">;</span>     <span class="o">//</span> <span class="n">diagonal</span> <span class="n">of</span> <span class="n">D</span> <span class="p">(</span><span class="n">number</span> <span class="n">of</span> <span class="n">neigbors</span> <span class="k">for</span> <span class="n">each</span> <span class="n">site</span><span class="p">)</span>
+  <span class="n">vector</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">lambda</span><span class="p">;</span>       <span class="o">//</span> <span class="n">eigenvalues</span> <span class="n">of</span> <span class="n">invsqrtD</span> <span class="o">*</span> <span class="n">W</span> <span class="o">*</span> <span class="n">invsqrtD</span>
+
+  <span class="p">{</span> <span class="o">//</span> <span class="n">generate</span> <span class="n">sparse</span> <span class="n">representation</span> <span class="k">for</span> <span class="n">W</span>
+  <span class="nb">int</span> <span class="n">counter</span><span class="p">;</span>
+  <span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="o">//</span> <span class="n">loop</span> <span class="n">over</span> <span class="n">upper</span> <span class="n">triangular</span> <span class="n">part</span> <span class="n">of</span> <span class="n">W</span> <span class="n">to</span> <span class="n">identify</span> <span class="n">neighbor</span> <span class="n">pairs</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="ow">in</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+          <span class="n">W_sparse</span><span class="p">[</span><span class="n">counter</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+          <span class="n">W_sparse</span><span class="p">[</span><span class="n">counter</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
+          <span class="n">counter</span> <span class="o">=</span> <span class="n">counter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)</span> <span class="n">D_sparse</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">W</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+  <span class="p">{</span>
+    <span class="n">vector</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="n">invsqrtD</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">invsqrtD</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">D_sparse</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+    <span class="p">}</span>
+    <span class="k">lambda</span> <span class="o">=</span> <span class="n">eigenvalues_sym</span><span class="p">(</span><span class="n">quad_form</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">diag_matrix</span><span class="p">(</span><span class="n">invsqrtD</span><span class="p">)));</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>and the likelihood:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="p">{</span>
+  <span class="n">phi</span> <span class="o">~</span> <span class="n">sparse_car</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">W_sparse</span><span class="p">,</span> <span class="n">D_sparse</span><span class="p">,</span> <span class="k">lambda</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">W_n</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is quite a lot of code to digest, so my general approach is to compare the intermediate steps (whenever possible) with <code class="docutils literal notranslate"><span class="pre">Stan</span></code>. In this case, I will try to compute <code class="docutils literal notranslate"><span class="pre">tau,</span> <span class="pre">alpha,</span> <span class="pre">W_sparse,</span> <span class="pre">D_sparse,</span> <span class="pre">lambda,</span> <span class="pre">n,</span> <span class="pre">W_n</span></code> outside of the <code class="docutils literal notranslate"><span class="pre">Stan</span></code> model in <code class="docutils literal notranslate"><span class="pre">R</span></code> and compare with my own implementation.</p>
+<p>Below is a Sparse CAR implementation in <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code> (<a class="reference external" href="https://github.com/pymc-devs/pymc3/issues/2066#issuecomment-296397012">see also here</a>). Again, we try to avoid using any looping, as in <code class="docutils literal notranslate"><span class="pre">Stan</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">scipy</span>
+
+
+<span class="k">class</span> <span class="nc">Sparse_CAR</span><span class="p">(</span><span class="n">distribution</span><span class="o">.</span><span class="n">Continuous</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sparse Conditional Autoregressive (CAR) distribution</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    alpha : spatial smoothing term</span>
+<span class="sd">    W : adjacency matrix</span>
+<span class="sd">    tau : precision at each location</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">median</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># eigenvalues of D^−1/2 * W * D^−1/2</span>
+        <span class="n">Dinv_sqrt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">D</span><span class="p">))</span>
+        <span class="n">DWD</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Dinv_sqrt</span><span class="p">,</span> <span class="n">W</span><span class="p">),</span> <span class="n">Dinv_sqrt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lam</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">DWD</span><span class="p">)</span>
+
+        <span class="c1"># sparse representation of W</span>
+        <span class="n">w_sparse</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">as_sparse_variable</span><span class="p">(</span><span class="n">w_sparse</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+
+        <span class="c1"># Presicion Matrix (inverse of Covariance matrix)</span>
+        <span class="c1"># d_sparse = scipy.sparse.csr_matrix(np.diag(D))</span>
+        <span class="c1"># self.D = theano.sparse.as_sparse_variable(d_sparse)</span>
+        <span class="c1"># self.Phi = self.tau * (self.D - self.alpha*self.W)</span>
+
+    <span class="k">def</span> <span class="nf">logp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">logtau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="n">tt</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span>
+        <span class="n">logdet</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lam</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="c1"># tau * ((phi .* D_sparse)&#39; * phi - alpha * (phit_W * phi))</span>
+        <span class="n">Wx</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">tau_dot_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">Wx</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">logquad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">*</span> <span class="n">tt</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">tau_dot_x</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+
+        <span class="c1"># logquad = tt.dot(x.T, theano.sparse.dot(self.Phi, x)).sum()</span>
+        <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">logtau</span> <span class="o">+</span> <span class="n">logdet</span> <span class="o">-</span> <span class="n">logquad</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model4</span><span class="p">:</span>
+    <span class="c1"># Vague prior on intercept and effect</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Priors for spatial random effects</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;tau&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">Sparse_CAR</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Mean model</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span> <span class="o">+</span> <span class="n">phi</span> <span class="o">+</span> <span class="n">log_offset</span><span class="p">))</span>
+
+    <span class="c1"># Likelihood</span>
+    <span class="n">Yi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Poisson</span><span class="p">(</span><span class="s2">&quot;Yi&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">observed</span><span class="o">=</span><span class="n">O</span><span class="p">)</span>
+
+    <span class="n">infdata4</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">target_accept</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">return_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [phi, alpha, tau, beta]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='12000' class='' max='12000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [12000/12000 00:26<00:00 Sampling 4 chains, 1 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 4 chains for 2_000 tune and 1_000 draw iterations (8_000 + 4_000 draws total) took 27 seconds.
+There was 1 divergence after tuning. Increase `target_accept` or reparameterize.
+The estimated number of effective samples is smaller than 200 for some parameters.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_trace</span><span class="p">(</span><span class="n">infdata4</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">&quot;tau&quot;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_41_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_41_0.png" style="width: 1211px; height: 811px;" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">infdata4</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f7ef1e9ebb0&gt;],
+      dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_42_1.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_42_1.png" style="width: 731px; height: 491px;" />
+</div>
+</div>
+<p>As you can see above, the sparse representation returns the same estimates, while being much faster than any other implementation.</p>
+</div>
+<div class="section" id="A-few-other-warnings">
+<h2>A few other warnings<a class="headerlink" href="#A-few-other-warnings" title="Permalink to this headline">¶</a></h2>
+<p>In <code class="docutils literal notranslate"><span class="pre">Stan</span></code>, there is an option to write a <code class="docutils literal notranslate"><span class="pre">generated</span> <span class="pre">quantities</span></code> block for sample generation. Doing the similar in pymc3, however, is not recommended.</p>
+<p>Consider the following simple sample:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Data</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">,</span> <span class="mf">1.8</span><span class="p">])</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model1</span><span class="p">:</span>
+    <span class="c1"># prior</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tau</span><span class="o">=.</span><span class="mi">001</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="c1"># observed</span>
+    <span class="n">xi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;xi&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">observed</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+    <span class="c1"># generation</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">mu</span><span class="p">))</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Binomial</span><span class="p">(</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where we intended to use <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">count</span> <span class="pre">=</span> <span class="pre">pm.Binomial('count',</span> <span class="pre">n=10,</span> <span class="pre">p=p,</span> <span class="pre">shape=10)</span></code> to generate posterior prediction. However, if the new RV added to the model is a discrete variable it can cause weird turbulence to the trace. You can see <a class="reference external" href="https://github.com/pymc-devs/pymc3/issues/1990">issue #1990</a> for related discussion.</p>
+</div>
+<div class="section" id="Final-remarks">
+<h2>Final remarks<a class="headerlink" href="#Final-remarks" title="Permalink to this headline">¶</a></h2>
+<p>In this notebook, most of the parameter conventions (e.g., using <code class="docutils literal notranslate"><span class="pre">tau</span></code> when defining a Normal distribution) and choice of priors are strictly matched with the original code in <code class="docutils literal notranslate"><span class="pre">Winbugs</span></code> or <code class="docutils literal notranslate"><span class="pre">Stan</span></code>. However, it is important to note that merely porting the code from one probabilistic programming language to the another is not necessarily the best practice. The aim is not just to run the code in <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code>, but to make sure the model is appropriate so that it returns correct estimates, and runs
+efficiently (fast sampling).</p>
+<p>For example, as [&#64;aseyboldt](<a class="reference external" href="https://github.com/aseyboldt">https://github.com/aseyboldt</a>) pointed out <a class="reference external" href="https://github.com/pymc-devs/pymc3/pull/2080#issuecomment-297456574">here</a> and <a class="reference external" href="https://github.com/pymc-devs/pymc3/issues/1924#issue-215496293">here</a>, non-centered parametrizations are often a better choice than the centered parametrizations. In our case here, <code class="docutils literal notranslate"><span class="pre">phi</span></code> is following a zero-mean Normal distribution, thus it can be left out in the beginning and used to scale the values afterwards. Often, doing this can
+avoid correlations in the posterior (it will be slower in some cases, however).</p>
+<p>Another thing to keep in mind is that models can be sensitive to choices of prior distributions; for example, you can have a hard time using Normal variables with a large sd as prior. Gelman often recommends Cauchy or StudentT (<em>i.e.</em>, weakly-informative priors). More information on prior choice can be found on the <a class="reference external" href="https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations">Stan wiki</a>.</p>
+<p>There are always ways to improve code. Since our computational graph with <code class="docutils literal notranslate"><span class="pre">pm.Model()</span></code> consist of <code class="docutils literal notranslate"><span class="pre">theano</span></code> objects, we can always do <code class="docutils literal notranslate"><span class="pre">print(VAR_TO_CHECK.tag.test_value)</span></code> right after the declaration or computation to check the shape. For example, in our last example, as suggested by [&#64;aseyboldt](<a class="reference external" href="https://github.com/pymc-devs/pymc3/pull/2080#issuecomment-297456574">https://github.com/pymc-devs/pymc3/pull/2080#issuecomment-297456574</a>) there seem to be a lot of correlation in the posterior. That probably slows down NUTS quite a bit. As a debugging tool and guide
+for reparametrization you can look at the singular value decomposition of the standardized samples from the trace – basically the eigenvalues of the correlation matrix. If the problem is high dimensional you can use stuff from <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg</span></code> to only compute the largest singular value:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">linalg</span><span class="p">,</span> <span class="n">sparse</span>
+
+<span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">model</span><span class="o">.</span><span class="n">dict_to_array</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">trace</span><span class="p">[</span><span class="mi">1000</span><span class="p">:]])</span><span class="o">.</span><span class="n">T</span>
+<span class="n">vals</span><span class="p">[:]</span> <span class="o">-=</span> <span class="n">vals</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">vals</span><span class="p">[:]</span> <span class="o">/=</span> <span class="n">vals</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+<span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vh</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svds</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then look at <code class="docutils literal notranslate"><span class="pre">plt.plot(S)</span></code> to see if any principal components are obvious, and check which variables are contributing by looking at the singular vectors: <code class="docutils literal notranslate"><span class="pre">plt.plot(U[:,</span> <span class="pre">-1]</span> <span class="pre">**</span> <span class="pre">2)</span></code>. You can get the indices by looking at <code class="docutils literal notranslate"><span class="pre">model.bijection.ordering.vmap</span></code>.</p>
+<p>Another great way to check the correlations in the posterior is to do a pairplot of the posterior (if your model doesn’t contain too many parameters). You can see quite clearly if and where the the posterior parameters are correlated.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_pair</span><span class="p">(</span><span class="n">infdata1</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;beta0&quot;</span><span class="p">,</span> <span class="s2">&quot;beta1&quot;</span><span class="p">,</span> <span class="s2">&quot;tau_h&quot;</span><span class="p">,</span> <span class="s2">&quot;tau_c&quot;</span><span class="p">],</span> <span class="n">divergences</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_46_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_46_0.png" style="width: 2495px; height: 1667px;" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_pair</span><span class="p">(</span><span class="n">infdata2</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;beta0&quot;</span><span class="p">,</span> <span class="s2">&quot;beta1&quot;</span><span class="p">,</span> <span class="s2">&quot;tau_h&quot;</span><span class="p">,</span> <span class="s2">&quot;tau_c&quot;</span><span class="p">],</span> <span class="n">divergences</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_47_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_47_0.png" style="width: 2495px; height: 1667px;" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_pair</span><span class="p">(</span><span class="n">infdata3</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">&quot;tau&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">],</span> <span class="n">divergences</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_48_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_48_0.png" style="width: 2495px; height: 1667px;" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_pair</span><span class="p">(</span><span class="n">infdata4</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">&quot;tau&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">],</span> <span class="n">divergences</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_conditional-autoregressive-model_49_0.png" class="no-scaled-link" src="../_images/notebooks_conditional-autoregressive-model_49_0.png" style="width: 2495px; height: 1667px;" />
+</div>
+</div>
+<ul class="simple">
+<li><p>Notebook Written by <a class="reference external" href="https://www.github.com/junpenglao/">Junpeng Lao</a>, inspired by <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code> <a class="reference external" href="https://github.com/pymc-devs/pymc3/issues/2022">issue#2022</a>, <a class="reference external" href="https://github.com/pymc-devs/pymc3/issues/2066">issue#2066</a> and <a class="reference external" href="https://github.com/pymc-devs/pymc3/issues/2066#issuecomment-296397012">comments</a>. I would like to thank [&#64;denadai2](<a class="reference external" href="https://github.com/denadai2">https://github.com/denadai2</a>), [&#64;aseyboldt](<a class="reference external" href="https://github.com/aseyboldt">https://github.com/aseyboldt</a>), and [&#64;twiecki](<a class="reference external" href="https://github.com/twiecki">https://github.com/twiecki</a>) for the helpful discussion.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> watermark
+<span class="o">%</span><span class="k">watermark</span> -n -u -v -iv -w
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+arviz  0.9.0
+theano 1.0.5
+pymc3  3.9.3
+scipy  1.5.0
+pandas 1.0.5
+numpy  1.18.5
+last updated: Fri Aug 14 2020
+
+CPython 3.8.3
+IPython 7.16.1
+watermark 2.0.2
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

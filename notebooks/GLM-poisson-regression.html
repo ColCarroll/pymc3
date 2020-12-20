@@ -1,0 +1,1226 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GLM: Poisson Regression &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="GLM:-Poisson-Regression">
+<h1>GLM: Poisson Regression<a class="headerlink" href="#GLM:-Poisson-Regression" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">arviz</span> <span class="k">as</span> <span class="nn">az</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">patsy</span> <span class="k">as</span> <span class="nn">pt</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running on PyMC3 v</span><span class="si">{</span><span class="n">pm</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Running on PyMC3 v3.9.3
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">config</span> InlineBackend.figure_format = &#39;retina&#39;
+<span class="n">RANDOM_SEED</span> <span class="o">=</span> <span class="mi">8927</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+<span class="n">az</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;arviz-darkgrid&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>This is a minimal reproducible example of Poisson regression to predict counts using dummy data.</p>
+<p>This Notebook is basically an excuse to demo Poisson regression using PyMC3, both manually and using the <code class="docutils literal notranslate"><span class="pre">glm</span></code> library to demo interactions using the <code class="docutils literal notranslate"><span class="pre">patsy</span></code> library. We will create some dummy data, Poisson distributed according to a linear model, and try to recover the coefficients of that linear model through inference.</p>
+<p>For more statistical detail see:</p>
+<ul class="simple">
+<li><p>Basic info on <a class="reference external" href="https://en.wikipedia.org/wiki/Poisson_regression">Wikipedia</a></p></li>
+<li><p>GLMs: Poisson regression, exposure, and overdispersion in Chapter 6.2 of <a class="reference external" href="http://www.stat.columbia.edu/%7Egelman/arm/">ARM, Gelmann &amp; Hill 2006</a></p></li>
+<li><p>This worked example from ARM 6.2 by <a class="reference external" href="http://www.clayford.net/statistics/poisson-regression-ch-6-of-gelman-and-hill/">Clay Ford</a></p></li>
+</ul>
+<p>This very basic model is inspired by <a class="reference external" href="http://ianozsvald.com/2016/05/07/statistically-solving-sneezes-and-sniffles-a-work-in-progress-report-at-pydatalondon-2016/">a project by Ian Osvald</a>, which is concerned with understanding the various effects of external environmental factors upon the allergic sneezing of a test subject.</p>
+<div class="section" id="Local-Functions">
+<h2>Local Functions<a class="headerlink" href="#Local-Functions" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="Generate-Data">
+<h2>Generate Data<a class="headerlink" href="#Generate-Data" title="Permalink to this headline">¶</a></h2>
+<p>This dummy dataset is created to emulate some data created as part of a study into quantified self, and the real data is more complicated than this. Ask Ian Osvald if you’d like to know more <a class="reference external" href="https://twitter.com/ianozsvald">https://twitter.com/ianozsvald</a></p>
+<div class="section" id="Assumptions:">
+<h3>Assumptions:<a class="headerlink" href="#Assumptions:" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>The subject sneezes N times per day, recorded as <code class="docutils literal notranslate"><span class="pre">nsneeze</span> <span class="pre">(int)</span></code></p></li>
+<li><p>The subject may or may not drink alcohol during that day, recorded as <code class="docutils literal notranslate"><span class="pre">alcohol</span> <span class="pre">(boolean)</span></code></p></li>
+<li><p>The subject may or may not take an antihistamine medication during that day, recorded as the negative action <code class="docutils literal notranslate"><span class="pre">nomeds</span> <span class="pre">(boolean)</span></code></p></li>
+<li><p>I postulate (probably incorrectly) that sneezing occurs at some baseline rate, which increases if an antihistamine is not taken, and further increased after alcohol is consumed.</p></li>
+<li><p>The data is aggregated per day, to yield a total count of sneezes on that day, with a boolean flag for alcohol and antihistamine usage, with the big assumption that nsneezes have a direct causal relationship.</p></li>
+</ul>
+<p>Create 4000 days of data: daily counts of sneezes which are Poisson distributed w.r.t alcohol consumption and antihistamine usage</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># decide poisson theta values</span>
+<span class="n">theta_noalcohol_meds</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># no alcohol, took an antihist</span>
+<span class="n">theta_alcohol_meds</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># alcohol, took an antihist</span>
+<span class="n">theta_noalcohol_nomeds</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># no alcohol, no antihist</span>
+<span class="n">theta_alcohol_nomeds</span> <span class="o">=</span> <span class="mi">36</span>  <span class="c1"># alcohol, no antihist</span>
+
+<span class="c1"># create samples</span>
+<span class="n">q</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;nsneeze&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">theta_noalcohol_meds</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">theta_alcohol_meds</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">theta_noalcohol_nomeds</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">theta_alcohol_nomeds</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;alcohol&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;nomeds&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">),</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>nsneeze</th>
+      <th>alcohol</th>
+      <th>nomeds</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3995</th>
+      <td>40</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3996</th>
+      <td>30</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3997</th>
+      <td>37</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3998</th>
+      <td>22</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3999</th>
+      <td>33</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="View-means-of-the-various-combinations-(Poisson-mean-values)">
+<h4>View means of the various combinations (Poisson mean values)<a class="headerlink" href="#View-means-of-the-various-combinations-(Poisson-mean-values)" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;alcohol&quot;</span><span class="p">,</span> <span class="s2">&quot;nomeds&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="2" halign="left">nsneeze</th>
+    </tr>
+    <tr>
+      <th>nomeds</th>
+      <th>False</th>
+      <th>True</th>
+    </tr>
+    <tr>
+      <th>alcohol</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>1.047</td>
+      <td>6.002</td>
+    </tr>
+    <tr>
+      <th>True</th>
+      <td>3.089</td>
+      <td>36.004</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Briefly-Describe-Dataset">
+<h3>Briefly Describe Dataset<a class="headerlink" href="#Briefly-Describe-Dataset" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">catplot</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;nsneeze&quot;</span><span class="p">,</span>
+    <span class="n">row</span><span class="o">=</span><span class="s2">&quot;nomeds&quot;</span><span class="p">,</span>
+    <span class="n">col</span><span class="o">=</span><span class="s2">&quot;alcohol&quot;</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">aspect</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/amit/miniconda3/envs/pymc3/lib/python3.8/site-packages/seaborn/axisgrid.py:382: UserWarning: This figure was using constrained_layout==True, but that is incompatible with subplots_adjust and or tight_layout: setting constrained_layout==False.
+  fig.tight_layout()
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_GLM-poisson-regression_12_1.png" class="no-scaled-link" src="../_images/notebooks_GLM-poisson-regression_12_1.png" style="width: 1216px; height: 791px;" />
+</div>
+</div>
+<p><strong>Observe:</strong></p>
+<ul class="simple">
+<li><p>This looks a lot like poisson-distributed count data (because it is)</p></li>
+<li><p>With <code class="docutils literal notranslate"><span class="pre">nomeds</span> <span class="pre">==</span> <span class="pre">False</span></code> and <code class="docutils literal notranslate"><span class="pre">alcohol</span> <span class="pre">==</span> <span class="pre">False</span></code> (top-left, akak antihistamines WERE used, alcohol was NOT drunk) the mean of the poisson distribution of sneeze counts is low.</p></li>
+<li><p>Changing <code class="docutils literal notranslate"><span class="pre">alcohol</span> <span class="pre">==</span> <span class="pre">True</span></code> (top-right) increases the sneeze count <code class="docutils literal notranslate"><span class="pre">nsneeze</span></code> slightly</p></li>
+<li><p>Changing <code class="docutils literal notranslate"><span class="pre">nomeds</span> <span class="pre">==</span> <span class="pre">True</span></code> (lower-left) increases the sneeze count <code class="docutils literal notranslate"><span class="pre">nsneeze</span></code> further</p></li>
+<li><p>Changing both <code class="docutils literal notranslate"><span class="pre">alcohol</span> <span class="pre">==</span> <span class="pre">True</span> <span class="pre">and</span> <span class="pre">nomeds</span> <span class="pre">==</span> <span class="pre">True</span></code> (lower-right) increases the sneeze count <code class="docutils literal notranslate"><span class="pre">nsneeze</span></code> a lot, increasing both the mean and variance.</p></li>
+</ul>
+<hr class="docutils" />
+</div>
+</div>
+<div class="section" id="Poisson-Regression">
+<h2>Poisson Regression<a class="headerlink" href="#Poisson-Regression" title="Permalink to this headline">¶</a></h2>
+<p>Our model here is a very simple Poisson regression, allowing for interaction of terms:</p>
+<div class="math notranslate nohighlight">
+\[\theta = exp(\beta X)\]</div>
+<div class="math notranslate nohighlight">
+\[Y_{sneeze\_count} ~ Poisson(\theta)\]</div>
+<p><strong>Create linear model for interaction of terms</strong></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fml</span> <span class="o">=</span> <span class="s2">&quot;nsneeze ~ alcohol + antihist + alcohol:antihist&quot;</span>  <span class="c1"># full patsy formulation</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fml</span> <span class="o">=</span> <span class="s2">&quot;nsneeze ~ alcohol * nomeds&quot;</span>  <span class="c1"># lazy, alternative patsy formulation</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="1.-Manual-method,-create-design-matrices-and-manually-specify-model">
+<h3>1. Manual method, create design matrices and manually specify model<a class="headerlink" href="#1.-Manual-method,-create-design-matrices-and-manually-specify-model" title="Permalink to this headline">¶</a></h3>
+<p><strong>Create Design Matrices</strong></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="p">(</span><span class="n">mx_en</span><span class="p">,</span> <span class="n">mx_ex</span><span class="p">)</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">dmatrices</span><span class="p">(</span><span class="n">fml</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span> <span class="n">NA_action</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">mx_ex</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">mx_ex</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Intercept</th>
+      <th>alcohol[T.True]</th>
+      <th>nomeds[T.True]</th>
+      <th>alcohol[T.True]:nomeds[T.True]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3997</th>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>3998</th>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>3999</th>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p><strong>Create Model</strong></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">mdl_fish</span><span class="p">:</span>
+
+    <span class="c1"># define priors, weakly informative Normal</span>
+    <span class="n">b0</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;b0_intercept&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;b1_alcohol[T.True]&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">b2</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;b2_nomeds[T.True]&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">b3</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;b3_alcohol[T.True]:nomeds[T.True]&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="c1"># define linear model and exp link function</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">b0</span>
+        <span class="o">+</span> <span class="n">b1</span> <span class="o">*</span> <span class="n">mx_ex</span><span class="p">[</span><span class="s2">&quot;alcohol[T.True]&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">b2</span> <span class="o">*</span> <span class="n">mx_ex</span><span class="p">[</span><span class="s2">&quot;nomeds[T.True]&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">b3</span> <span class="o">*</span> <span class="n">mx_ex</span><span class="p">[</span><span class="s2">&quot;alcohol[T.True]:nomeds[T.True]&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1">## Define Poisson likelihood</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Poisson</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">observed</span><span class="o">=</span><span class="n">mx_en</span><span class="p">[</span><span class="s2">&quot;nsneeze&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><strong>Sample Model</strong></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">mdl_fish</span><span class="p">:</span>
+    <span class="n">inf_fish</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">return_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [b3_alcohol[T.True]:nomeds[T.True], b2_nomeds[T.True], b1_alcohol[T.True], b0_intercept]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='8000' class='' max='8000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [8000/8000 00:33<00:00 Sampling 4 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 35 seconds.
+The acceptance probability does not match the target. It is 0.8860269606635056, but should be close to 0.8. Try to increase the number of tuning steps.
+The acceptance probability does not match the target. It is 0.8862113253674084, but should be close to 0.8. Try to increase the number of tuning steps.
+The number of effective samples is smaller than 25% for some parameters.
+</pre></div></div>
+</div>
+<p><strong>View Diagnostics</strong></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_trace</span><span class="p">(</span><span class="n">inf_fish</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f3ce6430&gt;,
+        &lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f3bbad90&gt;],
+       [&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f3b9da30&gt;,
+        &lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f478aac0&gt;],
+       [&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f58d0e80&gt;,
+        &lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f67132b0&gt;],
+       [&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f7550a60&gt;,
+        &lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f87e8250&gt;]],
+      dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_GLM-poisson-regression_29_1.png" class="no-scaled-link" src="../_images/notebooks_GLM-poisson-regression_29_1.png" style="width: 1211px; height: 811px;" />
+</div>
+</div>
+<p><strong>Observe:</strong></p>
+<ul class="simple">
+<li><p>The model converges quickly and traceplots looks pretty well mixed</p></li>
+</ul>
+</div>
+<div class="section" id="Transform-coeffs-and-recover-theta-values">
+<h3>Transform coeffs and recover theta values<a class="headerlink" href="#Transform-coeffs-and-recover-theta-values" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">az</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">inf_fish</span><span class="p">)[[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;hdi_3%&quot;</span><span class="p">,</span> <span class="s2">&quot;hdi_97%&quot;</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b0_intercept</th>
+      <td>1.047074</td>
+      <td>0.988072</td>
+      <td>1.108491</td>
+    </tr>
+    <tr>
+      <th>b1_alcohol[T.True]</th>
+      <td>2.950575</td>
+      <td>2.762124</td>
+      <td>3.148733</td>
+    </tr>
+    <tr>
+      <th>b2_nomeds[T.True]</th>
+      <td>5.731630</td>
+      <td>5.387061</td>
+      <td>6.086054</td>
+    </tr>
+    <tr>
+      <th>b3_alcohol[T.True]:nomeds[T.True]</th>
+      <td>2.033991</td>
+      <td>1.894585</td>
+      <td>2.185840</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p><strong>Observe:</strong></p>
+<ul>
+<li><p>The contributions from each feature as a multiplier of the baseline sneezecount appear to be as per the data generation:</p>
+<ol class="arabic">
+<li><p>exp(b0_intercept): mean=1.02 cr=[0.96, 1.08]</p>
+<p>Roughly linear baseline count when no alcohol and meds, as per the generated data:</p>
+<p>theta_noalcohol_meds = 1 (as set above) theta_noalcohol_meds = exp(b0_intercept) = 1</p>
+</li>
+<li><p>exp(b1_alcohol): mean=2.88 cr=[2.69, 3.09]</p>
+<p>non-zero positive effect of adding alcohol, a ~3x multiplier of baseline sneeze count, as per the generated data:</p>
+<p>theta_alcohol_meds = 3 (as set above) theta_alcohol_meds = exp(b0_intercept + b1_alcohol) = exp(b0_intercept) * exp(b1_alcohol) = 1 * 3 = 3</p>
+</li>
+<li><p>exp(b2_nomeds[T.True]): mean=5.76 cr=[5.40, 6.17]</p>
+<p>larger, non-zero positive effect of adding nomeds, a ~6x multiplier of baseline sneeze count, as per the generated data:</p>
+<p>theta_noalcohol_nomeds = 6 (as set above) theta_noalcohol_nomeds = exp(b0_intercept + b2_nomeds) = exp(b0_intercept) * exp(b2_nomeds) = 1 * 6 = 6</p>
+</li>
+<li><p>exp(b3_alcohol[T.True]:nomeds[T.True]): mean=2.12 cr=[1.98, 2.30]</p>
+<p>small, positive interaction effect of alcohol and meds, a ~2x multiplier of baseline sneeze count, as per the generated data:</p>
+<p>theta_alcohol_nomeds = 36 (as set above) theta_alcohol_nomeds = exp(b0_intercept + b1_alcohol + b2_nomeds + b3_alcohol:nomeds) = exp(b0_intercept) * exp(b1_alcohol) * exp(b2_nomeds * b3_alcohol:nomeds) = 1 * 3 * 6 * 2 = 36</p>
+</li>
+</ol>
+</li>
+</ul>
+</div>
+<div class="section" id="2.-Alternative-method,-using-pymc.glm">
+<h3>2. Alternative method, using <code class="docutils literal notranslate"><span class="pre">pymc.glm</span></code><a class="headerlink" href="#2.-Alternative-method,-using-pymc.glm" title="Permalink to this headline">¶</a></h3>
+<p><strong>Create Model</strong></p>
+<p><strong>Alternative automatic formulation using ``pmyc.glm``</strong></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">mdl_fish_alt</span><span class="p">:</span>
+
+    <span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">GLM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="n">fml</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Poisson</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<p><strong>Sample Model</strong></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">mdl_fish_alt</span><span class="p">:</span>
+    <span class="n">inf_fish_alt</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">return_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [mu, alcohol[T.True]:nomeds[T.True], nomeds[T.True], alcohol[T.True], Intercept]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='8000' class='' max='8000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [8000/8000 01:03<00:00 Sampling 2 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 2 chains for 2_000 tune and 2_000 draw iterations (4_000 + 4_000 draws total) took 64 seconds.
+The number of effective samples is smaller than 25% for some parameters.
+</pre></div></div>
+</div>
+<p><strong>View Traces</strong></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_trace</span><span class="p">(</span><span class="n">inf_fish_alt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50e91f65e0&gt;,
+        &lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50e811ceb0&gt;],
+       [&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50e3bb01f0&gt;,
+        &lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50e3bd1070&gt;],
+       [&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f3805190&gt;,
+        &lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f37f8520&gt;],
+       [&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50e80681c0&gt;,
+        &lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50f38128e0&gt;],
+       [&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50e811a520&gt;,
+        &lt;matplotlib.axes._subplots.AxesSubplot object at 0x7f50e8136850&gt;]],
+      dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_GLM-poisson-regression_41_1.png" class="no-scaled-link" src="../_images/notebooks_GLM-poisson-regression_41_1.png" style="width: 1211px; height: 1011px;" />
+</div>
+</div>
+</div>
+<div class="section" id="Transform-coeffs">
+<h3>Transform coeffs<a class="headerlink" href="#Transform-coeffs" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">az</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">inf_fish</span><span class="p">)[[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;hdi_3%&quot;</span><span class="p">,</span> <span class="s2">&quot;hdi_97%&quot;</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b0_intercept</th>
+      <td>1.047074</td>
+      <td>0.988072</td>
+      <td>1.108491</td>
+    </tr>
+    <tr>
+      <th>b1_alcohol[T.True]</th>
+      <td>2.950575</td>
+      <td>2.762124</td>
+      <td>3.148733</td>
+    </tr>
+    <tr>
+      <th>b2_nomeds[T.True]</th>
+      <td>5.731630</td>
+      <td>5.387061</td>
+      <td>6.086054</td>
+    </tr>
+    <tr>
+      <th>b3_alcohol[T.True]:nomeds[T.True]</th>
+      <td>2.033991</td>
+      <td>1.894585</td>
+      <td>2.185840</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p><strong>Observe:</strong></p>
+<ul class="simple">
+<li><p>The traceplots look well mixed</p></li>
+<li><p>The transformed model coeffs look moreorless the same as those generated by the manual model</p></li>
+<li><p>Note also that the <code class="docutils literal notranslate"><span class="pre">mu</span></code> coeff is for the overall mean of the dataset and has an extreme skew, if we look at the median value …</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">inf_fish_alt</span><span class="o">.</span><span class="n">posterior</span><span class="p">[</span><span class="s2">&quot;mu&quot;</span><span class="p">],</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([ 3.91395615,  9.56839665, 22.9396979 ])
+</pre></div></div>
+</div>
+<p>We see this is pretty close to the overall mean of:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;nsneeze&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+11.5355
+</pre></div></div>
+</div>
+<hr class="docutils" />
+<p>Example originally contributed by Jonathan Sedar 2016-05-15 <a class="reference external" href="https://github.com/jonsedar">github.com/jonsedar</a></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> watermark
+<span class="o">%</span><span class="k">watermark</span> -n -u -v -iv -w
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+patsy   0.5.1
+pymc3   3.9.3
+seaborn 0.10.1
+numpy   1.18.5
+pandas  1.0.5
+arviz   0.9.0
+last updated: Fri Sep 25 2020
+
+CPython 3.8.3
+IPython 7.16.1
+watermark 2.0.2
+</pre></div></div>
+</div>
+</div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

@@ -1,0 +1,679 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gaussian Processes using numpy kernel &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Gaussian-Processes-using-numpy-kernel">
+<h1>Gaussian Processes using numpy kernel<a class="headerlink" href="#Gaussian-Processes-using-numpy-kernel" title="Permalink to this headline">¶</a></h1>
+<ol class="loweralpha simple" start="3">
+<li><p>2016 by Chris Fonnesbeck</p></li>
+</ol>
+<p>Example of simple GP fit, adapted from Stan’s <a class="reference external" href="https://github.com/stan-dev/example-models/blob/master/misc/gaussian-process/gp-fit.stan">example-models repository</a>.</p>
+<p>This example builds a Gaussian process from scratch, to illustrate the underlying model. PyMC3 now includes a dedicated GP submodule which is going to be more usable for a wider variety of problems.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">arviz</span> <span class="k">as</span> <span class="nn">az</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">theano.tensor</span> <span class="k">as</span> <span class="nn">T</span>
+
+<span class="kn">from</span> <span class="nn">pymc3</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">NUTS</span><span class="p">,</span>
+    <span class="n">Deterministic</span><span class="p">,</span>
+    <span class="n">HalfCauchy</span><span class="p">,</span>
+    <span class="n">Model</span><span class="p">,</span>
+    <span class="n">MvNormal</span><span class="p">,</span>
+    <span class="n">find_MAP</span><span class="p">,</span>
+    <span class="n">sample</span><span class="p">,</span>
+    <span class="n">summary</span><span class="p">,</span>
+    <span class="n">traceplot</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">theano</span> <span class="kn">import</span> <span class="n">shared</span>
+<span class="kn">from</span> <span class="nn">theano.tensor.nlinalg</span> <span class="kn">import</span> <span class="n">matrix_inverse</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running on PyMC3 v</span><span class="si">{</span><span class="n">pm</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Running on PyMC3 v3.9.0
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">config</span> InlineBackend.figure_format = &#39;retina&#39;
+<span class="n">az</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;arviz-darkgrid&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># fmt: off</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.1</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">3.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.9</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">2.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.8</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">1.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.7</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span>
+<span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">,</span> <span class="mf">1.8</span><span class="p">,</span>
+<span class="mf">1.9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.6</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">,</span> <span class="mf">2.8</span><span class="p">,</span> <span class="mf">2.9</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">,</span>
+<span class="mf">3.2</span><span class="p">,</span> <span class="mf">3.3</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">,</span> <span class="mf">3.7</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="mf">3.9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">4.1</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">4.3</span><span class="p">,</span> <span class="mf">4.4</span><span class="p">,</span>
+<span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">,</span> <span class="mf">4.7</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span> <span class="mf">4.9</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.04442478194401</span><span class="p">,</span> <span class="mf">0.948306088493654</span><span class="p">,</span> <span class="mf">0.357037759697332</span><span class="p">,</span> <span class="mf">0.492336514646604</span><span class="p">,</span>
+<span class="mf">0.520651364364746</span><span class="p">,</span> <span class="mf">0.112629866592809</span><span class="p">,</span> <span class="mf">0.470995468454158</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.168442254267804</span><span class="p">,</span>
+<span class="mf">0.0720344402575861</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.188108980535916</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0160163306512027</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">0.0388792158617705</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0600673630622568</span><span class="p">,</span> <span class="mf">0.113568725264636</span><span class="p">,</span>
+<span class="mf">0.447160403837629</span><span class="p">,</span> <span class="mf">0.664421188556779</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.139510743820276</span><span class="p">,</span> <span class="mf">0.458823971660986</span><span class="p">,</span>
+<span class="mf">0.141214654640904</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.286957663528091</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.466537724021695</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.308185884317105</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">1.57664872694079</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.44463024170082</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.51206214603847</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.49393593601901</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">2.02292464164487</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.57047488853653</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.22973445533419</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.51502367058357</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">1.41493587255224</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.10140254663611</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.591866485375275</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.08781838696462</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">0.800375653733931</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.00764767602679</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0471028950122742</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.536820626879737</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">0.151688056391446</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.176771681318393</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.240094952335518</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.16827876746502</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">0.493597351974992</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.831683011472805</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.152347043914137</span><span class="p">,</span> <span class="mf">0.0190364158178343</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">1.09355955218051</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.328157917911376</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.585575679802941</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.472837120425201</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">0.503633622750049</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0124446353828312</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.465529814250314</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">0.101621725887347</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.26988462590405</span><span class="p">,</span> <span class="mf">0.398726664193302</span><span class="p">,</span> <span class="mf">0.113805181040188</span><span class="p">,</span>
+<span class="mf">0.331353802465398</span><span class="p">,</span> <span class="mf">0.383592361618461</span><span class="p">,</span> <span class="mf">0.431647298655434</span><span class="p">,</span> <span class="mf">0.580036473774238</span><span class="p">,</span>
+<span class="mf">0.830404669466897</span><span class="p">,</span> <span class="mf">1.17919105883462</span><span class="p">,</span> <span class="mf">0.871037583886711</span><span class="p">,</span> <span class="mf">1.12290553424174</span><span class="p">,</span>
+<span class="mf">0.752564860804382</span><span class="p">,</span> <span class="mf">0.76897960270623</span><span class="p">,</span> <span class="mf">1.14738839410786</span><span class="p">,</span> <span class="mf">0.773151715269892</span><span class="p">,</span>
+<span class="mf">0.700611498974798</span><span class="p">,</span> <span class="mf">0.0412951045437818</span><span class="p">,</span> <span class="mf">0.303526087747629</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.139399513324585</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">0.862987735433697</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.23399179134008</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.58924289116396</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.35105117911049</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">0.990144529089174</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.91175364127672</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.31836236129543</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.65955735224704</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">1.83516148300526</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.03817062501248</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.66764011409214</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.552154350554687</span><span class="p">,</span>
+<span class="o">-</span><span class="mf">0.547807883952654</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.905389222477036</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.737156477425302</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.40211249920415</span><span class="p">,</span>
+<span class="mf">0.129669958952991</span><span class="p">,</span> <span class="mf">0.271142753510592</span><span class="p">,</span> <span class="mf">0.176311762529962</span><span class="p">,</span> <span class="mf">0.283580281859344</span><span class="p">,</span>
+<span class="mf">0.635808289696458</span><span class="p">,</span> <span class="mf">1.69976647982837</span><span class="p">,</span> <span class="mf">1.10748978734239</span><span class="p">,</span> <span class="mf">0.365412229181044</span><span class="p">,</span>
+<span class="mf">0.788821368082444</span><span class="p">,</span> <span class="mf">0.879731888124867</span><span class="p">,</span> <span class="mf">1.02180766619069</span><span class="p">,</span> <span class="mf">0.551526067300283</span><span class="p">])</span>
+<span class="c1"># fmt: on</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We will use a squared exponential covariance function, which relies on the squared distances between observed points in the data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">squared_distance</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[[(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">gp_fit</span><span class="p">:</span>
+
+    <span class="n">μ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+    <span class="n">η_sq</span> <span class="o">=</span> <span class="n">HalfCauchy</span><span class="p">(</span><span class="s2">&quot;η_sq&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">ρ_sq</span> <span class="o">=</span> <span class="n">HalfCauchy</span><span class="p">(</span><span class="s2">&quot;ρ_sq&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">σ_sq</span> <span class="o">=</span> <span class="n">HalfCauchy</span><span class="p">(</span><span class="s2">&quot;σ_sq&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">D</span> <span class="o">=</span> <span class="n">squared_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># Squared exponential</span>
+    <span class="n">Σ</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">η_sq</span> <span class="o">*</span> <span class="n">T</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ρ_sq</span> <span class="o">*</span> <span class="n">D</span><span class="p">),</span> <span class="n">η_sq</span> <span class="o">+</span> <span class="n">σ_sq</span><span class="p">)</span>
+
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">MvNormal</span><span class="p">(</span><span class="s2">&quot;obs&quot;</span><span class="p">,</span> <span class="n">μ</span><span class="p">,</span> <span class="n">Σ</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>This is what our initial covariance matrix looks like. Intuitively, every data point’s Y-value correlates with points according to their squared distances.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Σ</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f5ef45d3c50&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_gaussian_process_9_1.png" class="no-scaled-link" src="../_images/notebooks_gaussian_process_9_1.png" style="width: 542px; height: 401px;" />
+</div>
+</div>
+<p>The following generates predictions from the GP model in a grid of values:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">gp_fit</span><span class="p">:</span>
+
+    <span class="c1"># Prediction over grid</span>
+    <span class="n">xgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+    <span class="n">D_pred</span> <span class="o">=</span> <span class="n">squared_distance</span><span class="p">(</span><span class="n">xgrid</span><span class="p">,</span> <span class="n">xgrid</span><span class="p">)</span>
+    <span class="n">D_off_diag</span> <span class="o">=</span> <span class="n">squared_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xgrid</span><span class="p">)</span>
+
+    <span class="c1"># Covariance matrices for prediction</span>
+    <span class="n">Σ_pred</span> <span class="o">=</span> <span class="n">η_sq</span> <span class="o">*</span> <span class="n">T</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ρ_sq</span> <span class="o">*</span> <span class="n">D_pred</span><span class="p">)</span>
+    <span class="n">Σ_off_diag</span> <span class="o">=</span> <span class="n">η_sq</span> <span class="o">*</span> <span class="n">T</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ρ_sq</span> <span class="o">*</span> <span class="n">D_off_diag</span><span class="p">)</span>
+
+    <span class="c1"># Posterior mean</span>
+    <span class="n">μ_post</span> <span class="o">=</span> <span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;μ_post&quot;</span><span class="p">,</span> <span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Σ_off_diag</span><span class="p">,</span> <span class="n">matrix_inverse</span><span class="p">(</span><span class="n">Σ</span><span class="p">)),</span> <span class="n">y</span><span class="p">))</span>
+    <span class="c1"># Posterior covariance</span>
+    <span class="n">Σ_post</span> <span class="o">=</span> <span class="n">Deterministic</span><span class="p">(</span>
+        <span class="s2">&quot;Σ_post&quot;</span><span class="p">,</span> <span class="n">Σ_pred</span> <span class="o">-</span> <span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Σ_off_diag</span><span class="p">,</span> <span class="n">matrix_inverse</span><span class="p">(</span><span class="n">Σ</span><span class="p">)),</span> <span class="n">Σ_off_diag</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">gp_fit</span><span class="p">:</span>
+    <span class="n">svgd_approx</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;svgd&quot;</span><span class="p">,</span> <span class="n">inf_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">n_particles</span><span class="o">=</span><span class="mi">500</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='400' class='' max='400' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [400/400 21:08<00:00]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/env/miniconda3/lib/python3.7/site-packages/theano/tensor/basic.py:6611: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+  result[diagonal_slice] = x
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gp_trace</span> <span class="o">=</span> <span class="n">svgd_approx</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">traceplot</span><span class="p">(</span><span class="n">gp_trace</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;η_sq&quot;</span><span class="p">,</span> <span class="s2">&quot;ρ_sq&quot;</span><span class="p">,</span> <span class="s2">&quot;σ_sq&quot;</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/dependencies/arviz/arviz/data/io_pymc3.py:89: FutureWarning: Using `from_pymc3` without the model will be deprecated in a future release. Not using the model will return less accurate and less useful results. Make sure you use the model argument or call from_pymc3 within a model context.
+  FutureWarning,
+/dependencies/arviz/arviz/data/io_pymc3.py:89: FutureWarning: Using `from_pymc3` without the model will be deprecated in a future release. Not using the model will return less accurate and less useful results. Make sure you use the model argument or call from_pymc3 within a model context.
+  FutureWarning,
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_gaussian_process_14_1.png" class="no-scaled-link" src="../_images/notebooks_gaussian_process_14_1.png" style="width: 1211px; height: 611px;" />
+</div>
+</div>
+<p>Sample from the posterior GP</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">y_pred</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">S</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">gp_trace</span><span class="p">[</span><span class="s2">&quot;μ_post&quot;</span><span class="p">],</span> <span class="n">gp_trace</span><span class="p">[</span><span class="s2">&quot;Σ_post&quot;</span><span class="p">])</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">yp</span> <span class="ow">in</span> <span class="n">y_pred</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">yp</span><span class="p">,</span> <span class="s2">&quot;c-&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;r.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;matplotlib.lines.Line2D at 0x7f5edcccef50&gt;]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_gaussian_process_17_1.png" class="no-scaled-link" src="../_images/notebooks_gaussian_process_17_1.png" style="width: 623px; height: 406px;" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> watermark
+<span class="o">%</span><span class="k">watermark</span> -n -u -v -iv -w
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+seaborn 0.10.1
+numpy   1.18.5
+pymc3   3.9.0
+arviz   0.8.3
+last updated: Mon Jun 15 2020
+
+CPython 3.7.7
+IPython 7.15.0
+watermark 2.0.2
+</pre></div></div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

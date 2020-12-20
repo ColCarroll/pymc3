@@ -1,0 +1,25 @@
+Gallery.examples = {"Advanced_usage_of_Theano_in_PyMC3.rst": {"title": "Advanced usage of Theano in PyMC3", "url": "/tutorials/../Advanced_usage_of_Theano_in_PyMC3.html", "thumb": "default.png"}, "DEMetropolisZ_EfficiencyComparison": {"title": "DEMetropolis(Z): Population vs. History efficiency comparison", "url": "/tutorials/../notebooks/DEMetropolisZ_EfficiencyComparison.html", "thumb": "DEMetropolisZ_EfficiencyComparison.png"}, "DEMetropolisZ_tune_drop_fraction": {"title": "DEMetropolis(Z): tune_drop_fraction", "url": "/tutorials/../notebooks/DEMetropolisZ_tune_drop_fraction.html", "thumb": "DEMetropolisZ_tune_drop_fraction.png"}, "Diagnosing_biased_Inference_with_Divergences": {"title": "Diagnosing Biased Inference with Divergences", "url": "/tutorials/../notebooks/Diagnosing_biased_Inference_with_Divergences.html", "thumb": "Diagnosing_biased_Inference_with_Divergences.png"}, "Gaussian_Processes.rst": {"title": "Gaussian Processes", "url": "/tutorials/../Gaussian_Processes.html", "thumb": "default.png"}, "ODE_API_shapes_and_benchmarking": {"title": "pymc3.ode: Shapes and benchmarking", "url": "/tutorials/../notebooks/ODE_API_shapes_and_benchmarking.html", "thumb": "ODE_API_shapes_and_benchmarking.png"}, "Probability_Distributions.rst": {"title": "Probability Distributions", "url": "/tutorials/../Probability_Distributions.html", "thumb": "default.png"}, "PyMC3_and_Theano.rst": {"title": "PyMC3 and Theano", "url": "/tutorials/../PyMC3_and_Theano.html", "thumb": "default.png"}, "api_quickstart": {"title": "General API quickstart", "url": "/tutorials/../notebooks/api_quickstart.html", "thumb": "api_quickstart.png"}, "blackbox_external_likelihood": {"title": "Using a \"black box\" likelihood function", "url": "/tutorials/../notebooks/blackbox_external_likelihood.html", "thumb": "blackbox_external_likelihood.png"}, "data_container": {"title": "Using shared variables (`Data` container adaptation)", "url": "/tutorials/../notebooks/data_container.html", "thumb": "data_container.png"}, "factor_analysis": {"title": "factor analysis.ipynb", "url": "/tutorials/../notebooks/factor_analysis.html", "thumb": "factor_analysis.png"}, "getting_started": {"title": "Getting started with PyMC3", "url": "/tutorials/../notebooks/getting_started.html", "thumb": "getting_started.png"}, "howto_debugging": {"title": "How to debug a model", "url": "/tutorials/../notebooks/howto_debugging.html", "thumb": "howto_debugging.png"}, "lasso_block_update": {"title": "Lasso regression with block updating", "url": "/tutorials/../notebooks/lasso_block_update.html", "thumb": "lasso_block_update.png"}, "model_averaging": {"title": "Model averaging", "url": "/tutorials/../notebooks/model_averaging.html", "thumb": "model_averaging.png"}, "profiling": {"title": "Profiling", "url": "/tutorials/../notebooks/profiling.html", "thumb": "profiling.png"}, "sampler-stats": {"title": "Sampler statistics", "url": "/tutorials/../notebooks/sampler-stats.html", "thumb": "sampler-stats.png"}, "sampling_callback": {"title": "Sample callback", "url": "/tutorials/../notebooks/sampling_callback.html", "thumb": "sampling_callback.png"}, "sampling_compound_step": {"title": "Compound Steps in Sampling", "url": "/tutorials/../notebooks/sampling_compound_step.html", "thumb": "sampling_compound_step.png"}, "updating_priors": {"title": "Updating priors", "url": "/tutorials/../notebooks/updating_priors.html", "thumb": "updating_priors.png"}, "variational_api_quickstart": {"title": "Variational API quickstart", "url": "/tutorials/../notebooks/variational_api_quickstart.html", "thumb": "variational_api_quickstart.png"}}
+Gallery.contents = {
+    "api_quickstart": "Basics",
+    "variational_api_quickstart": "Basics",
+    "PyMC3_and_Theano.rst": "Basics",
+    "Probability_Distributions.rst": "Basics",
+    "Gaussian_Processes.rst": "Basics",
+    "data_container": "Basics",
+    "sampling_compound_step": "Deep dives",
+    "sampling_callback": "Deep dives",
+    "sampler-stats": "Deep dives",
+    "Diagnosing_biased_Inference_with_Divergences": "Deep dives",
+    "Advanced_usage_of_Theano_in_PyMC3.rst": "Deep dives",
+    "getting_started": "Deep dives",
+    "ODE_API_shapes_and_benchmarking": "Deep dives",
+    "DEMetropolisZ_EfficiencyComparison": "Deep dives",
+    "DEMetropolisZ_tune_drop_fraction": "Deep dives",
+    "factor_analysis": "Deep dives",
+    "blackbox_external_likelihood": "How-To",
+    "profiling": "How-To",
+    "howto_debugging": "How-To",
+    "model_averaging": "How-To",
+    "updating_priors": "How-To",
+    "lasso_block_update": "How-To"
+}

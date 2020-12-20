@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About PyMC3 &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/default.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="_static/highlight.min.js"></script>
+    <script src="_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="#" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="nb_tutorials/index.html" class="item">Tutorials</a> <a href="nb_examples/index.html" class="item">Examples</a> <a href="learn.html" class="item">Books + Videos</a> <a href="api.html" class="item">API</a> <a href="developer_guide.html" class="item">Developer Guide</a> <a href="#" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  <div class="section" id="about-pymc3">
+<span id="about"></span><h1>About PyMC3<a class="headerlink" href="#about-pymc3" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose">
+<span id="intro"></span><h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>PyMC3 is a probabilistic programming package for Python that allows users to fit Bayesian models using a variety of numerical methods, most notably Markov chain Monte Carlo (MCMC) and variational inference (VI). Its flexibility and extensibility make it applicable to a large suite of problems. Along with core model specification and fitting functionality, PyMC3 includes functionality for summarizing output and for model diagnostics.</p>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<p>PyMC3 strives to make Bayesian modeling as simple and painless as possible,  allowing users to focus on their scientific problem, rather than on the methods used to solve it. Here is a partial list of its features:</p>
+<ul class="simple">
+<li><p>Modern methods for fitting Bayesian models, including MCMC and VI.</p></li>
+<li><p>Includes a large suite of well-documented statistical distributions.</p></li>
+<li><p>Uses Theano as the computational backend, allowing for fast expression evaluation, automatic gradient calculation, and GPU computing.</p></li>
+<li><p>Built-in support for Gaussian process modeling.</p></li>
+<li><p>Model summarization and plotting.</p></li>
+<li><p>Model checking and convergence detection.</p></li>
+<li><p>Extensible: easily incorporates custom step methods and unusual probability
+distributions.</p></li>
+<li><p>Bayesian models can be embedded in larger programs, and results can be analyzed
+with the full power of Python.</p></li>
+</ul>
+</div>
+<div class="section" id="what-s-new-in-version-3">
+<h2>What’s new in version 3<a class="headerlink" href="#what-s-new-in-version-3" title="Permalink to this headline">¶</a></h2>
+<p>The third major version of PyMC has benefitted from being re-written from scratch. Substantial improvements in the user interface and performance have resulted from this. While PyMC2 relied on Fortran extensions (via f2py) for most of the computational heavy-lifting, PyMC3 leverages Theano, a library from the Montréal Institute for Learning Algorithms (MILA), for array-based expression evaluation, to perform its computation. What this provides, above all else, is fast automatic differentiation, which is at the heart of the gradient-based sampling and optimization methods currently providing inference for probabilistic programming.</p>
+<p>Major changes from previous versions:</p>
+<ul class="simple">
+<li><p>New flexible object model and syntax (not backward-compatible with PyMC2).</p></li>
+<li><p>Gradient-based MCMC methods, including Hamiltonian Monte Carlo (HMC), the No U-turn Sampler (NUTS), and Stein Variational Gradient Descent.</p></li>
+<li><p>Variational inference methods, including automatic differentiation variational inference (ADVI) and operator variational inference (OPVI).</p></li>
+<li><p>An interface for easy formula-based specification of generalized linear models (GLM).</p></li>
+<li><p>Elliptical slice sampling.</p></li>
+<li><p>Specialized distributions for representing time series.</p></li>
+<li><p>A library of Jupyter notebooks that provide case studies and fully developed usage examples.</p></li>
+<li><p>Much more!</p></li>
+</ul>
+<p>While the addition of Theano adds a level of complexity to the development of PyMC, fundamentally altering how the underlying computation is performed, we have worked hard to maintain the elegant simplicity of the original PyMC model specification syntax.</p>
+</div>
+<div class="section" id="history">
+<h2>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h2>
+<p>PyMC began development in 2003, as an effort to generalize the process of
+building Metropolis-Hastings samplers, with an aim to making Markov chain Monte
+Carlo (MCMC) more accessible to applied scientists.
+The choice to develop PyMC as a python module, rather than a standalone
+application, allowed the use of MCMC methods in a larger modeling framework. By
+2005, PyMC was reliable enough for version 1.0 to be released to the public. A
+small group of regular users, most associated with the University of Georgia,
+provided much of the feedback necessary for the refinement of PyMC to a usable
+state.</p>
+<p>In 2006, David Huard and Anand Patil joined Chris Fonnesbeck on the development
+team for PyMC 2.0. This iteration of the software strives for more flexibility,
+better performance and a better end-user experience than any previous version
+of PyMC. PyMC 2.2 was released in April 2012. It contained numerous bugfixes and
+optimizations, as well as a few new features, including improved output
+plotting, csv table output, improved imputation syntax, and posterior
+predictive check plots. PyMC 2.3 was released on October 31, 2013. It included
+Python 3 compatibility, improved summary plots, and some important bug fixes.</p>
+<p>In 2011, John Salvatier began thinking about implementing gradient-based MCMC samplers, and developed the <code class="docutils literal notranslate"><span class="pre">mcex</span></code> package to experiment with his ideas. The following year, John was invited by the team to re-engineer PyMC to accomodate Hamiltonian Monte Carlo sampling. This led to the adoption of Theano as the computational back end, and marked the beginning of PyMC3’s development. The first alpha version of PyMC3 was released in June 2015. Over the following 2 years, the core development team grew to 12 members, and the first release, PyMC3 3.0, was launched in January 2017.</p>
+</div>
+</div>
+<div class="section" id="support-pymc">
+<span id="support"></span><h1>Support PyMC<a class="headerlink" href="#support-pymc" title="Permalink to this headline">¶</a></h1>
+<p>PyMC3 is a non-profit project under NumFOCUS umbrella. If you want to support PyMC3
+financially, consider donating to the project.</p>
+<style>.centered {text-align: center;}</style>
+<div class="centered"><a href="https://numfocus.org/donate-to-pymc3">
+  <div class="ui huge primary button">Donate to PyMC3</div>
+</a></div><div class="section" id="citing-pymc3">
+<h2>Citing PyMC3<a class="headerlink" href="#citing-pymc3" title="Permalink to this headline">¶</a></h2>
+<p>If you use PyMC3 in your reseach please cite: Salvatier J., Wiecki T.V., Fonnesbeck C. (2016) Probabilistic programming in Python using PyMC3. PeerJ Computer Science 2:e55 [DOI: 10.7717/peerj-cs.55](<a class="reference external" href="https://doi.org/10.7717/peerj-cs.55">https://doi.org/10.7717/peerj-cs.55</a>).</p>
+<p>The BibTeX entry is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>@article{pymc3,
+  title={Probabilistic programming in Python using PyMC3},
+  author={Salvatier, John and Wiecki, Thomas V and Fonnesbeck, Christopher},
+  journal={PeerJ Computer Science},
+  volume={2},
+  pages={e55},
+  year={2016},
+  publisher={PeerJ Inc.}
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="pymc-for-enterprise">
+<h2>PyMC for enterprise<a class="headerlink" href="#pymc-for-enterprise" title="Permalink to this headline">¶</a></h2>
+<p><cite>PyMC is now available as part of the Tidelift Subscription!</cite></p>
+<p>Tidelift is working with PyMC and the maintainers of thousands of other open source
+projects to deliver commercial support and maintenance for the open source dependencies
+you use to build your applications. Save time, reduce risk, and improve code health,
+while contributing financially to PyMC – making it even more robust, reliable and,
+let’s face it, amazing!</p>
+<style>.centered {text-align: center;}</style>
+<p><div class="centered">
+<a href="https://tidelift.com/subscription/pkg/pypi-pymc3?utm_source=undefined&utm_medium=referral&utm_campaign=enterprise">
+  <button class="ui large orange button" color="orange">Learn more</button>
+</a>
+<a href="https://tidelift.com/subscription/request-a-demo?utm_source=undefined&utm_medium=referral&utm_campaign=enterprise">
+  <button class="ui large orange button">Request a demo</button>
+</a>
+</div></p><div class="section" id="enterprise-ready-open-source-software-managed-for-you">
+<h3>Enterprise-ready open source software — managed for you<a class="headerlink" href="#enterprise-ready-open-source-software-managed-for-you" title="Permalink to this headline">¶</a></h3>
+<p>The Tidelift Subscription is a managed open source subscription for application
+dependencies covering millions of open source projects across JavaScript, Python, Java,
+PHP, Ruby, .NET, and more. And now, your favorite probabilistic programming language is included in the Tidelift subscription!</p>
+<p>Your subscription includes:</p>
+<ul class="simple">
+<li><p><strong>Security updates</strong>: Tidelift’s security response team coordinates patches for new breaking security vulnerabilities and alerts immediately through a private channel, so your software supply chain is always secure.</p></li>
+<li><p><strong>Licensing verification and indemnification</strong>: Tidelift verifies license information to enable easy policy enforcement and adds intellectual property indemnification to cover creators and users in case something goes wrong. You always have a 100% up-to-date bill of materials for your dependencies to share with your legal team, customers, or partners.</p></li>
+<li><p><strong>Maintenance and code improvement</strong>: Tidelift ensures the software you rely on keeps working as long as you need it to work. Your managed dependencies are actively maintained and Tidelift recruits additional maintainers where required.</p></li>
+<li><p><strong>Package selection and version guidance</strong>: Tidelift helps you choose the best open source packages from the start—and then guides you through updates to stay on the best releases as new issues arise.</p></li>
+<li><p><strong>Roadmap input</strong>: Take a seat at the table with the creators behind the software you use. PyMC developers and other Tidelift’s participating maintainers earn more income as our software is used by more subscribers, so we’re interested in knowing what you need.</p></li>
+<li><p><strong>Tooling and cloud integration</strong>: Tidelift works with GitHub, GitLab, BitBucket, and more. It supports every cloud platform (and other deployment targets, too).</p></li>
+</ul>
+<p>The end result? All of the capabilities you expect from commercial-grade software, for the full breadth of open source you use. That means less time grappling with esoteric open source trivia, and more time building your own applications — and your business.</p>
+<style>.centered {text-align: center;}</style>
+<p><div class="centered">
+<a href="https://tidelift.com/subscription/pkg/pypi-pymc3?utm_source=undefined&utm_medium=referral&utm_campaign=enterprise">
+  <button class="ui large orange button" color="orange">Learn more</button>
+</a>
+<a href="https://tidelift.com/subscription/request-a-demo?utm_source=undefined&utm_medium=referral&utm_campaign=enterprise">
+  <button class="ui large orange button">Request a demo</button>
+</a>
+</div></p></div>
+</div>
+<div class="section" id="sponsors">
+<h2>Sponsors<a class="headerlink" href="#sponsors" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://www.numfocus.org/"><img alt="NumFOCUS" src="https://numfocus.org/wp-content/uploads/2017/07/NumFocus_LRG.png" style="height: 120px;" /></a> <a class="reference external" href="https://quantopian.com"><img alt="Quantopian" src="https://raw.githubusercontent.com/pymc-devs/pymc3/master/docs/quantopianlogo.jpg" style="height: 120px;" /></a> <a class="reference external" href="https://odsc.com"><img alt="ODSC" src="https://raw.githubusercontent.com/pymc-devs/pymc3/master/docs/odsc_logo.png" style="height: 120px;" /></a></p>
+<p>More details about sponsoring PyMC3 can be found <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/GOVERNANCE.md#institutional-partners-and-funding">here</a>.
+If you are interested in becoming a sponsor, reach out to <a class="reference external" href="mailto:pymc&#46;devs&#37;&#52;&#48;gmail&#46;com">pymc<span>&#46;</span>devs<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+</div>
+</div>
+<div class="section" id="usage-overview">
+<h1>Usage Overview<a class="headerlink" href="#usage-overview" title="Permalink to this headline">¶</a></h1>
+<p>For a detailed overview of building models in PyMC3, please read the appropriate sections in the rest of the documentation. For a flavor of what PyMC3 models look like, here is a quick example.</p>
+<p>First, let’s import PyMC3 and <a class="reference external" href="https://arviz-devs.github.io/arviz/">ArviZ</a> (which handles plotting and diagnostics):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">arviz</span> <span class="k">as</span> <span class="nn">az</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+</pre></div>
+</div>
+<p>Models are defined using a context manager (<code class="docutils literal notranslate"><span class="pre">with</span></code> statement). The model is specified declaratively inside the context manager, instantiating model variables and transforming them as necessary. Here is an example of a model for a bioassay experiment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set style</span>
+<span class="n">az</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;arviz-darkgrid&quot;</span><span class="p">)</span>
+
+<span class="c1"># Data</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="mi">5</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="n">dose</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-.</span><span class="mi">86</span><span class="p">,</span><span class="o">-.</span><span class="mi">3</span><span class="p">,</span><span class="o">-.</span><span class="mi">05</span><span class="p">,</span><span class="o">.</span><span class="mi">73</span><span class="p">])</span>
+
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">bioassay_model</span><span class="p">:</span>
+
+    <span class="c1"># Prior distributions for latent variables</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Linear combination of parameters</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">invlogit</span><span class="p">(</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">dose</span><span class="p">)</span>
+
+    <span class="c1"># Model likelihood</span>
+    <span class="n">deaths</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Binomial</span><span class="p">(</span><span class="s1">&#39;deaths&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">theta</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Save this file, then from a python shell (or another file in the same directory), call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">bioassay_model</span><span class="p">:</span>
+
+    <span class="c1"># Draw samples</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Plot two parameters</span>
+    <span class="n">az</span><span class="o">.</span><span class="n">plot_forest</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">],</span> <span class="n">r_hat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This example will generate 1000 posterior samples on each of two cores using the NUTS algorithm, preceded by 2000 tuning samples (these are good default numbers for most models).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [beta, alpha]
+|██████████████████████████████████████| 100.00% [6000/6000 00:04&lt;00:00 Sampling 2 chains, 0 divergences]
+</pre></div>
+</div>
+<p>The sample is returned as arrays inside a <code class="docutils literal notranslate"><span class="pre">MultiTrace</span></code> object, which is then passed to the plotting function. The resulting graph shows a forest plot of the random variables in the model, along with a convergence diagnostic (R-hat) that indicates our model has converged.</p>
+<a class="reference internal image-reference" href="_images/forestplot.png"><img alt="_images/forestplot.png" src="_images/forestplot.png" style="width: 1000px;" /></a>
+<div class="section" id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="nb_tutorials/index.html">Tutorials</a></p></li>
+<li><p><a class="reference external" href="nb_examples/index.html">Examples</a></p></li>
+</ul>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

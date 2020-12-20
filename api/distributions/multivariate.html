@@ -1,0 +1,1176 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multivariate &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../../_static/highlight.min.js"></script>
+    <script src="../../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../../nb_examples/index.html" class="item">Examples</a> <a href="../../learn.html" class="item">Books + Videos</a> <a href="../../api.html" class="item">API</a> <a href="../../developer_guide.html" class="item">Developer Guide</a> <a href="../../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  <div class="section" id="multivariate">
+<h1>Multivariate<a class="headerlink" href="#multivariate" title="Permalink to this headline">¶</a></h1>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pymc3.distributions.multivariate.MvNormal" title="pymc3.distributions.multivariate.MvNormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MvNormal</span></code></a>(name, *args, **kwargs)</p></td>
+<td><p>Multivariate normal log-likelihood.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pymc3.distributions.multivariate.MatrixNormal" title="pymc3.distributions.multivariate.MatrixNormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MatrixNormal</span></code></a>(name, *args, **kwargs)</p></td>
+<td><p>Matrix-valued normal log-likelihood.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pymc3.distributions.multivariate.KroneckerNormal" title="pymc3.distributions.multivariate.KroneckerNormal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KroneckerNormal</span></code></a>(name, *args, **kwargs)</p></td>
+<td><p>Multivariate normal log-likelihood with Kronecker-structured covariance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pymc3.distributions.multivariate.MvStudentT" title="pymc3.distributions.multivariate.MvStudentT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MvStudentT</span></code></a>(name, *args, **kwargs)</p></td>
+<td><p>Multivariate Student-T log-likelihood.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pymc3.distributions.multivariate.Wishart" title="pymc3.distributions.multivariate.Wishart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Wishart</span></code></a>(name, *args, **kwargs)</p></td>
+<td><p>Wishart log-likelihood.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pymc3.distributions.multivariate.LKJCholeskyCov" title="pymc3.distributions.multivariate.LKJCholeskyCov"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LKJCholeskyCov</span></code></a>(name, eta, n, sd_dist[, …])</p></td>
+<td><p>Wrapper function for covariance matrix with LKJ distributed correlations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pymc3.distributions.multivariate.LKJCorr" title="pymc3.distributions.multivariate.LKJCorr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LKJCorr</span></code></a>(name, *args, **kwargs)</p></td>
+<td><p>The LKJ (Lewandowski, Kurowicka and Joe) log-likelihood.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pymc3.distributions.multivariate.Multinomial" title="pymc3.distributions.multivariate.Multinomial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Multinomial</span></code></a>(name, *args, **kwargs)</p></td>
+<td><p>Multinomial log-likelihood.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pymc3.distributions.multivariate.Dirichlet" title="pymc3.distributions.multivariate.Dirichlet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dirichlet</span></code></a>(name, *args, **kwargs)</p></td>
+<td><p>Dirichlet log-likelihood.</p></td>
+</tr>
+</tbody>
+</table>
+<span class="target" id="module-pymc3.distributions.multivariate"></span><dl class="py class">
+<dt id="pymc3.distributions.multivariate.Dirichlet">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.multivariate.</code><code class="sig-name descname">Dirichlet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.Dirichlet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dirichlet log-likelihood.</p>
+<div class="math notranslate nohighlight">
+\[f(\mathbf{x}|\mathbf{a}) =
+    \frac{\Gamma(\sum_{i=1}^k a_i)}{\prod_{i=1}^k \Gamma(a_i)}
+    \prod_{i=1}^k x_i^{a_i - 1}\]</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 88%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Support</p></td>
+<td><p><span class="math notranslate nohighlight">\(x_i \in (0, 1)\)</span> for <span class="math notranslate nohighlight">\(i \in \{1, \ldots, K\}\)</span>
+such that <span class="math notranslate nohighlight">\(\sum x_i = 1\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Mean</p></td>
+<td><p><span class="math notranslate nohighlight">\(\dfrac{a_i}{\sum a_i}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Variance</p></td>
+<td><p><span class="math notranslate nohighlight">\(\dfrac{a_i - \sum a_0}{a_0^2 (a_0 + 1)}\)</span>
+where <span class="math notranslate nohighlight">\(a_0 = \sum a_i\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>a: array</strong></dt><dd><p>Concentration parameters (a &gt; 0).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.Dirichlet.logp">
+<code class="sig-name descname">logp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.Dirichlet.logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate log-probability of Dirichlet distribution
+at specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>value: numeric</strong></dt><dd><p>Value for which log-probability is calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TensorVariable</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.Dirichlet.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.Dirichlet.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random values from Dirichlet distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>point: dict, optional</strong></dt><dd><p>Dict of variable values on which random values are to be
+conditioned (uses default point if not specified).</p>
+</dd>
+<dt><strong>size: int, optional</strong></dt><dd><p>Desired size of random sample (returns one sample if not
+specified).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.multivariate.KroneckerNormal">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.multivariate.</code><code class="sig-name descname">KroneckerNormal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.KroneckerNormal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multivariate normal log-likelihood with Kronecker-structured covariance.</p>
+<div class="math notranslate nohighlight">
+\[f(x \mid \mu, K) =
+    \frac{1}{(2\pi |K|)^{1/2}}
+    \exp\left\{ -\frac{1}{2} (x-\mu)^{\prime} K^{-1} (x-\mu) \right\}\]</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 84%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Support</p></td>
+<td><p><span class="math notranslate nohighlight">\(x \in \mathbb{R}^N\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Mean</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mu\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Variance</p></td>
+<td><p><span class="math notranslate nohighlight">\(K = \bigotimes K_i\)</span> + sigma^2 I_N</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>mu: array</strong></dt><dd><p>Vector of means, just as in <cite>MvNormal</cite>.</p>
+</dd>
+<dt><strong>covs: list of arrays</strong></dt><dd><p>The set of covariance matrices <span class="math notranslate nohighlight">\([K_1, K_2, ...]\)</span> to be
+Kroneckered in the order provided <span class="math notranslate nohighlight">\(\bigotimes K_i\)</span>.</p>
+</dd>
+<dt><strong>chols: list of arrays</strong></dt><dd><p>The set of lower cholesky matrices <span class="math notranslate nohighlight">\([L_1, L_2, ...]\)</span> such that
+<span class="math notranslate nohighlight">\(K_i = L_i L_i'\)</span>.</p>
+</dd>
+<dt><strong>evds: list of tuples</strong></dt><dd><p>The set of eigenvalue-vector, eigenvector-matrix pairs
+<span class="math notranslate nohighlight">\([(v_1, Q_1), (v_2, Q_2), ...]\)</span> such that
+<span class="math notranslate nohighlight">\(K_i = Q_i \text{diag}(v_i) Q_i'\)</span>. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">v_i</span><span class="p">,</span> <span class="n">Q_i</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">nlinalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">K_i</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>sigma: scalar, variable</strong></dt><dd><p>Standard deviation of the Gaussian white noise.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="rc778692fd389-1"><span class="brackets">1</span></dt>
+<dd><p>Saatchi, Y. (2011). “Scalable inference for structured Gaussian process models”</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Define a multivariate normal variable with a covariance
+<span class="math notranslate nohighlight">\(K = K_1 \otimes K_2\)</span></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">K1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+<span class="n">K2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="n">covs</span> <span class="o">=</span> <span class="p">[</span><span class="n">K1</span><span class="p">,</span> <span class="n">K2</span><span class="p">]</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">KroneckerNormal</span><span class="p">(</span><span class="s1">&#39;vals&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">covs</span><span class="o">=</span><span class="n">covs</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Effeciency gains are made by cholesky decomposing <span class="math notranslate nohighlight">\(K_1\)</span> and
+<span class="math notranslate nohighlight">\(K_2\)</span> individually rather than the larger <span class="math notranslate nohighlight">\(K\)</span> matrix. Although
+only two matrices <span class="math notranslate nohighlight">\(K_1\)</span> and <span class="math notranslate nohighlight">\(K_2\)</span> are shown here, an arbitrary
+number of submatrices can be combined in this way. Choleskys and
+eigendecompositions can be provided instead</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">chols</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">Ki</span><span class="p">)</span> <span class="k">for</span> <span class="n">Ki</span> <span class="ow">in</span> <span class="n">covs</span><span class="p">]</span>
+<span class="n">evds</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">Ki</span><span class="p">)</span> <span class="k">for</span> <span class="n">Ki</span> <span class="ow">in</span> <span class="n">covs</span><span class="p">]</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">vals2</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">KroneckerNormal</span><span class="p">(</span><span class="s1">&#39;vals2&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">chols</span><span class="o">=</span><span class="n">chols</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+    <span class="c1"># or</span>
+    <span class="n">vals3</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">KroneckerNormal</span><span class="p">(</span><span class="s1">&#39;vals3&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">evds</span><span class="o">=</span><span class="n">evds</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>neither of which will be converted. Diagonal noise can also be added to
+the covariance matrix, <span class="math notranslate nohighlight">\(K = K_1 \otimes K_2 + \sigma^2 I_N\)</span>.
+Despite the noise removing the overall Kronecker structure of the matrix,
+<cite>KroneckerNormal</cite> can continue to make efficient calculations by
+utilizing eigendecompositons of the submatrices behind the scenes [1].
+Thus,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">noise_model</span><span class="p">:</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">KroneckerNormal</span><span class="p">(</span><span class="s1">&#39;vals&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">covs</span><span class="o">=</span><span class="n">covs</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">vals2</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">KroneckerNormal</span><span class="p">(</span><span class="s1">&#39;vals2&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">chols</span><span class="o">=</span><span class="n">chols</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">vals3</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">KroneckerNormal</span><span class="p">(</span><span class="s1">&#39;vals3&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">evds</span><span class="o">=</span><span class="n">evds</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>are identical, with <cite>covs</cite> and <cite>chols</cite> each converted to
+eigendecompositions.</p>
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.KroneckerNormal.logp">
+<code class="sig-name descname">logp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.KroneckerNormal.logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate log-probability of Multivariate Normal distribution
+with Kronecker-structured covariance at specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>value: numeric</strong></dt><dd><p>Value for which log-probability is calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TensorVariable</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.KroneckerNormal.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.KroneckerNormal.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random values from Multivariate Normal distribution
+with Kronecker-structured covariance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>point: dict, optional</strong></dt><dd><p>Dict of variable values on which random values are to be
+conditioned (uses default point if not specified).</p>
+</dd>
+<dt><strong>size: int, optional</strong></dt><dd><p>Desired size of random sample (returns one sample if not
+specified).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymc3.distributions.multivariate.LKJCholeskyCov">
+<code class="sig-prename descclassname">pymc3.distributions.multivariate.</code><code class="sig-name descname">LKJCholeskyCov</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">eta</span></em>, <em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">sd_dist</span></em>, <em class="sig-param"><span class="n">compute_corr</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">store_in_trace</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.LKJCholeskyCov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper function for covariance matrix with LKJ distributed correlations.</p>
+<p>This defines a distribution over Cholesky decomposed covariance
+matrices, such that the underlying correlation matrices follow an
+LKJ distribution [1] and the standard deviations follow an arbitray
+distribution specified by the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: str</strong></dt><dd><p>The name given to the variable in the model.</p>
+</dd>
+<dt><strong>eta: float</strong></dt><dd><p>The shape parameter (eta &gt; 0) of the LKJ distribution. eta = 1
+implies a uniform distribution of the correlation matrices;
+larger values put more weight on matrices with few correlations.</p>
+</dd>
+<dt><strong>n: int</strong></dt><dd><p>Dimension of the covariance matrix (n &gt; 1).</p>
+</dd>
+<dt><strong>sd_dist: pm.Distribution</strong></dt><dd><p>A distribution for the standard deviations.</p>
+</dd>
+<dt><strong>compute_corr: bool, default=False</strong></dt><dd><p>If <cite>True</cite>, returns three values: the Cholesky decomposition, the correlations
+and the standard deviations of the covariance matrix. Otherwise, only returns
+the packed Cholesky decomposition. Defaults to <cite>False</cite> to ensure backwards
+compatibility.</p>
+</dd>
+<dt><strong>store_in_trace: bool, default=True</strong></dt><dd><p>Whether to store the correlations and standard deviations of the covariance
+matrix in the posterior trace. If <cite>True</cite>, they will automatically be named as
+<cite>{name}_corr</cite> and <cite>{name}_stds</cite> respectively. Effective only when
+<cite>compute_corr=True</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>packed_chol: TensorVariable</dt><dd><p>If <cite>compute_corr=False</cite> (default). The packed Cholesky covariance decomposition.</p>
+</dd>
+<dt>chol:  TensorVariable</dt><dd><p>If <cite>compute_corr=True</cite>. The unpacked Cholesky covariance decomposition.</p>
+</dd>
+<dt>corr: TensorVariable</dt><dd><p>If <cite>compute_corr=True</cite>. The correlations of the covariance matrix.</p>
+</dd>
+<dt>stds: TensorVariable</dt><dd><p>If <cite>compute_corr=True</cite>. The standard deviations of the covariance matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Since the Cholesky factor is a lower triangular matrix, we use packed storage for
+the matrix: We store the values of the lower triangular matrix in a one-dimensional
+array, numbered by row:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="mi">0</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="o">-</span> <span class="o">-</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span> <span class="o">-</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">6</span> <span class="mi">7</span> <span class="mi">8</span> <span class="mi">9</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>The unpacked Cholesky covariance matrix is automatically computed and returned when
+you specify <cite>compute_corr=True</cite> in <cite>pm.LKJCholeskyCov</cite> (see example below).
+Otherwise, you can use <cite>pm.expand_packed_triangular(packed_cov, lower=True)</cite>
+to convert the packed Cholesky matrix to a regular two-dimensional array.</p>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="r5f6d313c62fc-1"><span class="brackets">1</span></dt>
+<dd><p>Lewandowski, D., Kurowicka, D. and Joe, H. (2009).
+“Generating random correlation matrices based on vines and
+extended onion method.” Journal of multivariate analysis,
+100(9), pp.1989-2001.</p>
+</dd>
+<dt class="label" id="r5f6d313c62fc-2"><span class="brackets">2</span></dt>
+<dd><p>J. M. isn’t a mathematician (<a class="reference external" href="http://math.stackexchange.com/users/498/">http://math.stackexchange.com/users/498/</a>
+j-m-isnt-a-mathematician), Different approaches to evaluate this
+determinant, URL (version: 2012-04-14):
+<a class="reference external" href="http://math.stackexchange.com/q/130026">http://math.stackexchange.com/q/130026</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Note that we access the distribution for the standard</span>
+    <span class="c1"># deviations, and do not create a new random variable.</span>
+    <span class="n">sd_dist</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Exponential</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">chol</span><span class="p">,</span> <span class="n">corr</span><span class="p">,</span> <span class="n">sigmas</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">LKJCholeskyCov</span><span class="p">(</span><span class="s1">&#39;chol_cov&#39;</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">sd_dist</span><span class="o">=</span><span class="n">sd_dist</span><span class="p">,</span> <span class="n">compute_corr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># if you only want the packed Cholesky (default behavior):</span>
+    <span class="c1"># packed_chol = pm.LKJCholeskyCov(&#39;chol_cov&#39;, eta=4, n=10, sd_dist=sd_dist)</span>
+    <span class="c1"># chol = pm.expand_packed_triangular(10, packed_chol, lower=True)</span>
+
+    <span class="c1"># Define a new MvNormal with the given covariance</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MvNormal</span><span class="p">(</span><span class="s1">&#39;vals&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">chol</span><span class="o">=</span><span class="n">chol</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="c1"># Or transform an uncorrelated normal:</span>
+    <span class="n">vals_raw</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;vals_raw&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">chol</span><span class="p">,</span> <span class="n">vals_raw</span><span class="p">)</span>
+
+    <span class="c1"># Or compute the covariance matrix</span>
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">chol</span><span class="p">,</span> <span class="n">chol</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Implementation</strong> In the unconstrained space all values of the cholesky factor
+are stored untransformed, except for the diagonal entries, where
+we use a log-transform to restrict them to positive values.</p>
+<p>To correctly compute log-likelihoods for the standard deviations
+and the correlation matrix seperatly, we need to consider a
+second transformation: Given a cholesky factorization
+<span class="math notranslate nohighlight">\(LL^T = \Sigma\)</span> of a covariance matrix we can recover the
+standard deviations <span class="math notranslate nohighlight">\(\sigma\)</span> as the euclidean lengths of
+the rows of <span class="math notranslate nohighlight">\(L\)</span>, and the cholesky factor of the
+correlation matrix as <span class="math notranslate nohighlight">\(U = \text{diag}(\sigma)^{-1}L\)</span>.
+Since each row of <span class="math notranslate nohighlight">\(U\)</span> has length 1, we do not need to
+store the diagonal. We define a transformation <span class="math notranslate nohighlight">\(\phi\)</span>
+such that <span class="math notranslate nohighlight">\(\phi(L)\)</span> is the lower triangular matrix containing
+the standard deviations <span class="math notranslate nohighlight">\(\sigma\)</span> on the diagonal and the
+correlation matrix <span class="math notranslate nohighlight">\(U\)</span> below. In this form we can easily
+compute the different likelihoods separately, as the likelihood
+of the correlation matrix only depends on the values below the
+diagonal, and the likelihood of the standard deviation depends
+only on the diagonal values.</p>
+<p>We still need the determinant of the jacobian of <span class="math notranslate nohighlight">\(\phi^{-1}\)</span>.
+If we think of <span class="math notranslate nohighlight">\(\phi\)</span> as an automorphism on
+<span class="math notranslate nohighlight">\(\mathbb{R}^{\tfrac{n(n+1)}{2}}\)</span>, where we order
+the dimensions as described in the notes above, the jacobian
+is a block-diagonal matrix, where each block corresponds to
+one row of <span class="math notranslate nohighlight">\(U\)</span>. Each block has arrowhead shape, and we
+can compute the determinant of that as described in [2]. Since
+the determinant of a block-diagonal matrix is the product
+of the determinants of the blocks, we get</p>
+<div class="math notranslate nohighlight">
+\[\text{det}(J_{\phi^{-1}}(U)) =
+\left[
+  \prod_{i=2}^N u_{ii}^{i - 1} L_{ii}
+\right]^{-1}\]</div>
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.multivariate.LKJCorr">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.multivariate.</code><code class="sig-name descname">LKJCorr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.LKJCorr" title="Permalink to this definition">¶</a></dt>
+<dd><p>The LKJ (Lewandowski, Kurowicka and Joe) log-likelihood.</p>
+<p>The LKJ distribution is a prior distribution for correlation matrices.
+If eta = 1 this corresponds to the uniform distribution over correlation
+matrices. For eta -&gt; oo the LKJ prior approaches the identity matrix.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 85%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Support</p></td>
+<td><p>Upper triangular matrix with values in [-1, 1]</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n: int</strong></dt><dd><p>Dimension of the covariance matrix (n &gt; 1).</p>
+</dd>
+<dt><strong>eta: float</strong></dt><dd><p>The shape parameter (eta &gt; 0) of the LKJ distribution. eta = 1
+implies a uniform distribution of the correlation matrices;
+larger values put more weight on matrices with few correlations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This implementation only returns the values of the upper triangular
+matrix excluding the diagonal. Here is a schematic for n = 5, showing
+the indexes of the elements:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="o">-</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span> <span class="o">-</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="mi">7</span> <span class="mi">8</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="mi">9</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="rb6b76ea5c908-lkj2009"><span class="brackets">LKJ2009</span></dt>
+<dd><p>Lewandowski, D., Kurowicka, D. and Joe, H. (2009).
+“Generating random correlation matrices based on vines and
+extended onion method.” Journal of multivariate analysis,
+100(9), pp.1989-2001.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.LKJCorr.logp">
+<code class="sig-name descname">logp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.LKJCorr.logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate log-probability of LKJ distribution at specified
+value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: numeric</strong></dt><dd><p>Value for which log-probability is calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TensorVariable</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.LKJCorr.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.LKJCorr.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random values from LKJ distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>point: dict, optional</strong></dt><dd><p>Dict of variable values on which random values are to be
+conditioned (uses default point if not specified).</p>
+</dd>
+<dt><strong>size: int, optional</strong></dt><dd><p>Desired size of random sample (returns one sample if not
+specified).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.multivariate.MatrixNormal">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.multivariate.</code><code class="sig-name descname">MatrixNormal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.MatrixNormal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matrix-valued normal log-likelihood.</p>
+<div class="math notranslate nohighlight">
+\[f(x \mid \mu, U, V) =
+    \frac{1}{(2\pi |U|^n |V|^m)^{1/2}}
+    \exp\left\{
+         -\frac{1}{2} \mathrm{Tr}[ V^{-1} (x-\mu)^{\prime} U^{-1} (x-\mu)]
+     \right\}\]</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 71%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Support</p></td>
+<td><p><span class="math notranslate nohighlight">\(x \in \mathbb{R}^{m \times n}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Mean</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mu\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Row Variance</p></td>
+<td><p><span class="math notranslate nohighlight">\(U\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Column Variance</p></td>
+<td><p><span class="math notranslate nohighlight">\(V\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mu: array</strong></dt><dd><p>Array of means. Must be broadcastable with the random variable X such
+that the shape of mu + X is (m,n).</p>
+</dd>
+<dt><strong>rowcov: mxm array</strong></dt><dd><p>Among-row covariance matrix. Defines variance within
+columns. Exactly one of rowcov or rowchol is needed.</p>
+</dd>
+<dt><strong>rowchol: mxm array</strong></dt><dd><p>Cholesky decomposition of among-row covariance matrix. Exactly one of
+rowcov or rowchol is needed.</p>
+</dd>
+<dt><strong>colcov: nxn array</strong></dt><dd><p>Among-column covariance matrix. If rowcov is the identity matrix,
+this functions as <cite>cov</cite> in MvNormal.
+Exactly one of colcov or colchol is needed.</p>
+</dd>
+<dt><strong>colchol: nxn array</strong></dt><dd><p>Cholesky decomposition of among-column covariance matrix. Exactly one
+of colcov or colchol is needed.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Define a matrixvariate normal variable for given row and column covariance
+matrices:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">colcov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+<span class="n">rowcov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">]])</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">rowcov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">colcov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+<span class="n">vals</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MatrixNormal</span><span class="p">(</span><span class="s1">&#39;vals&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">colcov</span><span class="o">=</span><span class="n">colcov</span><span class="p">,</span>
+                       <span class="n">rowcov</span><span class="o">=</span><span class="n">rowcov</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Above, the ith row in vals has a variance that is scaled by 4^i.
+Alternatively, row or column cholesky matrices could be substituted for
+either covariance matrix. The MatrixNormal is quicker way compute
+MvNormal(mu, np.kron(rowcov, colcov)) that takes advantage of kronecker product
+properties for inversion. For example, if draws from MvNormal had the same
+covariance structure, but were scaled by different powers of an unknown
+constant, both the covariance and scaling could be learned as follows
+(see the docstring of <cite>LKJCholeskyCov</cite> for more information about this)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup data</span>
+<span class="n">true_colcov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+                        <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+                        <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+<span class="n">m</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">true_colcov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">true_scale</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">true_rowcov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="n">true_scale</span><span class="o">**</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)])</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+<span class="n">true_kron</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">true_rowcov</span><span class="p">,</span> <span class="n">true_colcov</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">true_kron</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Setup right cholesky matrix</span>
+    <span class="n">sd_dist</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfCauchy</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">colchol_packed</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">LKJCholeskyCov</span><span class="p">(</span><span class="s1">&#39;colcholpacked&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                       <span class="n">sd_dist</span><span class="o">=</span><span class="n">sd_dist</span><span class="p">)</span>
+    <span class="n">colchol</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">expand_packed_triangular</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">colchol_packed</span><span class="p">)</span>
+
+    <span class="c1"># Setup left covariance matrix</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Lognormal</span><span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">true_scale</span><span class="p">),</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">rowcov</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">nlinalg</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="n">scale</span><span class="o">**</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)])</span>
+
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MatrixNormal</span><span class="p">(</span><span class="s1">&#39;vals&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">colchol</span><span class="o">=</span><span class="n">colchol</span><span class="p">,</span> <span class="n">rowcov</span><span class="o">=</span><span class="n">rowcov</span><span class="p">,</span>
+                           <span class="n">observed</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.MatrixNormal.logp">
+<code class="sig-name descname">logp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.MatrixNormal.logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate log-probability of Matrix-valued Normal distribution
+at specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>value: numeric</strong></dt><dd><p>Value for which log-probability is calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TensorVariable</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.MatrixNormal.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.MatrixNormal.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random values from Matrix-valued Normal distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>point: dict, optional</strong></dt><dd><p>Dict of variable values on which random values are to be
+conditioned (uses default point if not specified).</p>
+</dd>
+<dt><strong>size: int, optional</strong></dt><dd><p>Desired size of random sample (returns one sample if not
+specified).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.multivariate.Multinomial">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.multivariate.</code><code class="sig-name descname">Multinomial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.Multinomial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multinomial log-likelihood.</p>
+<p>Generalizes binomial distribution, but instead of each trial resulting
+in “success” or “failure”, each one results in exactly one of some
+fixed finite number k of possible outcomes over n independent trials.
+‘x[i]’ indicates the number of times outcome number i was observed
+over the n trials.</p>
+<div class="math notranslate nohighlight">
+\[f(x \mid n, p) = \frac{n!}{\prod_{i=1}^k x_i!} \prod_{i=1}^k p_i^{x_i}\]</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 81%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Support</p></td>
+<td><p><span class="math notranslate nohighlight">\(x \in \{0, 1, \ldots, n\}\)</span> such that
+<span class="math notranslate nohighlight">\(\sum x_i = n\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Mean</p></td>
+<td><p><span class="math notranslate nohighlight">\(n p_i\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Variance</p></td>
+<td><p><span class="math notranslate nohighlight">\(n p_i (1 - p_i)\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Covariance</p></td>
+<td><p><span class="math notranslate nohighlight">\(-n p_i p_j\)</span> for <span class="math notranslate nohighlight">\(i \ne j\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n: int or array</strong></dt><dd><p>Number of trials (n &gt; 0). If n is an array its shape must be (N,) with
+N = p.shape[0]</p>
+</dd>
+<dt><strong>p: one- or two-dimensional array</strong></dt><dd><p>Probability of each one of the different outcomes. Elements must
+be non-negative and sum to 1 along the last axis. They will be
+automatically rescaled otherwise.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.Multinomial.logp">
+<code class="sig-name descname">logp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.Multinomial.logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate log-probability of Multinomial distribution
+at specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: numeric</strong></dt><dd><p>Value for which log-probability is calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TensorVariable</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.Multinomial.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.Multinomial.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random values from Multinomial distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>point: dict, optional</strong></dt><dd><p>Dict of variable values on which random values are to be
+conditioned (uses default point if not specified).</p>
+</dd>
+<dt><strong>size: int, optional</strong></dt><dd><p>Desired size of random sample (returns one sample if not
+specified).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.multivariate.MvNormal">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.multivariate.</code><code class="sig-name descname">MvNormal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.MvNormal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multivariate normal log-likelihood.</p>
+<div class="math notranslate nohighlight">
+\[f(x \mid \pi, T) =
+    \frac{|T|^{1/2}}{(2\pi)^{k/2}}
+    \exp\left\{ -\frac{1}{2} (x-\mu)^{\prime} T (x-\mu) \right\}\]</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 76%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Support</p></td>
+<td><p><span class="math notranslate nohighlight">\(x \in \mathbb{R}^k\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Mean</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mu\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Variance</p></td>
+<td><p><span class="math notranslate nohighlight">\(T^{-1}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mu: array</strong></dt><dd><p>Vector of means.</p>
+</dd>
+<dt><strong>cov: array</strong></dt><dd><p>Covariance matrix. Exactly one of cov, tau, or chol is needed.</p>
+</dd>
+<dt><strong>tau: array</strong></dt><dd><p>Precision matrix. Exactly one of cov, tau, or chol is needed.</p>
+</dd>
+<dt><strong>chol: array</strong></dt><dd><p>Cholesky decomposition of covariance matrix. Exactly one of cov,
+tau, or chol is needed.</p>
+</dd>
+<dt><strong>lower: bool, default=True</strong></dt><dd><p>Whether chol is the lower tridiagonal cholesky factor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Define a multivariate normal variable for a given covariance
+matrix:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">vals</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MvNormal</span><span class="p">(</span><span class="s1">&#39;vals&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Most of the time it is preferable to specify the cholesky
+factor of the covariance instead. For example, we could
+fit a multivariate outcome like this (see the docstring
+of <cite>LKJCholeskyCov</cite> for more information about this):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">true_cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+                     <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+                     <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">true_cov</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="n">sd_dist</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Exponential</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">chol</span><span class="p">,</span> <span class="n">corr</span><span class="p">,</span> <span class="n">stds</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">LKJCholeskyCov</span><span class="p">(</span><span class="s1">&#39;chol_cov&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">sd_dist</span><span class="o">=</span><span class="n">sd_dist</span><span class="p">,</span> <span class="n">compute_corr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">vals</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MvNormal</span><span class="p">(</span><span class="s1">&#39;vals&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">chol</span><span class="o">=</span><span class="n">chol</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For unobserved values it can be better to use a non-centered
+parametrization:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sd_dist</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Exponential</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">chol</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">LKJCholeskyCov</span><span class="p">(</span><span class="s1">&#39;chol_cov&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">sd_dist</span><span class="o">=</span><span class="n">sd_dist</span><span class="p">,</span> <span class="n">compute_corr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">vals_raw</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;vals_raw&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">vals</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s1">&#39;vals&#39;</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">chol</span><span class="p">,</span> <span class="n">vals_raw</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.MvNormal.logp">
+<code class="sig-name descname">logp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.MvNormal.logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate log-probability of Multivariate Normal distribution
+at specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>value: numeric</strong></dt><dd><p>Value for which log-probability is calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TensorVariable</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.MvNormal.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.MvNormal.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random values from Multivariate Normal distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>point: dict, optional</strong></dt><dd><p>Dict of variable values on which random values are to be
+conditioned (uses default point if not specified).</p>
+</dd>
+<dt><strong>size: int, optional</strong></dt><dd><p>Desired size of random sample (returns one sample if not
+specified).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.multivariate.MvStudentT">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.multivariate.</code><code class="sig-name descname">MvStudentT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.MvStudentT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multivariate Student-T log-likelihood.</p>
+<div class="math notranslate nohighlight">
+\[f(\mathbf{x}| \nu,\mu,\Sigma) =
+\frac
+    {\Gamma\left[(\nu+p)/2\right]}
+    {\Gamma(\nu/2)\nu^{p/2}\pi^{p/2}
+     \left|{\Sigma}\right|^{1/2}
+     \left[
+       1+\frac{1}{\nu}
+       ({\mathbf x}-{\mu})^T
+       {\Sigma}^{-1}({\mathbf x}-{\mu})
+     \right]^{(\nu+p)/2}}\]</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 85%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Support</p></td>
+<td><p><span class="math notranslate nohighlight">\(x \in \mathbb{R}^k\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Mean</p></td>
+<td><p><span class="math notranslate nohighlight">\(\mu\)</span> if <span class="math notranslate nohighlight">\(\nu &gt; 1\)</span> else undefined</p></td>
+</tr>
+<tr class="row-odd"><td><p>Variance</p></td>
+<td><dl class="simple">
+<dt><span class="math notranslate nohighlight">\(\frac{\nu}{\mu-2}\Sigma\)</span></dt><dd><p>if <span class="math notranslate nohighlight">\(\nu&gt;2\)</span> else undefined</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>nu: int</strong></dt><dd><p>Degrees of freedom.</p>
+</dd>
+<dt><strong>Sigma: matrix</strong></dt><dd><p>Covariance matrix. Use <cite>cov</cite> in new code.</p>
+</dd>
+<dt><strong>mu: array</strong></dt><dd><p>Vector of means.</p>
+</dd>
+<dt><strong>cov: matrix</strong></dt><dd><p>The covariance matrix.</p>
+</dd>
+<dt><strong>tau: matrix</strong></dt><dd><p>The precision matrix.</p>
+</dd>
+<dt><strong>chol: matrix</strong></dt><dd><p>The cholesky factor of the covariance matrix.</p>
+</dd>
+<dt><strong>lower: bool, default=True</strong></dt><dd><p>Whether the cholesky fatcor is given as a lower triangular matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.MvStudentT.logp">
+<code class="sig-name descname">logp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.MvStudentT.logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate log-probability of Multivariate Student’s T distribution
+at specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>value: numeric</strong></dt><dd><p>Value for which log-probability is calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TensorVariable</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.MvStudentT.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.MvStudentT.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random values from Multivariate Student’s T distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>point: dict, optional</strong></dt><dd><p>Dict of variable values on which random values are to be
+conditioned (uses default point if not specified).</p>
+</dd>
+<dt><strong>size: int, optional</strong></dt><dd><p>Desired size of random sample (returns one sample if not
+specified).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.multivariate.Wishart">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.multivariate.</code><code class="sig-name descname">Wishart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.Wishart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wishart log-likelihood.</p>
+<p>The Wishart distribution is the probability distribution of the
+maximum-likelihood estimator (MLE) of the precision matrix of a
+multivariate normal distribution.  If V=1, the distribution is
+identical to the chi-square distribution with nu degrees of
+freedom.</p>
+<div class="math notranslate nohighlight">
+\[f(X \mid nu, T) =
+    \frac{{\mid T \mid}^{nu/2}{\mid X \mid}^{(nu-k-1)/2}}{2^{nu k/2}
+    \Gamma_p(nu/2)} \exp\left\{ -\frac{1}{2} Tr(TX) \right\}\]</div>
+<p>where <span class="math notranslate nohighlight">\(k\)</span> is the rank of <span class="math notranslate nohighlight">\(X\)</span>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 84%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Support</p></td>
+<td><p><span class="math notranslate nohighlight">\(X(p x p)\)</span> positive definite matrix</p></td>
+</tr>
+<tr class="row-even"><td><p>Mean</p></td>
+<td><p><span class="math notranslate nohighlight">\(nu V\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Variance</p></td>
+<td><p><span class="math notranslate nohighlight">\(nu (v_{ij}^2 + v_{ii} v_{jj})\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>nu: int</strong></dt><dd><p>Degrees of freedom, &gt; 0.</p>
+</dd>
+<dt><strong>V: array</strong></dt><dd><p>p x p positive definite matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This distribution is unusable in a PyMC3 model. You should instead
+use LKJCholeskyCov or LKJCorr.</p>
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.Wishart.logp">
+<code class="sig-name descname">logp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.Wishart.logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate log-probability of Wishart distribution
+at specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: numeric</strong></dt><dd><p>Value for which log-probability is calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TensorVariable</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.multivariate.Wishart.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.Wishart.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random values from Wishart distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>point: dict, optional</strong></dt><dd><p>Dict of variable values on which random values are to be
+conditioned (uses default point if not specified).</p>
+</dd>
+<dt><strong>size: int, optional</strong></dt><dd><p>Desired size of random sample (returns one sample if not
+specified).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymc3.distributions.multivariate.WishartBartlett">
+<code class="sig-prename descclassname">pymc3.distributions.multivariate.</code><code class="sig-name descname">WishartBartlett</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">S</span></em>, <em class="sig-param"><span class="n">nu</span></em>, <em class="sig-param"><span class="n">is_cholesky</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">return_cholesky</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">testval</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.multivariate.WishartBartlett" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bartlett decomposition of the Wishart distribution. As the Wishart
+distribution requires the matrix to be symmetric positive semi-definite
+it is impossible for MCMC to ever propose acceptable matrices.</p>
+<p>Instead, we can use the Barlett decomposition which samples a lower
+diagonal matrix. Specifically:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\begin{split}\text{If} L \sim \begin{pmatrix}
+\sqrt{c_1} &amp; 0 &amp; 0 \\
+z_{21} &amp; \sqrt{c_2} &amp; 0 \\
+z_{31} &amp; z_{32} &amp; \sqrt{c_3}
+\end{pmatrix}\end{split}\\\begin{split}\text{with} c_i \sim \chi^2(n-i+1) \text{ and } n_{ij} \sim \mathcal{N}(0, 1), \text{then} \\
+L \times A \times A.T \times L.T \sim \text{Wishart}(L \times L.T, \nu)\end{split}\end{aligned}\end{align} \]</div>
+<p>See <a class="reference external" href="http://en.wikipedia.org/wiki/Wishart_distribution#Bartlett_decomposition">http://en.wikipedia.org/wiki/Wishart_distribution#Bartlett_decomposition</a>
+for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>S: ndarray</strong></dt><dd><p>p x p positive definite matrix
+Or:
+p x p lower-triangular matrix that is the Cholesky factor
+of the covariance matrix.</p>
+</dd>
+<dt><strong>nu: int</strong></dt><dd><p>Degrees of freedom, &gt; dim(S).</p>
+</dd>
+<dt><strong>is_cholesky: bool (default=False)</strong></dt><dd><p>Input matrix S is already Cholesky decomposed as S.T * S</p>
+</dd>
+<dt><strong>return_cholesky: bool (default=False)</strong></dt><dd><p>Only return the Cholesky decomposed matrix.</p>
+</dd>
+<dt><strong>testval: ndarray</strong></dt><dd><p>p x p positive definite matrix used to initialize</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This is not a standard Distribution class but follows a similar
+interface. Besides the Wishart distribution, it will add RVs
+name_c and name_z to your model which make up the matrix.</p>
+<p>This distribution is usually a bad idea to use as a prior for multivariate
+normal. You should instead use LKJCholeskyCov or LKJCorr.</p>
+</dd></dl>
+
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

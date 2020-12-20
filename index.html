@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PyMC3 Documentation &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/default.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="_static/highlight.min.js"></script>
+    <script src="_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="nb_tutorials/index.html" class="item">Tutorials</a> <a href="nb_examples/index.html" class="item">Examples</a> <a href="learn.html" class="item">Books + Videos</a> <a href="api.html" class="item">API</a> <a href="developer_guide.html" class="item">Developer Guide</a> <a href="about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ui center aligned text container">
+        <img src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+        <h2>Probabilistic Programming in Python</h2>
+        <a href="notebooks/api_quickstart.html">
+            <div class="ui huge primary button">Quickstart <i class="right arrow icon"></i></div>
+        </a>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+    <div class="ui vertical segment">
+        <a class="ui image" href="https://travis-ci.org/pymc-devs/pymc3">
+            <img src="https://travis-ci.org/pymc-devs/pymc3.svg?branch=master">
+        </a>
+        <a class="ui image" href="https://coveralls.io/github/pymc-devs/pymc3?branch=master">
+            <img src="https://coveralls.io/repos/github/pymc-devs/pymc3/badge.svg?branch=master">
+        </a>
+        <a class="ui image" href="https://tidelift.com/subscription/pkg/pypi-pymc3?utm_source=pypi-pymc3&utm_medium=referral&utm_campaign=enterprise">
+        <a class="ui image" href="https://www.numfocus.org/">
+            <img src="https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A">
+        </a>
+        <a class="ui image" href="https://mybinder.org/v2/gh/pymc-devs/pymc3/master?filepath=%2Fdocs%2Fsource%2Fnotebooks">
+            <img src="https://mybinder.org/badge_logo.svg">
+        </a>
+        <a class="ui image" href="https://hub.docker.com/r/pymc/pymc3">
+            <img src="https://img.shields.io/docker/automated/pymc/pymc3.svg">
+        </a>
+    </div>
+    
+
+    <div class="ui vertical segment">
+        
+  <div class="ui vertical stripe segment">
+    <div class="ui middle aligned stackable grid container">
+        <div class="row">
+
+            <div class="eight wide column">
+                <h3 class="ui header">Friendly modelling API</h3>
+                <p>PyMC3 allows you to write down models using an intuitive syntax to describe a data generating
+                    process.</p>
+                <h3 class="ui header">Cutting edge algorithms and model building blocks</h3>
+                <p>Fit your model using gradient-based MCMC algorithms like NUTS, using ADVI for fast approximate
+                    inference &mdash; including minibatch-ADVI for scaling to large datasets &mdash; or using
+                    Gaussian processes to build Bayesian nonparametric models.</p>
+            </div>
+            <div class="eight wide right floated column"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">linear_training_data</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">linear_model</span><span class="p">:</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;weights&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;noise&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">y_observed</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span>
+        <span class="s2">&quot;y_observed&quot;</span><span class="p">,</span>
+        <span class="n">mu</span><span class="o">=</span><span class="n">X</span> <span class="o">@</span> <span class="n">weights</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span>
+        <span class="n">observed</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">prior</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_prior_predictive</span><span class="p">()</span>
+    <span class="n">posterior</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
+    <span class="n">posterior_pred</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_posterior_predictive</span><span class="p">(</span><span class="n">posterior</span><span class="p">)</span>
+</pre></div>
+</div>
+        </div>
+    </div>
+</div>
+
+<div class="ui container">
+
+<h2 class="ui dividing header">Installation</h2>
+
+    <div class="row">
+        <div class="ui text container">
+            <h3 class="ui header">Via conda-forge:</h3><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge pymc3
+</pre></div>
+</div>
+<h3 class="ui header">Via pypi:</h3><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pymc3
+</pre></div>
+</div>
+<h3 class="ui header">Latest (unstable):</h3><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/pymc-devs/pymc3
+</pre></div>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui vertical segment">
+        <h2 class="ui dividing header">In-Depth Guides</h2>
+        <div class="ui four stackable cards">
+
+            <a class="ui link card" href="/Probability_Distributions.html">
+                <div class="content">
+                    <div class="header">Probability Distributions</div>
+                    <div class="description">PyMC3 includes a comprehensive set of pre-defined statistical distributions that can be used as model building blocks.
+                    </div>
+                </div>
+            </a>
+
+            <a class="ui link card" href="/Gaussian_Processes.html">
+                <div class="content">
+                    <div class="header">Gaussian Processes</div>
+                    <div class="description">Sometimes an unknown parameter or variable in a model is not a scalar value or a fixed-length vector, but a function. A Gaussian process (GP) can be used as a prior probability distribution whose support is over the space of continuous functions. PyMC3 provides rich support for defining and using GPs.
+                    </div>
+                </div>
+            </a>
+
+            <a class="ui link card" href="/notebooks/variational_api_quickstart.html">
+                <div class="content">
+                    <div class="header">Variational Inference</div>
+                    <div class="description">Variational inference saves computational cost by turning a problem of integration into one of optimization. PyMC3's variational API supports a number of cutting edge algorithms, as well as minibatch for scaling to large datasets.
+                    </div>
+                </div>
+            </a>
+
+            <a class="ui link card" href="/PyMC3_and_Theano.html">
+                <div class="content">
+                    <div class="header">PyMC3 and Theano</div>
+                    <div class="description">Theano is the deep-learning library PyMC3 uses to construct probability distributions and then access the gradient in order to implement cutting edge inference algorithms. More advanced models may be built by understanding this layer.
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+    <div class="ui vertical segment">
+        <h2 class="ui dividing header">License</h2>
+        <p>PyMC3 is licensed <a href="https://github.com/pymc-devs/pymc3/blob/master/LICENSE">under the Apache License, V2.</a></p>
+    </div>
+
+    <div class="ui vertical segment">
+        <h2 class="ui dividing header">Citing PyMC3</h2>
+        <p>Salvatier J., Wiecki T.V., Fonnesbeck C. (2016) Probabilistic programming in Python using PyMC3. PeerJ
+            Computer Science 2:e55 <a href="https://doi.org/10.7717/peerj-cs.55">DOI: 10.7717/peerj-cs.55</a>.</p>
+        <p>See <a href="https://scholar.google.de/scholar?oi=bibs&hl=en&authuser=1&cites=6936955228135731011">Google Scholar</a> for a continuously updated list of papers citing PyMC3.</p>
+    </div>
+
+    <div class="ui bottom attached segment">
+        <h2 class="ui dividing header">Support and sponsors</h2>
+        <p>PyMC3 is a non-profit project under NumFOCUS umbrella.
+        If you value PyMC and want to support its development, consider
+        <a href="https://numfocus.org/donate-to-pymc3">donating to the project</a> or
+        read our <a href="https://docs.pymc.io/about.html#support">support PyMC3 page</a>.
+        </p>
+
+        <div class="ui equal width grid">
+            <div class="column">
+                <a href="https://numfocus.org/">
+                    <img class="ui image" height="120" src="https://www.numfocus.org/wp-content/uploads/2017/07/NumFocus_LRG.png"/>
+                </a>
+            </div>
+            <div class="column">
+                <a href="https://quantopian.com">
+                    <img class="ui image" height="120" src="https://raw.githubusercontent.com/pymc-devs/pymc3/master/docs/quantopianlogo.jpg"/>
+                </a>
+            </div>
+            <div class="column">
+                <a href="https://odsc.com/">
+                    <img class="ui image" height="120" src="https://raw.githubusercontent.com/pymc-devs/pymc3/master/docs/odsc_logo.png"/>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

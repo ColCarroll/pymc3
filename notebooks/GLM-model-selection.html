@@ -1,0 +1,1785 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GLM: Model Selection &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="GLM:-Model-Selection">
+<h1>GLM: Model Selection<a class="headerlink" href="#GLM:-Model-Selection" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">arviz</span> <span class="k">as</span> <span class="nn">az</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interactive</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running on PyMC3 v</span><span class="si">{</span><span class="n">pm</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Running on PyMC3 v3.6
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">config</span> InlineBackend.figure_format = &#39;retina&#39;
+<span class="n">az</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;arviz-darkgrid&quot;</span><span class="p">)</span>
+<span class="n">rndst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>A fairly minimal reproducable example of Model Selection using WAIC, and LOO as currently implemented in PyMC3.</p>
+<p>This example creates two toy datasets under linear and quadratic models, and then tests the fit of a range of polynomial linear models upon those datasets by using Widely Applicable Information Criterion (WAIC), and leave-one-out (LOO) cross-validation using Pareto-smoothed importance sampling (PSIS).</p>
+<p>The example was inspired by Jake Vanderplas’ <a class="reference external" href="https://jakevdp.github.io/blog/2015/08/07/frequentism-and-bayesianism-5-model-selection/">blogpost</a> on model selection, although Cross-Validation and Bayes Factor comparison are not implemented. The datasets are tiny and generated within this Notebook. They contain errors in the measured value (y) only.</p>
+<div class="section" id="Local-Functions">
+<h2>Local Functions<a class="headerlink" href="#Local-Functions" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">latent_sigma_y</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a toy dataset based on a very simple model that we might</span>
+<span class="sd">    imagine is a noisy physical process:</span>
+<span class="sd">        1. random x values within a range</span>
+<span class="sd">        2. latent error aka inherent noise in y</span>
+<span class="sd">        3. optionally create labelled outliers with larger noise</span>
+
+<span class="sd">    Model form: y ~ a + bx + cx^2 + e</span>
+
+<span class="sd">    NOTE: latent_sigma_y is used to create a normally distributed,</span>
+<span class="sd">    &#39;latent error&#39; aka &#39;inherent noise&#39; in the &#39;physical&#39; generating</span>
+<span class="sd">    process, rather than experimental measurement error.</span>
+<span class="sd">    Please don&#39;t use the returned `latent_error` values in inferential</span>
+<span class="sd">    models, it&#39;s returned in the dataframe for interest only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">rndst</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)})</span>
+
+    <span class="c1"># create linear or quadratic model</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+
+    <span class="c1"># create latent noise and marked outliers</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;latent_error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rndst</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">latent_sigma_y</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;outlier_error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rndst</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">latent_sigma_y</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;outlier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rndst</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+    <span class="c1"># add noise, with extreme noise for marked outliers</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;outlier&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;latent_error&quot;</span><span class="p">]</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;outlier&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;outlier_error&quot;</span><span class="p">]</span>
+
+    <span class="c1"># round</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;latent_error&quot;</span><span class="p">,</span> <span class="s2">&quot;outlier_error&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">]:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># add label</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;quadratic&quot;</span>
+
+    <span class="c1"># create simple linspace for plotting true model</span>
+    <span class="n">plotx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="mi">100</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">ploty</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">plotx</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">plotx</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">dfp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">plotx</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">ploty</span><span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">dfp</span>
+
+
+<span class="k">def</span> <span class="nf">interact_dataset</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">a</span><span class="o">=-</span><span class="mi">30</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">latent_sigma_y</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function:</span>
+<span class="sd">    Interactively generate dataset and plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">df</span><span class="p">,</span> <span class="n">dfp</span> <span class="o">=</span> <span class="n">generate_data</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">latent_sigma_y</span><span class="p">)</span>
+
+    <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;outlier&quot;</span><span class="p">,</span>
+        <span class="n">hue_order</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+        <span class="n">palette</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;Set1&quot;</span><span class="p">),</span>
+        <span class="n">legend_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">,</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;latent_error&quot;</span><span class="p">,</span>
+        <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+        <span class="n">ms</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">mec</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+        <span class="n">mew</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">elinewidth</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">add_legend</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">0.92</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Sketch of Data Generation (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">plot_datasets</span><span class="p">(</span><span class="n">df_lin</span><span class="p">,</span> <span class="n">df_quad</span><span class="p">,</span> <span class="n">dfp_lin</span><span class="p">,</span> <span class="n">dfp_quad</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function:</span>
+<span class="sd">    Plot the two generated datasets in facets with generative model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">df_lin</span><span class="p">,</span> <span class="n">df_quad</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legend_out</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+
+    <span class="n">g</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dfp_lin</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">dfp_lin</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dfp_quad</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">dfp_quad</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">plot_traces</span><span class="p">(</span><span class="n">traces</span><span class="p">,</span> <span class="n">retain</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function:</span>
+<span class="sd">    Plot traces with overlaid means and values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span>
+        <span class="n">traces</span><span class="p">[</span><span class="o">-</span><span class="n">retain</span><span class="p">:],</span>
+        <span class="n">lines</span><span class="o">=</span><span class="nb">tuple</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="p">{},</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">traces</span><span class="p">[</span><span class="o">-</span><span class="n">retain</span><span class="p">:])</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()]),</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">mn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">traces</span><span class="p">[</span><span class="o">-</span><span class="n">retain</span><span class="p">:])[</span><span class="s2">&quot;mean&quot;</span><span class="p">]):</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mn</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">mn</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">xycoords</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span>
+            <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+            <span class="n">textcoords</span><span class="o">=</span><span class="s2">&quot;offset points&quot;</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="s2">&quot;large&quot;</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#AA0022&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">create_poly_modelspec</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function:</span>
+<span class="sd">    Create a polynomial modelspec string for patsy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;y ~ 1 + x &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;+ np.power(x,</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">run_models</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">upper_order</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function:</span>
+<span class="sd">    Fit a range of pymc3 models of increasing polynomial complexity.</span>
+<span class="sd">    Suggest limit to max order 5 since calculation time is exponential.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">models</span><span class="p">,</span> <span class="n">traces</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(),</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">upper_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+
+        <span class="n">nm</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;k</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">fml</span> <span class="o">=</span> <span class="n">create_poly_modelspec</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">models</span><span class="p">[</span><span class="n">nm</span><span class="p">]:</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Running: </span><span class="si">{</span><span class="n">nm</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">GLM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span>
+                <span class="n">fml</span><span class="p">,</span>
+                <span class="n">df</span><span class="p">,</span>
+                <span class="n">priors</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Intercept&quot;</span><span class="p">:</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">100</span><span class="p">)},</span>
+                <span class="n">family</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Normal</span><span class="p">(),</span>
+            <span class="p">)</span>
+
+            <span class="n">traces</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;advi+adapt_diag&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">models</span><span class="p">,</span> <span class="n">traces</span>
+
+
+<span class="k">def</span> <span class="nf">plot_posterior_cr</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">traces</span><span class="p">,</span> <span class="n">rawdata</span><span class="p">,</span> <span class="n">xlims</span><span class="p">,</span> <span class="n">datamodelnm</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">modelnm</span><span class="o">=</span><span class="s2">&quot;k1&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function:</span>
+<span class="sd">    Plot posterior predictions with credible regions shown as filled areas.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get traces and calc posterior prediction for npoints in x</span>
+    <span class="n">npoints</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">mdl</span> <span class="o">=</span> <span class="n">models</span><span class="p">[</span><span class="n">modelnm</span><span class="p">]</span>
+    <span class="n">trc</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">trace_to_dataframe</span><span class="p">(</span><span class="n">traces</span><span class="p">[</span><span class="n">modelnm</span><span class="p">][</span><span class="o">-</span><span class="mi">1000</span><span class="p">:])</span>
+    <span class="n">trc</span> <span class="o">=</span> <span class="n">trc</span><span class="p">[[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mdl</span><span class="o">.</span><span class="n">cont_vars</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]]</span>
+
+    <span class="n">ordr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">modelnm</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xlims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xlims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">npoints</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">npoints</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">pwrs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">npoints</span><span class="p">,</span> <span class="n">ordr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ordr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="n">pwrs</span>
+    <span class="n">cr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">trc</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># Calculate credible regions and plot over the datapoints</span>
+    <span class="n">dfp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">cr</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;025&quot;</span><span class="p">,</span> <span class="s2">&quot;250&quot;</span><span class="p">,</span> <span class="s2">&quot;500&quot;</span><span class="p">,</span> <span class="s2">&quot;750&quot;</span><span class="p">,</span> <span class="s2">&quot;975&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+    <span class="n">pal</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;Greens&quot;</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">ax1d</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Posterior Predictive Fit -- Data: </span><span class="si">{</span><span class="n">datamodelnm</span><span class="si">}</span><span class="s2"> -- Model: </span><span class="si">{</span><span class="n">modelnm</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
+
+    <span class="n">ax1d</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;025&quot;</span><span class="p">],</span> <span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;975&quot;</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">pal</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;CR 95%&quot;</span><span class="p">)</span>
+    <span class="n">ax1d</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;250&quot;</span><span class="p">],</span> <span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;750&quot;</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">pal</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;CR 50%&quot;</span><span class="p">)</span>
+    <span class="n">ax1d</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">dfp</span><span class="p">[</span><span class="s2">&quot;500&quot;</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">pal</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Median&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">ax1d</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlims</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">rawdata</span><span class="p">,</span>
+        <span class="n">fit_reg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;lw&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;edgecolor&quot;</span><span class="p">:</span> <span class="s2">&quot;w&quot;</span><span class="p">},</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax1d</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Generate-toy-datasets">
+<h3>Generate toy datasets<a class="headerlink" href="#Generate-toy-datasets" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="Interactively-draft-data">
+<h2>Interactively draft data<a class="headerlink" href="#Interactively-draft-data" title="Permalink to this headline">¶</a></h2>
+<p>Throughout the rest of the Notebook, we’ll use two toy datasets created by a linear and a quadratic model respectively, so that we can better evaluate the fit of the model selection.</p>
+<p>Right now, lets use an interactive session to play around with the data generation function in this Notebook, and get a feel for the possibilities of data we could generate.</p>
+<div class="math notranslate nohighlight">
+\[y_{i} = a + bx_{i} + cx_{i}^{2} + \epsilon_{i}\]</div>
+<div class="line-block">
+<div class="line">where:</div>
+<div class="line"><span class="math notranslate nohighlight">\(i \in n\)</span> datapoints</div>
+</div>
+<p><span class="math notranslate nohighlight">\(\epsilon \sim \mathcal{N}(0,latent\_sigma\_y)\)</span></p>
+<p><strong>NOTE on outliers:</strong></p>
+<ul class="simple">
+<li><p>We can use value <code class="docutils literal notranslate"><span class="pre">p</span></code> to set the (approximate) proportion of ‘outliers’ under a bernoulli distribution.</p></li>
+<li><p>These outliers have a 10x larger <code class="docutils literal notranslate"><span class="pre">latent_sigma_y</span></code></p></li>
+<li><p>These outliers are labelled in the returned datasets and may be useful for other modelling, see another example Notebook <code class="docutils literal notranslate"><span class="pre">GLM-robust-with-outlier-detection.ipynb</span></code></p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">interactive</span><span class="p">(</span>
+    <span class="n">interact_dataset</span><span class="p">,</span>
+    <span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">],</span>
+    <span class="n">a</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+    <span class="n">b</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+    <span class="n">c</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+    <span class="n">latent_sigma_y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "3f7c2b0604ab4d6aae55867976e7f8d1", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<p><strong>Observe:</strong></p>
+<ul class="simple">
+<li><p>I’ve shown the <code class="docutils literal notranslate"><span class="pre">latent_error</span></code> in errorbars, but this is for interest only, since this shows the <em>inherent noise</em> in whatever ‘physical process’ we imagine created the data.</p></li>
+<li><p>There is no <em>measurement error</em>.</p></li>
+<li><p>Datapoints created as outliers are shown in <strong>red</strong>, again for interest only.</p></li>
+</ul>
+</div>
+<div class="section" id="Create-datasets-for-modelling">
+<h2>Create datasets for modelling<a class="headerlink" href="#Create-datasets-for-modelling" title="Permalink to this headline">¶</a></h2>
+<p>We can use the above interactive plot to get a feel for the effect of the params. Now we’ll create 2 fixed datasets to use for the remainder of the Notebook.</p>
+<ol class="arabic simple">
+<li><p>For a start, we’ll create a linear model with small noise. Keep it simple.</p></li>
+<li><p>Secondly, a quadratic model with small noise</p></li>
+</ol>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">df_lin</span><span class="p">,</span> <span class="n">dfp_lin</span> <span class="o">=</span> <span class="n">generate_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">a</span><span class="o">=-</span><span class="mi">30</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">latent_sigma_y</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+<span class="n">df_quad</span><span class="p">,</span> <span class="n">dfp_quad</span> <span class="o">=</span> <span class="n">generate_data</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">a</span><span class="o">=-</span><span class="mi">200</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">latent_sigma_y</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Scatterplot against model line</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plot_datasets</span><span class="p">(</span><span class="n">df_lin</span><span class="p">,</span> <span class="n">df_quad</span><span class="p">,</span> <span class="n">dfp_lin</span><span class="p">,</span> <span class="n">dfp_quad</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_GLM-model-selection_13_0.png" src="../_images/notebooks_GLM-model-selection_13_0.png" />
+</div>
+</div>
+<p><strong>Observe:</strong></p>
+<ul class="simple">
+<li><p>We now have two datasets <code class="docutils literal notranslate"><span class="pre">df_lin</span></code> and <code class="docutils literal notranslate"><span class="pre">df_quad</span></code> created by a linear model and quadratic model respectively.</p></li>
+<li><p>You can see this raw data, the ideal model fit and the effect of the latent noise in the scatterplots above</p></li>
+<li><p>In the folowing plots in this Notebook, the linear-generated data will be shown in Blue and the quadratic in Green.</p></li>
+</ul>
+</div>
+<div class="section" id="Standardize">
+<h2>Standardize<a class="headerlink" href="#Standardize" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dfs_lin</span> <span class="o">=</span> <span class="n">df_lin</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">dfs_lin</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_lin</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df_lin</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">df_lin</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+<span class="n">dfs_quad</span> <span class="o">=</span> <span class="n">df_quad</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">dfs_quad</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_quad</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df_quad</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">df_quad</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Create ranges for later ylim xim</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dfs_lin_xlims</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">dfs_lin</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">dfs_lin</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">dfs_lin</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">dfs_lin</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">dfs_lin_ylims</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">dfs_lin</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">dfs_lin</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">dfs_lin</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">dfs_lin</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">dfs_quad_ylims</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">dfs_quad</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">dfs_quad</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">dfs_quad</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">dfs_quad</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Demonstrate-simple-linear-model">
+<h3>Demonstrate simple linear model<a class="headerlink" href="#Demonstrate-simple-linear-model" title="Permalink to this headline">¶</a></h3>
+<p>This <em>linear model</em> is really simple and conventional, an OLS with L2 constraints (Ridge Regression):</p>
+<div class="math notranslate nohighlight">
+\[y = a + bx + \epsilon\]</div>
+</div>
+</div>
+<div class="section" id="Define-model-using-explicit-PyMC3-method">
+<h2>Define model using explicit PyMC3 method<a class="headerlink" href="#Define-model-using-explicit-PyMC3-method" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">mdl_ols</span><span class="p">:</span>
+    <span class="c1">## define Normal priors to give Ridge regression</span>
+    <span class="n">b0</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;b0&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;b1&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+    <span class="c1">## define Linear model</span>
+    <span class="n">yest</span> <span class="o">=</span> <span class="n">b0</span> <span class="o">+</span> <span class="n">b1</span> <span class="o">*</span> <span class="n">df_lin</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
+
+    <span class="c1">## define Normal likelihood with HalfCauchy noise (fat tails, equiv to HalfT 1DoF)</span>
+    <span class="n">sigma_y</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfCauchy</span><span class="p">(</span><span class="s2">&quot;sigma_y&quot;</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">likelihood</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;likelihood&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">yest</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma_y</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">df_lin</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+
+    <span class="n">traces_ols</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sigma_y, b1, b0]
+Sampling 2 chains: 100%|██████████| 5000/5000 [00:05&lt;00:00, 915.99draws/s]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plot_traces</span><span class="p">(</span><span class="n">traces_ols</span><span class="p">,</span> <span class="n">retain</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_GLM-model-selection_22_0.png" src="../_images/notebooks_GLM-model-selection_22_0.png" />
+</div>
+</div>
+<p><strong>Observe:</strong></p>
+<ul class="simple">
+<li><p>This simple OLS manages to make fairly good guesses on the model parameters - the data has been generated fairly simply after all - but it does appear to have been fooled slightly by the inherent noise.</p></li>
+</ul>
+</div>
+<div class="section" id="Define-model-using-PyMC3-GLM-method">
+<h2>Define model using PyMC3 GLM method<a class="headerlink" href="#Define-model-using-PyMC3-GLM-method" title="Permalink to this headline">¶</a></h2>
+<p>PyMC3 has a module - <code class="docutils literal notranslate"><span class="pre">glm</span></code> - for defining models using a <code class="docutils literal notranslate"><span class="pre">patsy</span></code>-style formula syntax. This seems really useful, especially for defining simple regression models in fewer lines of code.</p>
+<p>Here’s the same OLS model as above, defined using <code class="docutils literal notranslate"><span class="pre">glm</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">mdl_ols_glm</span><span class="p">:</span>
+    <span class="c1"># Define priors for intercept and regression coefficients.</span>
+    <span class="n">priors</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Intercept&quot;</span><span class="p">:</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">100.0</span><span class="p">),</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">100.0</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="c1"># setup model with Normal likelihood (which uses HalfCauchy for error prior)</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">GLM</span><span class="o">.</span><span class="n">from_formula</span><span class="p">(</span><span class="s2">&quot;y ~ 1 + x&quot;</span><span class="p">,</span> <span class="n">df_lin</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Normal</span><span class="p">())</span>
+
+    <span class="n">traces_ols_glm</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, x, Intercept]
+Sampling 2 chains: 100%|██████████| 5000/5000 [00:04&lt;00:00, 1132.82draws/s]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plot_traces</span><span class="p">(</span><span class="n">traces_ols_glm</span><span class="p">,</span> <span class="n">retain</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_GLM-model-selection_26_0.png" src="../_images/notebooks_GLM-model-selection_26_0.png" />
+</div>
+</div>
+<p><strong>Observe:</strong></p>
+<ul>
+<li><p>The output parameters are of course named differently to the custom naming before. Now we have:</p>
+<div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">b0</span> <span class="pre">==</span> <span class="pre">Intercept</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">b1</span> <span class="pre">==</span> <span class="pre">x</span></code></div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">sigma_y</span> <span class="pre">==</span> <span class="pre">sd</span></code></div>
+</div>
+</li>
+<li><p>However, naming aside, this <code class="docutils literal notranslate"><span class="pre">glm</span></code>-defined model appears to behave in a very similar way, and finds the same parameter values as the conventionally-defined model - any differences are due to the random nature of the sampling.</p></li>
+<li><p>We can quite happily use the <code class="docutils literal notranslate"><span class="pre">glm</span></code> syntax for further models below, since it allows us to create a small model factory very easily.</p></li>
+</ul>
+<div class="section" id="Create-higher-order-linear-models">
+<h3>Create higher-order linear models<a class="headerlink" href="#Create-higher-order-linear-models" title="Permalink to this headline">¶</a></h3>
+<p>Back to the real purpose of this Notebook, to demonstrate model selection.</p>
+<p>First, let’s create and run a set of polynomial models on each of our toy datasets. By default this is for models of order 1 to 5.</p>
+</div>
+</div>
+<div class="section" id="Create-and-run-polynomial-models">
+<h2>Create and run polynomial models<a class="headerlink" href="#Create-and-run-polynomial-models" title="Permalink to this headline">¶</a></h2>
+<p>Please see <code class="docutils literal notranslate"><span class="pre">run_models()</span></code> above for details. Generally, we’re creating 5 polynomial models and fitting each to the chosen dataset</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">models_lin</span><span class="p">,</span> <span class="n">traces_lin</span> <span class="o">=</span> <span class="n">run_models</span><span class="p">(</span><span class="n">dfs_lin</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Running: k1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi+adapt_diag...
+Average Loss = 95.185:  12%|█▏        | 23589/200000 [00:11&lt;01:25, 2069.12it/s]
+Convergence achieved at 23700
+Interrupted at 23,699 [11%]: Average Loss = 66,411
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, x, Intercept]
+Sampling 2 chains: 100%|██████████| 6000/6000 [00:03&lt;00:00, 1600.45draws/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Running: k2
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi+adapt_diag...
+Average Loss = 100.25:  12%|█▏        | 23691/200000 [00:13&lt;01:39, 1764.44it/s]
+Convergence achieved at 23700
+Interrupted at 23,699 [11%]: Average Loss = 66,768
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, np.power(x, 2), x, Intercept]
+Sampling 2 chains: 100%|██████████| 6000/6000 [00:04&lt;00:00, 1389.61draws/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Running: k3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi+adapt_diag...
+Average Loss = 105.36:  12%|█▏        | 23581/200000 [00:14&lt;01:46, 1658.03it/s]
+Convergence achieved at 23600
+Interrupted at 23,599 [11%]: Average Loss = 68,508
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, np.power(x, 3), np.power(x, 2), x, Intercept]
+Sampling 2 chains: 100%|██████████| 6000/6000 [00:06&lt;00:00, 860.92draws/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Running: k4
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi+adapt_diag...
+Average Loss = 109.99:  12%|█▏        | 24092/200000 [00:15&lt;01:50, 1597.36it/s]
+Convergence achieved at 24200
+Interrupted at 24,199 [12%]: Average Loss = 65,362
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, np.power(x, 4), np.power(x, 3), np.power(x, 2), x, Intercept]
+Sampling 2 chains: 100%|██████████| 6000/6000 [00:11&lt;00:00, 533.93draws/s]
+There were 3 divergences after tuning. Increase `target_accept` or reparameterize.
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Running: k5
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi+adapt_diag...
+Average Loss = 114.75:  12%|█▏        | 24447/200000 [00:15&lt;01:50, 1584.35it/s]
+Convergence achieved at 24500
+Interrupted at 24,499 [12%]: Average Loss = 64,276
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, np.power(x, 5), np.power(x, 4), np.power(x, 3), np.power(x, 2), x, Intercept]
+Sampling 2 chains: 100%|██████████| 6000/6000 [00:28&lt;00:00, 208.21draws/s]
+There were 62 divergences after tuning. Increase `target_accept` or reparameterize.
+There were 188 divergences after tuning. Increase `target_accept` or reparameterize.
+The acceptance probability does not match the target. It is 0.6372358436158017, but should be close to 0.8. Try to increase the number of tuning steps.
+The number of effective samples is smaller than 10% for some parameters.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">models_quad</span><span class="p">,</span> <span class="n">traces_quad</span> <span class="o">=</span> <span class="n">run_models</span><span class="p">(</span><span class="n">dfs_quad</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi+adapt_diag...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Running: k1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Average Loss = 1.6448e+06:   7%|▋         | 13881/200000 [00:08&lt;01:50, 1685.36it/s]
+Convergence achieved at 14000
+Interrupted at 13,999 [6%]: Average Loss = 5.4105e+08
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, x, Intercept]
+Sampling 2 chains: 100%|██████████| 6000/6000 [00:03&lt;00:00, 1700.82draws/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Running: k2
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi+adapt_diag...
+Average Loss = 193.06:  15%|█▌        | 30693/200000 [00:15&lt;01:26, 1959.84it/s]
+Convergence achieved at 30700
+Interrupted at 30,699 [15%]: Average Loss = 2.2511e+08
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, np.power(x, 2), x, Intercept]
+Sampling 2 chains: 100%|██████████| 6000/6000 [00:03&lt;00:00, 1679.86draws/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Running: k3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi+adapt_diag...
+Average Loss = 197.5:  15%|█▌        | 30539/200000 [00:19&lt;01:45, 1605.67it/s]
+Convergence achieved at 30700
+Interrupted at 30,699 [15%]: Average Loss = 2.1858e+08
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, np.power(x, 3), np.power(x, 2), x, Intercept]
+Sampling 2 chains: 100%|██████████| 6000/6000 [00:04&lt;00:00, 1332.04draws/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Running: k4
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi+adapt_diag...
+Average Loss = 176.83:  16%|█▌        | 31896/200000 [00:18&lt;01:36, 1740.96it/s]
+Convergence achieved at 32000
+Interrupted at 31,999 [15%]: Average Loss = 2.0112e+08
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, np.power(x, 4), np.power(x, 3), np.power(x, 2), x, Intercept]
+Sampling 2 chains: 100%|██████████| 6000/6000 [00:04&lt;00:00, 1234.69draws/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Running: k5
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using advi+adapt_diag...
+Average Loss = 175.7:  16%|█▌        | 32381/200000 [00:20&lt;01:43, 1614.69it/s]
+Convergence achieved at 32500
+Interrupted at 32,499 [16%]: Average Loss = 2.1393e+08
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sd, np.power(x, 5), np.power(x, 4), np.power(x, 3), np.power(x, 2), x, Intercept]
+Sampling 2 chains: 100%|██████████| 6000/6000 [00:05&lt;00:00, 1145.86draws/s]
+</pre></div></div>
+</div>
+<div class="section" id="A-really-bad-method-for-model-selection:-compare-likelihoods">
+<h3>A really bad method for model selection: compare likelihoods<a class="headerlink" href="#A-really-bad-method-for-model-selection:-compare-likelihoods" title="Permalink to this headline">¶</a></h3>
+<p>Evaluate log likelihoods straight from model.logp</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dfll</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span> <span class="s2">&quot;k2&quot;</span><span class="p">,</span> <span class="s2">&quot;k3&quot;</span><span class="p">,</span> <span class="s2">&quot;k4&quot;</span><span class="p">,</span> <span class="s2">&quot;k5&quot;</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lin&quot;</span><span class="p">,</span> <span class="s2">&quot;quad&quot;</span><span class="p">])</span>
+<span class="n">dfll</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;model&quot;</span>
+
+<span class="k">for</span> <span class="n">nm</span> <span class="ow">in</span> <span class="n">dfll</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="n">dfll</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">nm</span><span class="p">,</span> <span class="s2">&quot;lin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">models_lin</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span><span class="o">.</span><span class="n">logp</span><span class="p">(</span>
+        <span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">traces_lin</span><span class="p">[</span><span class="n">nm</span><span class="p">],</span> <span class="n">traces_lin</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span><span class="o">.</span><span class="n">varnames</span><span class="p">)[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="n">dfll</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">nm</span><span class="p">,</span> <span class="s2">&quot;quad&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">models_quad</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span><span class="o">.</span><span class="n">logp</span><span class="p">(</span>
+        <span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">traces_quad</span><span class="p">[</span><span class="n">nm</span><span class="p">],</span> <span class="n">traces_quad</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span><span class="o">.</span><span class="n">varnames</span><span class="p">)[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">)</span>
+
+<span class="n">dfll</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">dfll</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">id_vars</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">],</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">&quot;poly&quot;</span><span class="p">,</span> <span class="n">value_name</span><span class="o">=</span><span class="s2">&quot;log_likelihood&quot;</span><span class="p">)</span>
+<span class="n">dfll</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="n">dfll</span><span class="p">[[</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;poly&quot;</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<p>Plot log-likelihoods</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">dfll</span><span class="p">[</span><span class="s2">&quot;log_likelihood&quot;</span><span class="p">]</span>
+    <span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span> <span class="s2">&quot;k2&quot;</span><span class="p">,</span> <span class="s2">&quot;k3&quot;</span><span class="p">,</span> <span class="s2">&quot;k4&quot;</span><span class="p">,</span> <span class="s2">&quot;k5&quot;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">4.25</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_GLM-model-selection_34_0.png" src="../_images/notebooks_GLM-model-selection_34_0.png" />
+</div>
+</div>
+<p><strong>Observe:</strong></p>
+<ul class="simple">
+<li><p>Again we’re showing the linear-generated data at left (Blue) and the quadratic-generated data on the right (Green)</p></li>
+<li><p>For both datasets, as the models get more complex, the likelhood increases monotonically</p></li>
+<li><p>This is expected, since the models are more flexible and thus able to (over)fit more easily.</p></li>
+<li><p>This overfitting makes it a terrible idea to simply use the likelihood to evaluate the model fits.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="View-posterior-predictive-fit">
+<h2>View posterior predictive fit<a class="headerlink" href="#View-posterior-predictive-fit" title="Permalink to this headline">¶</a></h2>
+<p>Just for the linear, generated data, lets take an interactive look at the posterior predictive fit for the models k1 through k5.</p>
+<p>As indicated by the likelhood plots above, the higher-order polynomial models exhibit some quite wild swings in the function in order to (over)fit the data</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">interactive</span><span class="p">(</span>
+    <span class="n">plot_posterior_cr</span><span class="p">,</span>
+    <span class="n">models</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">models_lin</span><span class="p">),</span>
+    <span class="n">traces</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">traces_lin</span><span class="p">),</span>
+    <span class="n">rawdata</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">dfs_lin</span><span class="p">),</span>
+    <span class="n">xlims</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="n">dfs_lin_xlims</span><span class="p">),</span>
+    <span class="n">datamodelnm</span><span class="o">=</span><span class="n">fixed</span><span class="p">(</span><span class="s2">&quot;linear&quot;</span><span class="p">),</span>
+    <span class="n">modelnm</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span> <span class="s2">&quot;k2&quot;</span><span class="p">,</span> <span class="s2">&quot;k3&quot;</span><span class="p">,</span> <span class="s2">&quot;k4&quot;</span><span class="p">,</span> <span class="s2">&quot;k5&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "90023ea40004448bb211f4910de44ab8", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="section" id="Compare-models-using-WAIC">
+<h3>Compare models using WAIC<a class="headerlink" href="#Compare-models-using-WAIC" title="Permalink to this headline">¶</a></h3>
+<p>The Widely Applicable Information Criterion (WAIC) can be used to calculate the goodness-of-fit of a model using numerical techniques. See <a class="reference external" href="http://www.jmlr.org/papers/volume14/watanabe13a/watanabe13a.pdf">(Watanabe 2013)</a> for details.</p>
+<p><strong>Observe:</strong></p>
+<ul class="simple">
+<li><p>We get three different measurements:</p>
+<ul>
+<li><p>waic: widely available information criterion</p></li>
+<li><p>waic_se: standard error of waic</p></li>
+<li><p>p_waic: effective number parameters</p></li>
+</ul>
+</li>
+</ul>
+<p>In this case we are interested in the WAIC score. We also plot error bars for the standard error of the estimated scores. This gives us a more accurate view of how much they might differ.</p>
+<p>Now loop through all the models and calculate the WAIC</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">model_trace_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">nm</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span> <span class="s2">&quot;k2&quot;</span><span class="p">,</span> <span class="s2">&quot;k3&quot;</span><span class="p">,</span> <span class="s2">&quot;k4&quot;</span><span class="p">,</span> <span class="s2">&quot;k5&quot;</span><span class="p">]:</span>
+    <span class="n">models_lin</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;poly=lin, &quot;</span> <span class="o">+</span> <span class="n">nm</span>
+    <span class="n">model_trace_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">models_lin</span><span class="p">[</span><span class="n">nm</span><span class="p">]:</span> <span class="n">traces_lin</span><span class="p">[</span><span class="n">nm</span><span class="p">]})</span>
+
+    <span class="n">models_quad</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;poly=quad, &quot;</span> <span class="o">+</span> <span class="n">nm</span>
+    <span class="n">model_trace_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">models_quad</span><span class="p">[</span><span class="n">nm</span><span class="p">]:</span> <span class="n">traces_quad</span><span class="p">[</span><span class="n">nm</span><span class="p">]})</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dfwaic</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">model_trace_dict</span><span class="p">,</span> <span class="n">ic</span><span class="o">=</span><span class="s2">&quot;WAIC&quot;</span><span class="p">)</span>
+<span class="n">dfwaic</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_tuples</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dfwaic</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()])</span>
+
+<span class="n">dfwaic</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:218: UserWarning: For one or more samples the posterior variance of the
+        log predictive densities exceeds 0.4. This could be indication of
+        WAIC starting to fail see http://arxiv.org/abs/1507.04544 for details
+
+  &#34;&#34;&#34;)
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:218: UserWarning: For one or more samples the posterior variance of the
+        log predictive densities exceeds 0.4. This could be indication of
+        WAIC starting to fail see http://arxiv.org/abs/1507.04544 for details
+
+  &#34;&#34;&#34;)
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:218: UserWarning: For one or more samples the posterior variance of the
+        log predictive densities exceeds 0.4. This could be indication of
+        WAIC starting to fail see http://arxiv.org/abs/1507.04544 for details
+
+  &#34;&#34;&#34;)
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:218: UserWarning: For one or more samples the posterior variance of the
+        log predictive densities exceeds 0.4. This could be indication of
+        WAIC starting to fail see http://arxiv.org/abs/1507.04544 for details
+
+  &#34;&#34;&#34;)
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:218: UserWarning: For one or more samples the posterior variance of the
+        log predictive densities exceeds 0.4. This could be indication of
+        WAIC starting to fail see http://arxiv.org/abs/1507.04544 for details
+
+  &#34;&#34;&#34;)
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:218: UserWarning: For one or more samples the posterior variance of the
+        log predictive densities exceeds 0.4. This could be indication of
+        WAIC starting to fail see http://arxiv.org/abs/1507.04544 for details
+
+  &#34;&#34;&#34;)
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:218: UserWarning: For one or more samples the posterior variance of the
+        log predictive densities exceeds 0.4. This could be indication of
+        WAIC starting to fail see http://arxiv.org/abs/1507.04544 for details
+
+  &#34;&#34;&#34;)
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:218: UserWarning: For one or more samples the posterior variance of the
+        log predictive densities exceeds 0.4. This could be indication of
+        WAIC starting to fail see http://arxiv.org/abs/1507.04544 for details
+
+  &#34;&#34;&#34;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>WAIC</th>
+      <th>pWAIC</th>
+      <th>dWAIC</th>
+      <th>weight</th>
+      <th>SE</th>
+      <th>dSE</th>
+      <th>var_warn</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">poly=lin</th>
+      <th>k1</th>
+      <td>130.89</td>
+      <td>2.22</td>
+      <td>0</td>
+      <td>1</td>
+      <td>3.98</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>k2</th>
+      <td>131.97</td>
+      <td>2.74</td>
+      <td>1.08</td>
+      <td>0</td>
+      <td>3.47</td>
+      <td>0.92</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>k3</th>
+      <td>134.67</td>
+      <td>3.77</td>
+      <td>3.78</td>
+      <td>0</td>
+      <td>3.71</td>
+      <td>1.08</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>k4</th>
+      <td>137.22</td>
+      <td>4.28</td>
+      <td>6.32</td>
+      <td>0</td>
+      <td>3.17</td>
+      <td>1.8</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>k5</th>
+      <td>138.86</td>
+      <td>4.63</td>
+      <td>7.96</td>
+      <td>0</td>
+      <td>3.76</td>
+      <td>2.17</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">poly=quad</th>
+      <th>k4</th>
+      <td>263.74</td>
+      <td>0.92</td>
+      <td>132.85</td>
+      <td>0</td>
+      <td>2.73</td>
+      <td>5.21</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>k5</th>
+      <td>263.9</td>
+      <td>1.04</td>
+      <td>133.01</td>
+      <td>0</td>
+      <td>2.57</td>
+      <td>5.27</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>k3</th>
+      <td>265.83</td>
+      <td>0.85</td>
+      <td>134.93</td>
+      <td>0</td>
+      <td>3.33</td>
+      <td>5.25</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>k2</th>
+      <td>266.57</td>
+      <td>0.64</td>
+      <td>135.67</td>
+      <td>0</td>
+      <td>3.73</td>
+      <td>5.4</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>k1</th>
+      <td>267.72</td>
+      <td>0.63</td>
+      <td>136.82</td>
+      <td>0</td>
+      <td>4.01</td>
+      <td>5.53</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">dfwaic</span><span class="p">[</span><span class="s2">&quot;WAIC&quot;</span><span class="p">]</span>
+    <span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+        <span class="n">yerr</span><span class="o">=</span><span class="n">dfwaic</span><span class="p">[</span><span class="s2">&quot;SE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span> <span class="s2">&quot;k2&quot;</span><span class="p">,</span> <span class="s2">&quot;k3&quot;</span><span class="p">,</span> <span class="s2">&quot;k4&quot;</span><span class="p">,</span> <span class="s2">&quot;k5&quot;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">4.25</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_GLM-model-selection_42_0.png" src="../_images/notebooks_GLM-model-selection_42_0.png" />
+</div>
+</div>
+<p><strong>Observe</strong></p>
+<ul class="simple">
+<li><p>We should prefer the model(s) with lower WAIC</p></li>
+<li><p>Linear-generated data (lhs):</p>
+<ul>
+<li><p>The WAIC seems quite flat across models</p></li>
+<li><p>The WAIC seems best (lowest) for simpler models.</p></li>
+</ul>
+</li>
+<li><p>Quadratic-generated data (rhs):</p>
+<ul>
+<li><p>The WAIC is also quite flat across the models</p></li>
+<li><p>The lowest WAIC is model <strong>k4</strong>, but <strong>k3</strong> - <strong>k5</strong> are more or less the same.</p></li>
+</ul>
+</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dfloo</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">model_trace_dict</span><span class="p">,</span> <span class="n">ic</span><span class="o">=</span><span class="s2">&quot;LOO&quot;</span><span class="p">)</span>
+<span class="n">dfloo</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_tuples</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dfloo</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()])</span>
+
+<span class="n">dfloo</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:299: UserWarning: Estimated shape parameter of Pareto distribution is
+        greater than 0.7 for one or more samples.
+        You should consider using a more robust model, this is because
+        importance sampling is less likely to work well if the marginal
+        posterior and LOO posterior are very different. This is more likely to
+        happen with a non-robust model and highly influential observations.
+  happen with a non-robust model and highly influential observations.&#34;&#34;&#34;)
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:299: UserWarning: Estimated shape parameter of Pareto distribution is
+        greater than 0.7 for one or more samples.
+        You should consider using a more robust model, this is because
+        importance sampling is less likely to work well if the marginal
+        posterior and LOO posterior are very different. This is more likely to
+        happen with a non-robust model and highly influential observations.
+  happen with a non-robust model and highly influential observations.&#34;&#34;&#34;)
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:299: UserWarning: Estimated shape parameter of Pareto distribution is
+        greater than 0.7 for one or more samples.
+        You should consider using a more robust model, this is because
+        importance sampling is less likely to work well if the marginal
+        posterior and LOO posterior are very different. This is more likely to
+        happen with a non-robust model and highly influential observations.
+  happen with a non-robust model and highly influential observations.&#34;&#34;&#34;)
+/home/junpenglao/Documents/pymc3/pymc3/stats.py:299: UserWarning: Estimated shape parameter of Pareto distribution is
+        greater than 0.7 for one or more samples.
+        You should consider using a more robust model, this is because
+        importance sampling is less likely to work well if the marginal
+        posterior and LOO posterior are very different. This is more likely to
+        happen with a non-robust model and highly influential observations.
+  happen with a non-robust model and highly influential observations.&#34;&#34;&#34;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>LOO</th>
+      <th>pLOO</th>
+      <th>dLOO</th>
+      <th>weight</th>
+      <th>SE</th>
+      <th>dSE</th>
+      <th>shape_warn</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">poly=lin</th>
+      <th>k1</th>
+      <td>131.14</td>
+      <td>2.34</td>
+      <td>0</td>
+      <td>1</td>
+      <td>4.05</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>k2</th>
+      <td>132.38</td>
+      <td>2.94</td>
+      <td>1.24</td>
+      <td>0</td>
+      <td>3.54</td>
+      <td>0.97</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>k3</th>
+      <td>136.02</td>
+      <td>4.44</td>
+      <td>4.88</td>
+      <td>0</td>
+      <td>4.08</td>
+      <td>1.38</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>k4</th>
+      <td>139.44</td>
+      <td>5.39</td>
+      <td>8.3</td>
+      <td>0</td>
+      <td>3.62</td>
+      <td>2.52</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>k5</th>
+      <td>141.23</td>
+      <td>5.82</td>
+      <td>10.09</td>
+      <td>0</td>
+      <td>4.35</td>
+      <td>2.67</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">poly=quad</th>
+      <th>k4</th>
+      <td>263.87</td>
+      <td>0.98</td>
+      <td>132.72</td>
+      <td>0</td>
+      <td>2.78</td>
+      <td>5.29</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>k5</th>
+      <td>264.79</td>
+      <td>1.48</td>
+      <td>133.65</td>
+      <td>0</td>
+      <td>2.84</td>
+      <td>5.35</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>k3</th>
+      <td>265.94</td>
+      <td>0.9</td>
+      <td>134.8</td>
+      <td>0</td>
+      <td>3.4</td>
+      <td>5.34</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>k2</th>
+      <td>266.64</td>
+      <td>0.68</td>
+      <td>135.49</td>
+      <td>0</td>
+      <td>3.78</td>
+      <td>5.49</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>k1</th>
+      <td>267.78</td>
+      <td>0.66</td>
+      <td>136.63</td>
+      <td>0</td>
+      <td>4.06</td>
+      <td>5.62</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">dfloo</span><span class="p">[</span><span class="s2">&quot;LOO&quot;</span><span class="p">]</span>
+    <span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+        <span class="n">yerr</span><span class="o">=</span><span class="n">dfloo</span><span class="p">[</span><span class="s2">&quot;SE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span> <span class="s2">&quot;k2&quot;</span><span class="p">,</span> <span class="s2">&quot;k3&quot;</span><span class="p">,</span> <span class="s2">&quot;k4&quot;</span><span class="p">,</span> <span class="s2">&quot;k5&quot;</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">4.25</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_GLM-model-selection_45_0.png" src="../_images/notebooks_GLM-model-selection_45_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Compare-leave-one-out-Cross-Validation-[LOO]">
+<h3>Compare leave-one-out Cross-Validation [LOO]<a class="headerlink" href="#Compare-leave-one-out-Cross-Validation-[LOO]" title="Permalink to this headline">¶</a></h3>
+<p>Leave-One-Out Cross-Validation or K-fold Cross-Validation is another quite universal approach for model selection. However, to implement K-fold cross-validation we need to paritition the data repeatly and fit the model on every partition. It can be very time consumming (computation time increase roughly as a factor of K). Here we are applying the numerical approach using the posterier trace as suggested in Vehtari et al 2015.</p>
+<p><strong>Observe</strong></p>
+<ul class="simple">
+<li><p>We should prefer the model(s) with lower LOO. You can see that LOO is nearly identical with WAIC. That’s because WAIC is asymptotically equal to LOO. However, PSIS-LOO is supposedly more robust than WAIC in the finite case (under weak priors or influential observation).</p></li>
+<li><p>Linear-generated data (lhs):</p>
+<ul>
+<li><p>The LOO is also quite flat across models</p></li>
+<li><p>The LOO is also seems best (lowest) for simpler models.</p></li>
+</ul>
+</li>
+<li><p>Quadratic-generated data (rhs):</p>
+<ul>
+<li><p>The same pattern as the WAIC</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="Final-remarks-and-tips">
+<h3>Final remarks and tips<a class="headerlink" href="#Final-remarks-and-tips" title="Permalink to this headline">¶</a></h3>
+<p>It is important to keep in mind that, with more data points, the real underlying model (one that we used to generate the data) should outperform other models.</p>
+<p>There is some agreement that PSIS-LOO offers the best indication of a model’s quality. To quote from <a class="reference external" href="https://github.com/pymc-devs/pymc3/issues/938#issuecomment-313425552">avehtari’s comment</a>: “I also recommend using PSIS-LOO instead of WAIC, because it’s more reliable and has better diagnostics as discussed in <a class="reference external" href="http://link.springer.com/article/10.1007/s11222-016-9696-4">http://link.springer.com/article/10.1007/s11222-016-9696-4</a> (preprint <a class="reference external" href="https://arxiv.org/abs/1507.04544">https://arxiv.org/abs/1507.04544</a>), but if you insist to have one information criterion then leave WAIC”.</p>
+<p>Alternatively, Watanabe <a class="reference external" href="http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/index.html">says</a> “WAIC is a better approximator of the generalization error than the pareto smoothing importance sampling cross validation. The Pareto smoothing cross validation may be the better approximator of the cross validation than WAIC, however, it is not of the generalization error”.</p>
+</div>
+<div class="section" id="Reference">
+<h3>Reference<a class="headerlink" href="#Reference" title="Permalink to this headline">¶</a></h3>
+<p>For more information on Model Selection in PyMC3, and about Bayesian model selection, you could start with:</p>
+<ul class="simple">
+<li><p>Thomas Wiecki’s <a class="reference external" href="https://stats.stackexchange.com/questions/161082/bayesian-model-selection-in-pymc3/166383#166383">detailed response</a> to a question on Cross Validated</p></li>
+<li><p>The Deviance Information Criterion: 12 Years On <a class="reference external" href="http://onlinelibrary.wiley.com/doi/10.1111/rssb.12062/abstract">(Speigelhalter et al 2014)</a></p></li>
+<li><p>Bayesian predictive information criterion for the evaluation of hierarchical Bayesian and empirical Bayes models <a class="reference external" href="https://doi.org/10.1093/biomet/asm017">(Ando 2007)</a></p></li>
+<li><p>A Widely Applicable Bayesian Information Criterion <a class="reference external" href="http://www.jmlr.org/papers/volume14/watanabe13a/watanabe13a.pdf">(Watanabe 2013)</a></p></li>
+<li><p>Efficient Implementation of Leave-One-Out Cross-Validation and WAIC for Evaluating Fitted Bayesian Models <a class="reference external" href="http://arxiv.org/abs/1507.04544">(Vehtari et al 2015)</a></p></li>
+</ul>
+<p>Example originally contributed by Jonathan Sedar 2016-01-09 <a class="reference external" href="https://github.com/jonsedar">github.com/jonsedar</a>. Edited by Junpeng Lao 2017-07-6 <a class="reference external" href="https://github.com/junpenglao">github.com/junpenglao</a></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> watermark
+<span class="o">%</span><span class="k">watermark</span> -n -u -v -iv -w
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pymc3 3.8
+arviz 0.8.3
+numpy 1.17.5
+last updated: Thu Jun 11 2020
+
+CPython 3.8.2
+IPython 7.11.0
+watermark 2.0.2
+</pre></div></div>
+</div>
+</div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

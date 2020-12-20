@@ -1,0 +1,885 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Implementations &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../../_static/highlight.min.js"></script>
+    <script src="../../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../../nb_examples/index.html" class="item">Examples</a> <a href="../../learn.html" class="item">Books + Videos</a> <a href="../../api.html" class="item">API</a> <a href="../../developer_guide.html" class="item">Developer Guide</a> <a href="../../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  <div class="section" id="implementations">
+<h1>Implementations<a class="headerlink" href="#implementations" title="Permalink to this headline">¶</a></h1>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pymc3.gp.gp.Latent" title="pymc3.gp.gp.Latent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Latent</span></code></a>([mean_func, cov_func])</p></td>
+<td><p>Latent Gaussian process.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pymc3.gp.gp.Marginal" title="pymc3.gp.gp.Marginal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Marginal</span></code></a>([mean_func, cov_func])</p></td>
+<td><p>Marginal Gaussian process.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pymc3.gp.gp.LatentKron" title="pymc3.gp.gp.LatentKron"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatentKron</span></code></a>([mean_func, cov_funcs])</p></td>
+<td><p>Latent Gaussian process whose covariance is a tensor product kernel.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pymc3.gp.gp.MarginalKron" title="pymc3.gp.gp.MarginalKron"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MarginalKron</span></code></a>([mean_func, cov_funcs])</p></td>
+<td><p>Marginal Gaussian process whose covariance is a tensor product kernel.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pymc3.gp.gp.MarginalSparse" title="pymc3.gp.gp.MarginalSparse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MarginalSparse</span></code></a>([mean_func, cov_func, approx])</p></td>
+<td><p>Approximate marginal Gaussian process.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pymc3.gp.gp.TP" title="pymc3.gp.gp.TP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TP</span></code></a>([mean_func, cov_func, nu])</p></td>
+<td><p>Student’s T process prior.</p></td>
+</tr>
+</tbody>
+</table>
+<span class="target" id="module-pymc3.gp.gp"></span><dl class="py class">
+<dt id="pymc3.gp.gp.Latent">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.gp.gp.</code><code class="sig-name descname">Latent</code><span class="sig-paren">(</span><em class="sig-param">mean_func=&lt;pymc3.gp.mean.Zero object&gt;</em>, <em class="sig-param">cov_func=&lt;pymc3.gp.cov.Constant object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.Latent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Latent Gaussian process.</p>
+<p>The <cite>gp.Latent</cite> class is a direct implementation of a GP.  No additive
+noise is assumed.  It is called “Latent” because the underlying function
+values are treated as latent variables.  It has a <cite>prior</cite> method and a
+<cite>conditional</cite> method.  Given a mean and covariance function the
+function <span class="math notranslate nohighlight">\(f(x)\)</span> is modeled as,</p>
+<div class="math notranslate nohighlight">
+\[f(x) \sim \mathcal{GP}\left(\mu(x), k(x, x')\right)\]</div>
+<p>Use the <cite>prior</cite> and <cite>conditional</cite> methods to actually construct random
+variables representing the unknown, or latent, function whose
+distribution is the GP prior or GP conditional.  This GP implementation
+can be used to implement regression on data that is not normally
+distributed.  For more information on the <cite>prior</cite> and <cite>conditional</cite> methods,
+see their docstrings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cov_func: None, 2D array, or instance of Covariance</strong></dt><dd><p>The covariance function.  Defaults to zero.</p>
+</dd>
+<dt><strong>mean_func: None, instance of Mean</strong></dt><dd><p>The mean function.  Defaults to zero.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># A one dimensional column vector of inputs.</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Specify the covariance function.</span>
+    <span class="n">cov_func</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">cov</span><span class="o">.</span><span class="n">ExpQuad</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+    <span class="c1"># Specify the GP.  The default mean function is `Zero`.</span>
+    <span class="n">gp</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">Latent</span><span class="p">(</span><span class="n">cov_func</span><span class="o">=</span><span class="n">cov_func</span><span class="p">)</span>
+
+    <span class="c1"># Place a GP prior over the function f.</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">prior</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
+
+<span class="o">...</span>
+
+<span class="c1"># After fitting or sampling, specify the distribution</span>
+<span class="c1"># at new points with .conditional</span>
+<span class="n">Xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">50</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">fcond</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">conditional</span><span class="p">(</span><span class="s2">&quot;fcond&quot;</span><span class="p">,</span> <span class="n">Xnew</span><span class="o">=</span><span class="n">Xnew</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="pymc3.gp.gp.Latent.conditional">
+<code class="sig-name descname">conditional</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">Xnew</span></em>, <em class="sig-param"><span class="n">given</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.Latent.conditional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the conditional distribution evaluated over new input
+locations <cite>Xnew</cite>.</p>
+<p>Given a set of function values <cite>f</cite> that
+the GP prior was over, the conditional distribution over a
+set of new points, <cite>f_*</cite> is</p>
+<div class="math notranslate nohighlight">
+\[f_* \mid f, X, X_* \sim \mathcal{GP}\left(
+    K(X_*, X) K(X, X)^{-1} f \,,
+    K(X_*, X_*) - K(X_*, X) K(X, X)^{-1} K(X, X_*) \right)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>Xnew: array-like</strong></dt><dd><p>Function input values.</p>
+</dd>
+<dt><strong>given: dict</strong></dt><dd><p>Can optionally take as key value pairs: <cite>X</cite>, <cite>y</cite>, <cite>noise</cite>,
+and <cite>gp</cite>.  See the section in the documentation on additive GP
+models in PyMC3 for more information.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to <cite>MvNormal</cite> distribution
+constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.gp.gp.Latent.prior">
+<code class="sig-name descname">prior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">reparameterize</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.Latent.prior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the GP prior distribution evaluated over the input
+locations <cite>X</cite>.</p>
+<p>This is the prior probability over the space
+of functions described by its mean and covariance function.</p>
+<div class="math notranslate nohighlight">
+\[f \mid X \sim \text{MvNormal}\left( \mu(X), k(X, X') \right)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>X: array-like</strong></dt><dd><p>Function input values.</p>
+</dd>
+<dt><strong>reparameterize: bool</strong></dt><dd><p>Reparameterize the distribution by rotating the random
+variable by the Cholesky factor of the covariance matrix.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to distribution constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.gp.gp.LatentKron">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.gp.gp.</code><code class="sig-name descname">LatentKron</code><span class="sig-paren">(</span><em class="sig-param">mean_func=&lt;pymc3.gp.mean.Zero object&gt;</em>, <em class="sig-param">cov_funcs=&lt;pymc3.gp.cov.Constant object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.LatentKron" title="Permalink to this definition">¶</a></dt>
+<dd><p>Latent Gaussian process whose covariance is a tensor product kernel.</p>
+<p>The <cite>gp.LatentKron</cite> class is a direct implementation of a GP with a
+Kronecker structured covariance, without reference to any noise or
+specific likelihood.  The GP is constructed with the <cite>prior</cite> method,
+and the conditional GP over new input locations is constructed with
+the <cite>conditional</cite> method.  <cite>conditional</cite> and method.  For more
+information on these methods, see their docstrings.  This GP
+implementation can be used to model a Gaussian process whose inputs
+cover evenly spaced grids on more than one dimension.  <cite>LatentKron</cite>
+is relies on the <cite>KroneckerNormal</cite> distribution, see its docstring
+for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cov_funcs: list of Covariance objects</strong></dt><dd><p>The covariance functions that compose the tensor (Kronecker) product.
+Defaults to [zero].</p>
+</dd>
+<dt><strong>mean_func: None, instance of Mean</strong></dt><dd><p>The mean function.  Defaults to zero.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># One dimensional column vectors of inputs</span>
+<span class="n">X1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">X2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">Xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="p">]</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Specify the covariance functions for each Xi</span>
+    <span class="n">cov_func1</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">cov</span><span class="o">.</span><span class="n">ExpQuad</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># Must accept X1 without error</span>
+    <span class="n">cov_func2</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">cov</span><span class="o">.</span><span class="n">ExpQuad</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>  <span class="c1"># Must accept X2 without error</span>
+
+    <span class="c1"># Specify the GP.  The default mean function is `Zero`.</span>
+    <span class="n">gp</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">LatentKron</span><span class="p">(</span><span class="n">cov_funcs</span><span class="o">=</span><span class="p">[</span><span class="n">cov_func1</span><span class="p">,</span> <span class="n">cov_func2</span><span class="p">])</span>
+
+    <span class="c1"># ...</span>
+
+<span class="c1"># After fitting or sampling, specify the distribution</span>
+<span class="c1"># at new points with .conditional</span>
+<span class="c1"># Xnew need not be on a full grid</span>
+<span class="n">Xnew1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">Xnew2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">Xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">Xnew1</span><span class="p">,</span> <span class="n">Xnew2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Not full grid, works</span>
+<span class="n">Xnew</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">cartesian</span><span class="p">(</span><span class="n">Xnew1</span><span class="p">,</span> <span class="n">Xnew2</span><span class="p">)</span>  <span class="c1"># Full grid, also works</span>
+
+<span class="k">with</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">fcond</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">conditional</span><span class="p">(</span><span class="s2">&quot;fcond&quot;</span><span class="p">,</span> <span class="n">Xnew</span><span class="o">=</span><span class="n">Xnew</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="pymc3.gp.gp.LatentKron.conditional">
+<code class="sig-name descname">conditional</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">Xnew</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.LatentKron.conditional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the conditional distribution evaluated over new input
+locations <cite>Xnew</cite>.</p>
+<p><cite>Xnew</cite> will be split by columns and fed to the relevant
+covariance functions based on their <cite>input_dim</cite>. For example, if
+<cite>cov_func1</cite>, <cite>cov_func2</cite>, and <cite>cov_func3</cite> have <cite>input_dim</cite> of 2,
+1, and 4, respectively, then <cite>Xnew</cite> must have 7 columns and a
+covariance between the prediction points</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cov_func</span><span class="p">(</span><span class="n">Xnew</span><span class="p">)</span> <span class="o">=</span> <span class="n">cov_func1</span><span class="p">(</span><span class="n">Xnew</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">cov_func1</span><span class="p">(</span><span class="n">Xnew</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span> <span class="o">*</span> <span class="n">cov_func1</span><span class="p">(</span><span class="n">Xnew</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:])</span>
+</pre></div>
+</div>
+<p>The distribution returned by <cite>conditional</cite> does not have a
+Kronecker structure regardless of whether the input points lie
+on a full grid.  Therefore, <cite>Xnew</cite> does not need to have grid
+structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>Xnew: array-like</strong></dt><dd><p>Function input values.  If one-dimensional, must be a column
+vector with shape <cite>(n, 1)</cite>.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to <cite>MvNormal</cite> distribution
+constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.gp.gp.LatentKron.prior">
+<code class="sig-name descname">prior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">Xs</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.LatentKron.prior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the prior distribution evaluated over the input
+locations <cite>Xs</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>Xs: list of array-like</strong></dt><dd><p>Function input values for each covariance function. Each entry
+must be passable to its respective covariance without error. The
+total covariance function is measured on the full grid
+<cite>cartesian(*Xs)</cite>.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to the <cite>KroneckerNormal</cite>
+distribution constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.gp.gp.Marginal">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.gp.gp.</code><code class="sig-name descname">Marginal</code><span class="sig-paren">(</span><em class="sig-param">mean_func=&lt;pymc3.gp.mean.Zero object&gt;</em>, <em class="sig-param">cov_func=&lt;pymc3.gp.cov.Constant object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.Marginal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marginal Gaussian process.</p>
+<p>The <cite>gp.Marginal</cite> class is an implementation of the sum of a GP
+prior and additive noise.  It has <cite>marginal_likelihood</cite>, <cite>conditional</cite>
+and <cite>predict</cite> methods.  This GP implementation can be used to
+implement regression on data that is normally distributed.  For more
+information on the <cite>prior</cite> and <cite>conditional</cite> methods, see their docstrings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cov_func: None, 2D array, or instance of Covariance</strong></dt><dd><p>The covariance function.  Defaults to zero.</p>
+</dd>
+<dt><strong>mean_func: None, instance of Mean</strong></dt><dd><p>The mean function.  Defaults to zero.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># A one dimensional column vector of inputs.</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Specify the covariance function.</span>
+    <span class="n">cov_func</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">cov</span><span class="o">.</span><span class="n">ExpQuad</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+    <span class="c1"># Specify the GP.  The default mean function is `Zero`.</span>
+    <span class="n">gp</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">Marginal</span><span class="p">(</span><span class="n">cov_func</span><span class="o">=</span><span class="n">cov_func</span><span class="p">)</span>
+
+    <span class="c1"># Place a GP prior over the function f.</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfCauchy</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">marginal_likelihood</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+
+<span class="o">...</span>
+
+<span class="c1"># After fitting or sampling, specify the distribution</span>
+<span class="c1"># at new points with .conditional</span>
+<span class="n">Xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">50</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">fcond</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">conditional</span><span class="p">(</span><span class="s2">&quot;fcond&quot;</span><span class="p">,</span> <span class="n">Xnew</span><span class="o">=</span><span class="n">Xnew</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="pymc3.gp.gp.Marginal.conditional">
+<code class="sig-name descname">conditional</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">Xnew</span></em>, <em class="sig-param"><span class="n">pred_noise</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">given</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.Marginal.conditional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the conditional distribution evaluated over new input
+locations <cite>Xnew</cite>.</p>
+<p>Given a set of function values <cite>f</cite> that the GP prior was over, the
+conditional distribution over a set of new points, <cite>f_*</cite> is:</p>
+<div class="math notranslate nohighlight">
+\[f_* \mid f, X, X_* \sim \mathcal{GP}\left(
+    K(X_*, X) [K(X, X) + K_{n}(X, X)]^{-1} f \,,
+    K(X_*, X_*) - K(X_*, X) [K(X, X) + K_{n}(X, X)]^{-1} K(X, X_*) \right)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>Xnew: array-like</strong></dt><dd><p>Function input values.  If one-dimensional, must be a column
+vector with shape <cite>(n, 1)</cite>.</p>
+</dd>
+<dt><strong>pred_noise: bool</strong></dt><dd><p>Whether or not observation noise is included in the conditional.
+Default is <cite>False</cite>.</p>
+</dd>
+<dt><strong>given: dict</strong></dt><dd><p>Can optionally take as key value pairs: <cite>X</cite>, <cite>y</cite>, <cite>noise</cite>,
+and <cite>gp</cite>.  See the section in the documentation on additive GP
+models in PyMC3 for more information.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to <cite>MvNormal</cite> distribution
+constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.gp.gp.Marginal.marginal_likelihood">
+<code class="sig-name descname">marginal_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">noise</span></em>, <em class="sig-param"><span class="n">is_observed</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.Marginal.marginal_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the marginal likelihood distribution, given the input
+locations <cite>X</cite> and the data <cite>y</cite>.</p>
+<p>This is integral over the product of the GP prior and a normal likelihood.</p>
+<div class="math notranslate nohighlight">
+\[y \mid X,\theta \sim \int p(y \mid f,\, X,\, \theta) \, p(f \mid X,\, \theta) \, df\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>X: array-like</strong></dt><dd><p>Function input values.  If one-dimensional, must be a column
+vector with shape <cite>(n, 1)</cite>.</p>
+</dd>
+<dt><strong>y: array-like</strong></dt><dd><p>Data that is the sum of the function with the GP prior and Gaussian
+noise.  Must have shape <cite>(n, )</cite>.</p>
+</dd>
+<dt><strong>noise: scalar, Variable, or Covariance</strong></dt><dd><p>Standard deviation of the Gaussian noise.  Can also be a Covariance for
+non-white noise.</p>
+</dd>
+<dt><strong>is_observed: bool</strong></dt><dd><p>Whether to set <cite>y</cite> as an <cite>observed</cite> variable in the <cite>model</cite>.
+Default is <cite>True</cite>.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to <cite>MvNormal</cite> distribution
+constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.gp.gp.Marginal.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Xnew</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">diag</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">pred_noise</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">given</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.Marginal.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the mean vector and covariance matrix of the conditional
+distribution as numpy arrays, given a <cite>point</cite>, such as the MAP
+estimate or a sample from a <cite>trace</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Xnew: array-like</strong></dt><dd><p>Function input values.  If one-dimensional, must be a column
+vector with shape <cite>(n, 1)</cite>.</p>
+</dd>
+<dt><strong>point: pymc3.model.Point</strong></dt><dd><p>A specific point to condition on.</p>
+</dd>
+<dt><strong>diag: bool</strong></dt><dd><p>If <cite>True</cite>, return the diagonal instead of the full covariance
+matrix.  Default is <cite>False</cite>.</p>
+</dd>
+<dt><strong>pred_noise: bool</strong></dt><dd><p>Whether or not observation noise is included in the conditional.
+Default is <cite>False</cite>.</p>
+</dd>
+<dt><strong>given: dict</strong></dt><dd><p>Same as <cite>conditional</cite> method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.gp.gp.Marginal.predictt">
+<code class="sig-name descname">predictt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Xnew</span></em>, <em class="sig-param"><span class="n">diag</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">pred_noise</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">given</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.Marginal.predictt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the mean vector and covariance matrix of the conditional
+distribution as symbolic variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Xnew: array-like</strong></dt><dd><p>Function input values.  If one-dimensional, must be a column
+vector with shape <cite>(n, 1)</cite>.</p>
+</dd>
+<dt><strong>diag: bool</strong></dt><dd><p>If <cite>True</cite>, return the diagonal instead of the full covariance
+matrix.  Default is <cite>False</cite>.</p>
+</dd>
+<dt><strong>pred_noise: bool</strong></dt><dd><p>Whether or not observation noise is included in the conditional.
+Default is <cite>False</cite>.</p>
+</dd>
+<dt><strong>given: dict</strong></dt><dd><p>Same as <cite>conditional</cite> method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.gp.gp.MarginalKron">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.gp.gp.</code><code class="sig-name descname">MarginalKron</code><span class="sig-paren">(</span><em class="sig-param">mean_func=&lt;pymc3.gp.mean.Zero object&gt;</em>, <em class="sig-param">cov_funcs=&lt;pymc3.gp.cov.Constant object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.MarginalKron" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marginal Gaussian process whose covariance is a tensor product kernel.</p>
+<p>The <cite>gp.MarginalKron</cite> class is an implementation of the sum of a
+Kronecker GP prior and additive white noise. It has
+<cite>marginal_likelihood</cite>, <cite>conditional</cite> and <cite>predict</cite> methods. This GP
+implementation can be used to efficiently implement regression on
+data that are normally distributed with a tensor product kernel and
+are measured on a full grid of inputs: <cite>cartesian(*Xs)</cite>.
+<cite>MarginalKron</cite> is based on the <cite>KroneckerNormal</cite> distribution, see
+its docstring for more information. For more information on the
+<cite>prior</cite> and <cite>conditional</cite> methods, see their docstrings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cov_funcs: list of Covariance objects</strong></dt><dd><p>The covariance functions that compose the tensor (Kronecker) product.
+Defaults to [zero].</p>
+</dd>
+<dt><strong>mean_func: None, instance of Mean</strong></dt><dd><p>The mean function.  Defaults to zero.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># One dimensional column vectors of inputs</span>
+<span class="n">X1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">X2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">Xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X1</span><span class="p">)</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">X2</span><span class="p">))</span>  <span class="c1"># toy data</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Specify the covariance functions for each Xi</span>
+    <span class="n">cov_func1</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">cov</span><span class="o">.</span><span class="n">ExpQuad</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># Must accept X1 without error</span>
+    <span class="n">cov_func2</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">cov</span><span class="o">.</span><span class="n">ExpQuad</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>  <span class="c1"># Must accept X2 without error</span>
+
+    <span class="c1"># Specify the GP.  The default mean function is `Zero`.</span>
+    <span class="n">gp</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">MarginalKron</span><span class="p">(</span><span class="n">cov_funcs</span><span class="o">=</span><span class="p">[</span><span class="n">cov_func1</span><span class="p">,</span> <span class="n">cov_func2</span><span class="p">])</span>
+
+    <span class="c1"># Place a GP prior over the function f.</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfCauchy</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">marginal_likelihood</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">Xs</span><span class="o">=</span><span class="n">Xs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+
+    <span class="c1"># ...</span>
+
+<span class="c1"># After fitting or sampling, specify the distribution</span>
+<span class="c1"># at new points with .conditional</span>
+<span class="c1"># Xnew need not be on a full grid</span>
+<span class="n">Xnew1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">Xnew2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">Xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">Xnew1</span><span class="p">,</span> <span class="n">Xnew2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Not full grid, works</span>
+<span class="n">Xnew</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">cartesian</span><span class="p">(</span><span class="n">Xnew1</span><span class="p">,</span> <span class="n">Xnew2</span><span class="p">)</span>  <span class="c1"># Full grid, also works</span>
+
+<span class="k">with</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">fcond</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">conditional</span><span class="p">(</span><span class="s2">&quot;fcond&quot;</span><span class="p">,</span> <span class="n">Xnew</span><span class="o">=</span><span class="n">Xnew</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="pymc3.gp.gp.MarginalKron.conditional">
+<code class="sig-name descname">conditional</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">Xnew</span></em>, <em class="sig-param"><span class="n">pred_noise</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.MarginalKron.conditional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the conditional distribution evaluated over new input
+locations <cite>Xnew</cite>, just as in <cite>Marginal</cite>.</p>
+<p><cite>Xnew</cite> will be split by columns and fed to the relevant
+covariance functions based on their <cite>input_dim</cite>. For example, if
+<cite>cov_func1</cite>, <cite>cov_func2</cite>, and <cite>cov_func3</cite> have <cite>input_dim</cite> of 2,
+1, and 4, respectively, then <cite>Xnew</cite> must have 7 columns and a
+covariance between the prediction points</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cov_func</span><span class="p">(</span><span class="n">Xnew</span><span class="p">)</span> <span class="o">=</span> <span class="n">cov_func1</span><span class="p">(</span><span class="n">Xnew</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">cov_func1</span><span class="p">(</span><span class="n">Xnew</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span> <span class="o">*</span> <span class="n">cov_func1</span><span class="p">(</span><span class="n">Xnew</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:])</span>
+</pre></div>
+</div>
+<p>The distribution returned by <cite>conditional</cite> does not have a
+Kronecker structure regardless of whether the input points lie
+on a full grid.  Therefore, <cite>Xnew</cite> does not need to have grid
+structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>Xnew: array-like</strong></dt><dd><p>Function input values.  If one-dimensional, must be a column
+vector with shape <cite>(n, 1)</cite>.</p>
+</dd>
+<dt><strong>pred_noise: bool</strong></dt><dd><p>Whether or not observation noise is included in the conditional.
+Default is <cite>False</cite>.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to <cite>MvNormal</cite> distribution
+constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.gp.gp.MarginalKron.marginal_likelihood">
+<code class="sig-name descname">marginal_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">Xs</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">is_observed</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.MarginalKron.marginal_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the marginal likelihood distribution, given the input
+locations <cite>cartesian(*Xs)</cite> and the data <cite>y</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>Xs: list of array-like</strong></dt><dd><p>Function input values for each covariance function. Each entry
+must be passable to its respective covariance without error. The
+total covariance function is measured on the full grid
+<cite>cartesian(*Xs)</cite>.</p>
+</dd>
+<dt><strong>y: array-like</strong></dt><dd><p>Data that is the sum of the function with the GP prior and Gaussian
+noise.  Must have shape <cite>(n, )</cite>.</p>
+</dd>
+<dt><strong>sigma: scalar, Variable</strong></dt><dd><p>Standard deviation of the white Gaussian noise.</p>
+</dd>
+<dt><strong>is_observed: bool</strong></dt><dd><p>Whether to set <cite>y</cite> as an <cite>observed</cite> variable in the <cite>model</cite>.
+Default is <cite>True</cite>.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to <cite>KroneckerNormal</cite>
+distribution constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.gp.gp.MarginalKron.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Xnew</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">diag</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">pred_noise</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.MarginalKron.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the mean vector and covariance matrix of the conditional
+distribution as numpy arrays, given a <cite>point</cite>, such as the MAP
+estimate or a sample from a <cite>trace</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Xnew: array-like</strong></dt><dd><p>Function input values.  If one-dimensional, must be a column
+vector with shape <cite>(n, 1)</cite>.</p>
+</dd>
+<dt><strong>point: pymc3.model.Point</strong></dt><dd><p>A specific point to condition on.</p>
+</dd>
+<dt><strong>diag: bool</strong></dt><dd><p>If <cite>True</cite>, return the diagonal instead of the full covariance
+matrix.  Default is <cite>False</cite>.</p>
+</dd>
+<dt><strong>pred_noise: bool</strong></dt><dd><p>Whether or not observation noise is included in the conditional.
+Default is <cite>False</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.gp.gp.MarginalKron.predictt">
+<code class="sig-name descname">predictt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Xnew</span></em>, <em class="sig-param"><span class="n">diag</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">pred_noise</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.MarginalKron.predictt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the mean vector and covariance matrix of the conditional
+distribution as symbolic variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Xnew: array-like</strong></dt><dd><p>Function input values.  If one-dimensional, must be a column
+vector with shape <cite>(n, 1)</cite>.</p>
+</dd>
+<dt><strong>diag: bool</strong></dt><dd><p>If <cite>True</cite>, return the diagonal instead of the full covariance
+matrix.  Default is <cite>False</cite>.</p>
+</dd>
+<dt><strong>pred_noise: bool</strong></dt><dd><p>Whether or not observation noise is included in the conditional.
+Default is <cite>False</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.gp.gp.MarginalSparse">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.gp.gp.</code><code class="sig-name descname">MarginalSparse</code><span class="sig-paren">(</span><em class="sig-param">mean_func=&lt;pymc3.gp.mean.Zero object&gt;</em>, <em class="sig-param">cov_func=&lt;pymc3.gp.cov.Constant object&gt;</em>, <em class="sig-param">approx='FITC'</em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.MarginalSparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Approximate marginal Gaussian process.</p>
+<p>The <cite>gp.MarginalSparse</cite> class is an implementation of the sum of a GP
+prior and additive noise.  It has <cite>marginal_likelihood</cite>, <cite>conditional</cite>
+and <cite>predict</cite> methods.  This GP implementation can be used to
+implement regression on data that is normally distributed.  The
+available approximations are:</p>
+<ul class="simple">
+<li><p>DTC: Deterministic Training Conditional</p></li>
+<li><p>FITC: Fully independent Training Conditional</p></li>
+<li><p>VFE: Variational Free Energy</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cov_func: None, 2D array, or instance of Covariance</strong></dt><dd><p>The covariance function.  Defaults to zero.</p>
+</dd>
+<dt><strong>mean_func: None, instance of Mean</strong></dt><dd><p>The mean function.  Defaults to zero.</p>
+</dd>
+<dt><strong>approx: string</strong></dt><dd><p>The approximation to use.  Must be one of <cite>VFE</cite>, <cite>FITC</cite> or <cite>DTC</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>Quinonero-Candela, J., and Rasmussen, C. (2005). A Unifying View of
+Sparse Approximate Gaussian Process Regression.</p></li>
+<li><p>Titsias, M. (2009). Variational Learning of Inducing Variables in
+Sparse Gaussian Processes.</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># A one dimensional column vector of inputs.</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+<span class="c1"># A smaller set of inducing inputs</span>
+<span class="n">Xu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Specify the covariance function.</span>
+    <span class="n">cov_func</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">cov</span><span class="o">.</span><span class="n">ExpQuad</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+    <span class="c1"># Specify the GP.  The default mean function is `Zero`.</span>
+    <span class="n">gp</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">gp</span><span class="o">.</span><span class="n">MarginalSparse</span><span class="p">(</span><span class="n">cov_func</span><span class="o">=</span><span class="n">cov_func</span><span class="p">,</span> <span class="n">approx</span><span class="o">=</span><span class="s2">&quot;FITC&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Place a GP prior over the function f.</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfCauchy</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">marginal_likelihood</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Xu</span><span class="o">=</span><span class="n">Xu</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+
+<span class="o">...</span>
+
+<span class="c1"># After fitting or sampling, specify the distribution</span>
+<span class="c1"># at new points with .conditional</span>
+<span class="n">Xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">50</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">fcond</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">conditional</span><span class="p">(</span><span class="s2">&quot;fcond&quot;</span><span class="p">,</span> <span class="n">Xnew</span><span class="o">=</span><span class="n">Xnew</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="pymc3.gp.gp.MarginalSparse.conditional">
+<code class="sig-name descname">conditional</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">Xnew</span></em>, <em class="sig-param"><span class="n">pred_noise</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">given</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.MarginalSparse.conditional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the approximate conditional distribution of the GP evaluated over
+new input locations <cite>Xnew</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>Xnew: array-like</strong></dt><dd><p>Function input values.  If one-dimensional, must be a column
+vector with shape <cite>(n, 1)</cite>.</p>
+</dd>
+<dt><strong>pred_noise: bool</strong></dt><dd><p>Whether or not observation noise is included in the conditional.
+Default is <cite>False</cite>.</p>
+</dd>
+<dt><strong>given: dict</strong></dt><dd><p>Can optionally take as key value pairs: <cite>X</cite>, <cite>Xu</cite>, <cite>y</cite>, <cite>noise</cite>,
+and <cite>gp</cite>.  See the section in the documentation on additive GP
+models in PyMC3 for more information.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to <cite>MvNormal</cite> distribution
+constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.gp.gp.MarginalSparse.marginal_likelihood">
+<code class="sig-name descname">marginal_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">Xu</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">noise</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">is_observed</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.MarginalSparse.marginal_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the approximate marginal likelihood distribution, given the input
+locations <cite>X</cite>, inducing point locations <cite>Xu</cite>, data <cite>y</cite>, and white noise
+standard deviations <cite>sigma</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>X: array-like</strong></dt><dd><p>Function input values.  If one-dimensional, must be a column
+vector with shape <cite>(n, 1)</cite>.</p>
+</dd>
+<dt><strong>Xu: array-like</strong></dt><dd><p>The inducing points.  Must have the same number of columns as <cite>X</cite>.</p>
+</dd>
+<dt><strong>y: array-like</strong></dt><dd><p>Data that is the sum of the function with the GP prior and Gaussian
+noise.  Must have shape <cite>(n, )</cite>.</p>
+</dd>
+<dt><strong>noise: scalar, Variable</strong></dt><dd><p>Standard deviation of the Gaussian noise.</p>
+</dd>
+<dt><strong>is_observed: bool</strong></dt><dd><p>Whether to set <cite>y</cite> as an <cite>observed</cite> variable in the <cite>model</cite>.
+Default is <cite>True</cite>.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to <cite>MvNormal</cite> distribution
+constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.gp.gp.TP">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.gp.gp.</code><code class="sig-name descname">TP</code><span class="sig-paren">(</span><em class="sig-param">mean_func=&lt;pymc3.gp.mean.Zero object&gt;</em>, <em class="sig-param">cov_func=&lt;pymc3.gp.cov.Constant object&gt;</em>, <em class="sig-param">nu=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.TP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Student’s T process prior.</p>
+<p>The usage is nearly identical to that of <cite>gp.Latent</cite>.  The differences
+are that it must be initialized with a degrees of freedom parameter, and
+TP is not additive.  Given a mean and covariance function, and a degrees of
+freedom parameter, the function <span class="math notranslate nohighlight">\(f(x)\)</span> is modeled as,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}f(X) \sim \mathcal{TP}\left( \mu(X), k(X, X'), \\nu \\right)\end{split}\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cov_func</strong><span class="classifier">None, 2D array, or instance of Covariance</span></dt><dd><p>The covariance function.  Defaults to zero.</p>
+</dd>
+<dt><strong>mean_func</strong><span class="classifier">None, instance of Mean</span></dt><dd><p>The mean function.  Defaults to zero.</p>
+</dd>
+<dt><strong>nu</strong><span class="classifier">float</span></dt><dd><p>The degrees of freedom</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>Shah, A., Wilson, A. G., and Ghahramani, Z. (2014).  Student-t
+Processes as Alternatives to Gaussian Processes.  arXiv preprint arXiv:1402.4306.</p></li>
+</ul>
+<dl class="py method">
+<dt id="pymc3.gp.gp.TP.conditional">
+<code class="sig-name descname">conditional</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">Xnew</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.TP.conditional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the conditional distribution evaluated over new input
+locations <cite>Xnew</cite>.</p>
+<p>Given a set of function values <cite>f</cite> that
+the TP prior was over, the conditional distribution over a
+set of new points, <cite>f_*</cite> is</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>Xnew: array-like</strong></dt><dd><p>Function input values.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to <cite>MvNormal</cite> distribution
+constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.gp.gp.TP.prior">
+<code class="sig-name descname">prior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">reparameterize</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.gp.gp.TP.prior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the TP prior distribution evaluated over the input
+locations <cite>X</cite>.</p>
+<p>This is the prior probability over the space
+of functions described by its mean and covariance function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: string</strong></dt><dd><p>Name of the random variable</p>
+</dd>
+<dt><strong>X: array-like</strong></dt><dd><p>Function input values.</p>
+</dd>
+<dt><strong>reparameterize: bool</strong></dt><dd><p>Reparameterize the distribution by rotating the random
+variable by the Cholesky factor of the covariance matrix.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Extra keyword arguments that are passed to distribution constructor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

@@ -1,0 +1,1319 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Variance reduction in MLDA - Linear regression &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Variance-reduction-in-MLDA---Linear-regression">
+<h1>Variance reduction in MLDA - Linear regression<a class="headerlink" href="#Variance-reduction-in-MLDA---Linear-regression" title="Permalink to this headline">¶</a></h1>
+<p>MLDA is based on the idea of running multiple chains which sample from approximations of the true posterior (where the approximation normally becomes coarser when going from the top level to the bottom level). Due to this characteristic, MLDA draws MCMC samples from all those levels. These samples, apart from improving the mixing of the top-level chain can serve another purpose; we can use them to apply a variance reduction technique when estimating a quantity of interest from the drawn samples.</p>
+<p>In this example, we demonstrate this technique using a linear model example similar to the <code class="docutils literal notranslate"><span class="pre">MLDA_simple_linear_regression.ipynb</span></code> notebook in the same folder.</p>
+<div class="section" id="Typical-quantity-of-interest-estimation-in-MCMC">
+<h2>Typical quantity of interest estimation in MCMC<a class="headerlink" href="#Typical-quantity-of-interest-estimation-in-MCMC" title="Permalink to this headline">¶</a></h2>
+<p>Specifically, here we are interested in cases where we have a forward model <span class="math notranslate nohighlight">\(F\)</span> which is a function of an unknown vector of random variables <span class="math notranslate nohighlight">\(\theta\)</span>, i.e. <span class="math notranslate nohighlight">\(F = F(\theta)\)</span>. <span class="math notranslate nohighlight">\(F\)</span> is a model of some physical process or phenomenon and <span class="math notranslate nohighlight">\(\theta\)</span> is usually a set of unknown parameters in the model. We want to estimate a quantity of interest <span class="math notranslate nohighlight">\(Q\)</span> which depends on the forward model <span class="math notranslate nohighlight">\(F\)</span>, i.e. <span class="math notranslate nohighlight">\(Q = Q(F(\theta))\)</span>. In order to do that, we draw samples from the
+posterior of <span class="math notranslate nohighlight">\(P(\theta | D)\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> are our data, and we use the samples to construct an estimator <span class="math notranslate nohighlight">\(E_P[Q] = {1\over N} \Sigma_{n}Q(F(\theta_n))\)</span> where <span class="math notranslate nohighlight">\(\theta_n\)</span> is the <span class="math notranslate nohighlight">\(n-th\)</span> sample drawn from the posterior <span class="math notranslate nohighlight">\(P\)</span> using MCMC.</p>
+<p>In this notebook, where we work with a linear regression model, we can use simply one of the values in the theta vector or the mean of all y outputs of the model.</p>
+</div>
+<div class="section" id="Quantity-of-interest-estimation-using-variance-reduction-in-MLDA">
+<h2>Quantity of interest estimation using variance reduction in MLDA<a class="headerlink" href="#Quantity-of-interest-estimation-using-variance-reduction-in-MLDA" title="Permalink to this headline">¶</a></h2>
+<p>In a usual MCMC algorithm we would sample from the posterior and use the samples to get the estimate above. In MLDA, we have the extra advantage that we do not only draw samples from the correct/fine posterior <span class="math notranslate nohighlight">\(P\)</span>; we also draw samples from approximations of it. We can use those samples to reduce the variance of the estimator of <span class="math notranslate nohighlight">\(Q\)</span> (and thus require fewer samples to achieve the same variance).</p>
+<p>The technique we use is similar to the idea of a telescopic sum. Instead of estimating <span class="math notranslate nohighlight">\(Q\)</span> directly, we estimate differences of <span class="math notranslate nohighlight">\(Q\)</span>-estimates between levels and add those differences (i.e. we estimate the correction with respect to the next lower level).</p>
+<p>Specifically, we have a set of approximate forward models <span class="math notranslate nohighlight">\(F_l\)</span> and posteriors <span class="math notranslate nohighlight">\(P_l, l \in \{0,1,...,L-1\}\)</span>, where <span class="math notranslate nohighlight">\(L\)</span> is the number of levels in MLDA, <span class="math notranslate nohighlight">\(F_{L-1} = F\)</span> and <span class="math notranslate nohighlight">\(P_{L-1} = P\)</span>. MLDA in level <span class="math notranslate nohighlight">\(l\)</span> produces the samples <span class="math notranslate nohighlight">\(\theta_{1:N_l}^l\)</span> from posterior <span class="math notranslate nohighlight">\(P_l\)</span>, where <span class="math notranslate nohighlight">\(N_l\)</span> is the number of samples at that level (each level generates a different number of samples, with <span class="math notranslate nohighlight">\(N_l\)</span> decreasing with <span class="math notranslate nohighlight">\(l\)</span>). This also results in the
+quantitiy of interest functions <span class="math notranslate nohighlight">\(Q_l = Q(F_l(\theta))\)</span> for each level <span class="math notranslate nohighlight">\(l\)</span> (where <span class="math notranslate nohighlight">\(\theta\)</span> indexes are ommited. We use the following equation to estimate the quanity of interest (by combining the above functions): <span class="math notranslate nohighlight">\(E_{VR}[Q] = E_{P_0}[Q_0] + \Sigma_{l=1}^{L-1} (E_{P_l}[Q_l] - E_{P_{l-1}}[Q_{l-1}])\)</span>.</p>
+<p>The first term in the right hand side can be estimated using the samples from level 0. For the second term in the right hand side which contains all the differences, we estimate using the following process: In level <span class="math notranslate nohighlight">\(l\)</span>, and for each sample <span class="math notranslate nohighlight">\(\theta_n^l\)</span> in that level where <span class="math notranslate nohighlight">\(n \in {1,...,N_l}\)</span>, we use the sample <span class="math notranslate nohighlight">\(\theta_{s+R}^{l-1}\)</span> from level <span class="math notranslate nohighlight">\(l-1\)</span>, which is a random sample in the block of <span class="math notranslate nohighlight">\(K\)</span> samples generated in level <span class="math notranslate nohighlight">\(l-1\)</span> to propose a sample for
+level <span class="math notranslate nohighlight">\(l\)</span>, where <span class="math notranslate nohighlight">\(s\)</span> is the starting sample of the block. In other words <span class="math notranslate nohighlight">\(K\)</span> is the subsampling rate at level <span class="math notranslate nohighlight">\(l\)</span> and R is the index of the randomly selected sample (<span class="math notranslate nohighlight">\(R\)</span> can range from 1 to <span class="math notranslate nohighlight">\(K\)</span>). Having this sample, we calculate the following quantity: <span class="math notranslate nohighlight">\(Y_n^l = Q_l(F_l(\theta_n^l)) - Q_{l-1}(F_{l-1}(\theta_(s+R)^{l-1}))\)</span>. We do the same thing for all <span class="math notranslate nohighlight">\(N_l\)</span> samples in level <span class="math notranslate nohighlight">\(l\)</span> and finally use them to calculate
+<span class="math notranslate nohighlight">\(E_{P_l}[Q_l] - E_{P_{l-1}}[Q_{l-1}] = {1 \over N_l} \Sigma Y_n^l\)</span>. We do the same to estimate the remaining differences and add them all together to get <span class="math notranslate nohighlight">\(E_{VR}[Q]\)</span>.</p>
+</div>
+<div class="section" id="Note-on-asymptotic-variance-results">
+<h2>Note on asymptotic variance results<a class="headerlink" href="#Note-on-asymptotic-variance-results" title="Permalink to this headline">¶</a></h2>
+<p><span class="math notranslate nohighlight">\(E_{VR}[Q]\)</span> is shown to have asymptotically lower variance than <span class="math notranslate nohighlight">\(E_P[Q]\)</span> in [1], as long as the subsampling rate <span class="math notranslate nohighlight">\(K\)</span> in level <span class="math notranslate nohighlight">\(l\)</span> is larger than the MCMC autocorrelation length in level <span class="math notranslate nohighlight">\(l-1\)</span> (and if this is true for all levels). When this condition does not hold, we still see reasonably good variance reduction in experiments, although there is no theoretical gurantee of asymptotically lower variance. Users are advices to do pre-runs to detect the autocorrelation
+length of all chains in MLDA and then set the subsampling rates accordingly.</p>
+</div>
+<div class="section" id="Using-variance-reductioon-in-PyMC3">
+<h2>Using variance reductioon in PyMC3<a class="headerlink" href="#Using-variance-reductioon-in-PyMC3" title="Permalink to this headline">¶</a></h2>
+<p>The code in this notebook demonstrates how the user can employ the variance reduction technique within the PyMC3 implementation of MLDA. We run two samplers, one with VR and one without and calculate the resulting variances in the estimates.</p>
+<p>In order to use variance reduction, the user needs to pass the argument <code class="docutils literal notranslate"><span class="pre">variance_reduction=True</span></code> when instantiating the MLDA stepper. Also, they need to do two things when defining the PyMC3 model: - Include a <code class="docutils literal notranslate"><span class="pre">pm.Data()</span></code> variable with the name <code class="docutils literal notranslate"><span class="pre">Q</span></code> in the model description of all levels, as shown in the code. - Use a Theano Op to calculate the forward model (or the combination of a forward model and a likelihood). This Op should have a <code class="docutils literal notranslate"><span class="pre">perform()</span></code> method which (in addition to all the
+other calculations), calculates the quantity of interest and stores it to the variable <code class="docutils literal notranslate"><span class="pre">Q</span></code> of the PyMC3 model, using the <code class="docutils literal notranslate"><span class="pre">set_value()</span></code> function. An example is shown in the code.</p>
+<p>By doing the above, the user provides MLDA with the quantity of interest in each MCMC step. MLDA then internally stores and manages the values and returns all the terms necessary to calculate <span class="math notranslate nohighlight">\(E_{VR}[Q]\)</span> (i.e. all <span class="math notranslate nohighlight">\(Q_0\)</span> values and all <span class="math notranslate nohighlight">\(Y_n^l\)</span> differences/corrections) within the stats of the generated trace. The user can extract them using the <code class="docutils literal notranslate"><span class="pre">get_sampler_stats()</span></code> function of the trace object, as shown at the end of the notebook.</p>
+<div class="section" id="Dependencies">
+<h3>Dependencies<a class="headerlink" href="#Dependencies" title="Permalink to this headline">¶</a></h3>
+<p>The code has been developed and tested with Python 3.6. You will need to have pymc3 installed and also <a class="reference external" href="https://fenicsproject.org/">FEniCS</a> for your system. FEniCS is a popular, open-source, <a class="reference external" href="https://fenicsproject.org/documentation/">well documented</a>, high-performance computing framework for solving Partial Differential Equations. FEniCS can be <a class="reference external" href="https://fenicsproject.org/download/">installed</a> either through their prebuilt Docker images, from their Ubuntu PPA, or from Anaconda.</p>
+</div>
+<div class="section" id="References">
+<h3>References<a class="headerlink" href="#References" title="Permalink to this headline">¶</a></h3>
+<p>[1] Dodwell, Tim &amp; Ketelsen, Chris &amp; Scheichl, Robert &amp; Teckentrup, Aretha. (2019). Multilevel Markov Chain Monte Carlo. SIAM Review. 61. 509-545. <a class="reference external" href="https://doi.org/10.1137/19M126966X">https://doi.org/10.1137/19M126966X</a></p>
+</div>
+<div class="section" id="Import-modules">
+<h3>Import modules<a class="headerlink" href="#Import-modules" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span> <span class="k">as</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">arviz</span> <span class="k">as</span> <span class="nn">az</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="kn">import</span> <span class="nn">theano.tensor</span> <span class="k">as</span> <span class="nn">tt</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">ScalarFormatter</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">RANDOM_SEED</span> <span class="o">=</span> <span class="mi">4555</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+<span class="n">az</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;arviz-darkgrid&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Set-parameters-and-generate-data-using-a-linear-model">
+<h3>Set parameters and generate data using a linear model<a class="headerlink" href="#Set-parameters-and-generate-data-using-a-linear-model" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># set up the model and data</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+<span class="n">size</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">true_intercept</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">true_slope</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+<span class="c1"># y = a + b*x</span>
+<span class="n">true_regression_line</span> <span class="o">=</span> <span class="n">true_intercept</span> <span class="o">+</span> <span class="n">true_slope</span> <span class="o">*</span> <span class="n">x</span>
+
+<span class="c1"># add noise</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">true_regression_line</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">sigma</span>
+
+<span class="c1"># reduced datasets</span>
+<span class="c1"># We use fewer data in the coarse models compared to the fine model in order to make them less accurate</span>
+<span class="n">x_coarse_0</span> <span class="o">=</span> <span class="n">x</span><span class="p">[::</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">y_coarse_0</span> <span class="o">=</span> <span class="n">y</span><span class="p">[::</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">x_coarse_1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">y_coarse_1</span> <span class="o">=</span> <span class="n">y</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="c1"># MCMC parameters</span>
+<span class="n">ndraws</span> <span class="o">=</span> <span class="mi">3000</span>
+<span class="n">ntune</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">nsub</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">nchains</span> <span class="o">=</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Plot the data</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Generated data and underlying model&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;sampled data&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">true_regression_line</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;true regression line&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_MLDA_variance_reduction_linear_regression_7_0.png" src="../_images/notebooks_MLDA_variance_reduction_linear_regression_7_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Create-a-theano-op-that-implements-the-likelihood">
+<h3>Create a theano op that implements the likelihood<a class="headerlink" href="#Create-a-theano-op-that-implements-the-likelihood" title="Permalink to this headline">¶</a></h3>
+<p>In order to use variance reduction, the user needs to define a Theano Op that calculates the forward model (or both the forward model and the likelihood). Also, this Op needs to save the quantity of interest to a model variable with the name <code class="docutils literal notranslate"><span class="pre">Q</span></code>. Here we use a Theano Op that contains both the forward model (i.e. the linear equation in this case) and the likelihood calculation. The quantity of interest is calculated with the perform() function and it is the mean of linear predictions given
+theta from all data points.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">Likelihood</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">Op</span><span class="p">):</span>
+    <span class="c1"># Specify what type of object will be passed and returned to the Op when it is</span>
+    <span class="c1"># called. In our case we will be passing it a vector of values (the parameters</span>
+    <span class="c1"># that define our model) and returning a scalar (likelihood)</span>
+    <span class="n">itypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">tt</span><span class="o">.</span><span class="n">dvector</span><span class="p">]</span>
+    <span class="n">otypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">tt</span><span class="o">.</span><span class="n">dscalar</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">pymc3_model</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialise the Op with various things that our likelihood requires.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x:</span>
+<span class="sd">            The x points.</span>
+<span class="sd">        y:</span>
+<span class="sd">            The y points.</span>
+<span class="sd">        pymc3_model:</span>
+<span class="sd">            The pymc3 model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pymc3_model</span> <span class="o">=</span> <span class="n">pymc3_model</span>
+
+    <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+        <span class="n">intercept</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">x_coeff</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># this uses the linear model to calculate outputs</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">x_coeff</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+        <span class="c1"># this saves the quantity of interest to the pymc3 model variable Q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pymc3_model</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+        <span class="c1"># this calculates the likelihood value</span>
+        <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">/</span> <span class="n">s</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">temp</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Define-the-coarse-models">
+<h3>Define the coarse models<a class="headerlink" href="#Define-the-coarse-models" title="Permalink to this headline">¶</a></h3>
+<p>Here we create the coarse models for MLDA. We need to include a <code class="docutils literal notranslate"><span class="pre">pm.Data()</span></code> variable <code class="docutils literal notranslate"><span class="pre">Q</span></code> in each one of those models, instantiated at <code class="docutils literal notranslate"><span class="pre">0.0</span></code>. These variables are set during sampling when the Op code under <code class="docutils literal notranslate"><span class="pre">perform()</span></code> runs.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">mout</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">coarse_models</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Set up models in pymc3 for each level - excluding finest model level</span>
+<span class="c1"># Level 0 (coarsest)</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">coarse_model_0</span><span class="p">:</span>
+    <span class="c1"># A variable Q has to be defined if you want to use the variance reduction feature</span>
+    <span class="c1"># Q can be of any dimension - here it a scalar</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+
+    <span class="c1"># Define priors</span>
+    <span class="n">intercept</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;Intercept&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">x_coeff</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+    <span class="c1"># convert thetas to a tensor vector</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">([</span><span class="n">intercept</span><span class="p">,</span> <span class="n">x_coeff</span><span class="p">])</span>
+
+    <span class="c1"># Here we instatiate a Likelihood obhect using the class defined above</span>
+    <span class="c1"># and we add to the mout list. We pass the coarse data x_coarse_0 and y_coarse_0</span>
+    <span class="c1"># and the coarse pymc3 model coarse_model_0. This creates a coarse likelihood.</span>
+    <span class="n">mout</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Likelihood</span><span class="p">(</span><span class="n">x_coarse_0</span><span class="p">,</span> <span class="n">y_coarse_0</span><span class="p">,</span> <span class="n">coarse_model_0</span><span class="p">))</span>
+
+    <span class="c1"># This uses the likelihood object to define the likelihood of the model, given theta</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">Potential</span><span class="p">(</span><span class="s2">&quot;likelihood&quot;</span><span class="p">,</span> <span class="n">mout</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">theta</span><span class="p">))</span>
+
+    <span class="n">coarse_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coarse_model_0</span><span class="p">)</span>
+
+<span class="c1"># Level 1</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">coarse_model_1</span><span class="p">:</span>
+    <span class="c1"># A variable Q has to be defined if you want to use the variance reduction feature</span>
+    <span class="c1"># Q can be of any dimension - here it a scalar</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+
+    <span class="c1"># Define priors</span>
+    <span class="n">intercept</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;Intercept&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">x_coeff</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+    <span class="c1"># convert thetas to a tensor vector</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">([</span><span class="n">intercept</span><span class="p">,</span> <span class="n">x_coeff</span><span class="p">])</span>
+
+    <span class="c1"># Here we instatiate a Likelihood obhect using the class defined above</span>
+    <span class="c1"># and we add to the mout list. We pass the coarse data x_coarse_1 and y_coarse_1</span>
+    <span class="c1"># and the coarse pymc3 model coarse_model_1. This creates a coarse likelihood.</span>
+    <span class="n">mout</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Likelihood</span><span class="p">(</span><span class="n">x_coarse_1</span><span class="p">,</span> <span class="n">y_coarse_1</span><span class="p">,</span> <span class="n">coarse_model_1</span><span class="p">))</span>
+
+    <span class="c1"># This uses the likelihood object to define the likelihood of the model, given theta</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">Potential</span><span class="p">(</span><span class="s2">&quot;likelihood&quot;</span><span class="p">,</span> <span class="n">mout</span><span class="p">[</span><span class="mi">1</span><span class="p">](</span><span class="n">theta</span><span class="p">))</span>
+
+    <span class="n">coarse_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coarse_model_1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Define-the-fine-model-and-sample">
+<h3>Define the fine model and sample<a class="headerlink" href="#Define-the-fine-model-and-sample" title="Permalink to this headline">¶</a></h3>
+<p>Here we define the fine (i.e. correct) model and sample from it using MLDA (with and without variance reduction). Note that <code class="docutils literal notranslate"><span class="pre">Q</span></code> is used here too.</p>
+<p>We create two MLDA samplers, one with VR activated and one without.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># A variable Q has to be defined if you want to use the variance reduction feature</span>
+    <span class="c1"># Q can be of any dimension - here it a scalar</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+
+    <span class="c1"># Define priors</span>
+    <span class="n">intercept</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;Intercept&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">x_coeff</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+    <span class="c1"># convert thetas to a tensor vector</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">([</span><span class="n">intercept</span><span class="p">,</span> <span class="n">x_coeff</span><span class="p">])</span>
+
+    <span class="c1"># Here we instatiate a Likelihood object using the class defined above</span>
+    <span class="c1"># and we add to the mout list. We pass the fine data x and y</span>
+    <span class="c1"># and the fine pymc3 model model. This creates a fine likelihood.</span>
+    <span class="n">mout</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Likelihood</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
+
+    <span class="c1"># This uses the likelihood object to define the likelihood of the model, given theta</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">Potential</span><span class="p">(</span><span class="s2">&quot;likelihood&quot;</span><span class="p">,</span> <span class="n">mout</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">](</span><span class="n">theta</span><span class="p">))</span>
+
+    <span class="c1"># MLDA with variance reduction</span>
+    <span class="n">step_with</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MLDA</span><span class="p">(</span>
+        <span class="n">coarse_models</span><span class="o">=</span><span class="n">coarse_models</span><span class="p">,</span> <span class="n">subsampling_rates</span><span class="o">=</span><span class="n">nsub</span><span class="p">,</span> <span class="n">variance_reduction</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="c1"># MLDA without variance reduction</span>
+    <span class="n">step_without</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MLDA</span><span class="p">(</span>
+        <span class="n">coarse_models</span><span class="o">=</span><span class="n">coarse_models</span><span class="p">,</span>
+        <span class="n">subsampling_rates</span><span class="o">=</span><span class="n">nsub</span><span class="p">,</span>
+        <span class="n">variance_reduction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">store_Q_fine</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># sample</span>
+    <span class="n">trace1</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+        <span class="n">draws</span><span class="o">=</span><span class="n">ndraws</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="n">step_with</span><span class="p">,</span>
+        <span class="n">chains</span><span class="o">=</span><span class="n">nchains</span><span class="p">,</span>
+        <span class="n">tune</span><span class="o">=</span><span class="n">ntune</span><span class="p">,</span>
+        <span class="n">discard_tuned_samples</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="o">=</span><span class="n">RANDOM_SEED</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">trace2</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+        <span class="n">draws</span><span class="o">=</span><span class="n">ndraws</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="n">step_without</span><span class="p">,</span>
+        <span class="n">chains</span><span class="o">=</span><span class="n">nchains</span><span class="p">,</span>
+        <span class="n">tune</span><span class="o">=</span><span class="n">ntune</span><span class="p">,</span>
+        <span class="n">discard_tuned_samples</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="o">=</span><span class="n">RANDOM_SEED</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/mikkel/venv/pymc3_mlda_develop/lib/python3.6/site-packages/pymc3/step_methods/mlda.py:385: UserWarning: The MLDA implementation in PyMC3 is still immature. You should be particularly critical of its results.
+  &#34;The MLDA implementation in PyMC3 is still immature. You should be particularly critical of its results.&#34;
+/home/mikkel/venv/pymc3_mlda_develop/lib/python3.6/site-packages/pymc3/step_methods/mlda.py:385: UserWarning: The MLDA implementation in PyMC3 is still immature. You should be particularly critical of its results.
+  &#34;The MLDA implementation in PyMC3 is still immature. You should be particularly critical of its results.&#34;
+Multiprocess sampling (2 chains in 4 jobs)
+MLDA: [x, Intercept]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='8000' class='' max='8000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [8000/8000 01:36<00:00 Sampling 2 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 2 chains for 1_000 tune and 3_000 draw iterations (2_000 + 6_000 draws total) took 97 seconds.
+Multiprocess sampling (2 chains in 4 jobs)
+MLDA: [x, Intercept]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='8000' class='' max='8000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [8000/8000 01:29<00:00 Sampling 2 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 2 chains for 1_000 tune and 3_000 draw iterations (2_000 + 6_000 draws total) took 89 seconds.
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Show-stats-summary">
+<h3>Show stats summary<a class="headerlink" href="#Show-stats-summary" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pm</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">trace1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/mikkel/venv/pymc3_mlda_develop/lib/python3.6/site-packages/arviz/data/io_pymc3.py:91: FutureWarning: Using `from_pymc3` without the model will be deprecated in a future release. Not using the model will return less accurate and less useful results. Make sure you use the model argument or call from_pymc3 within a model context.
+  FutureWarning,
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_mean</th>
+      <th>ess_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Intercept</th>
+      <td>1.001</td>
+      <td>0.040</td>
+      <td>0.929</td>
+      <td>1.078</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>2319.0</td>
+      <td>2319.0</td>
+      <td>2314.0</td>
+      <td>2934.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>x</th>
+      <td>1.996</td>
+      <td>0.068</td>
+      <td>1.874</td>
+      <td>2.126</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>2271.0</td>
+      <td>2261.0</td>
+      <td>2257.0</td>
+      <td>2782.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pm</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">trace2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/mikkel/venv/pymc3_mlda_develop/lib/python3.6/site-packages/arviz/data/io_pymc3.py:91: FutureWarning: Using `from_pymc3` without the model will be deprecated in a future release. Not using the model will return less accurate and less useful results. Make sure you use the model argument or call from_pymc3 within a model context.
+  FutureWarning,
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_mean</th>
+      <th>ess_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Intercept</th>
+      <td>1.002</td>
+      <td>0.04</td>
+      <td>0.925</td>
+      <td>1.076</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>3446.0</td>
+      <td>3446.0</td>
+      <td>3434.0</td>
+      <td>3675.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>x</th>
+      <td>1.997</td>
+      <td>0.07</td>
+      <td>1.872</td>
+      <td>2.131</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>3466.0</td>
+      <td>3455.0</td>
+      <td>3469.0</td>
+      <td>3891.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="Show-traceplots">
+<h3>Show traceplots<a class="headerlink" href="#Show-traceplots" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pm</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/mikkel/venv/pymc3_mlda_develop/lib/python3.6/site-packages/arviz/data/io_pymc3.py:91: FutureWarning: Using `from_pymc3` without the model will be deprecated in a future release. Not using the model will return less accurate and less useful results. Make sure you use the model argument or call from_pymc3 within a model context.
+  FutureWarning,
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[&lt;AxesSubplot:title={&#39;center&#39;:&#39;Intercept&#39;}&gt;,
+        &lt;AxesSubplot:title={&#39;center&#39;:&#39;Intercept&#39;}&gt;],
+       [&lt;AxesSubplot:title={&#39;center&#39;:&#39;x&#39;}&gt;,
+        &lt;AxesSubplot:title={&#39;center&#39;:&#39;x&#39;}&gt;]], dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_MLDA_variance_reduction_linear_regression_18_2.png" src="../_images/notebooks_MLDA_variance_reduction_linear_regression_18_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pm</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/mikkel/venv/pymc3_mlda_develop/lib/python3.6/site-packages/arviz/data/io_pymc3.py:91: FutureWarning: Using `from_pymc3` without the model will be deprecated in a future release. Not using the model will return less accurate and less useful results. Make sure you use the model argument or call from_pymc3 within a model context.
+  FutureWarning,
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[&lt;AxesSubplot:title={&#39;center&#39;:&#39;Intercept&#39;}&gt;,
+        &lt;AxesSubplot:title={&#39;center&#39;:&#39;Intercept&#39;}&gt;],
+       [&lt;AxesSubplot:title={&#39;center&#39;:&#39;x&#39;}&gt;,
+        &lt;AxesSubplot:title={&#39;center&#39;:&#39;x&#39;}&gt;]], dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_MLDA_variance_reduction_linear_regression_19_2.png" src="../_images/notebooks_MLDA_variance_reduction_linear_regression_19_2.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Estimate-standard-error-of-two-methods">
+<h3>Estimate standard error of two methods<a class="headerlink" href="#Estimate-standard-error-of-two-methods" title="Permalink to this headline">¶</a></h3>
+<p>Compare standard error of Q estimation between: - Standard approach: Using only Q values from the fine chain (Q_2) - samples from MLDA without VR - Collapsing sum (VR) approach: Using Q values from the coarsest chain (Q_0), plus all estimates of differences between levels (in this case Q_1_0 and Q_2_1) - samples from MLDA with VR</p>
+</div>
+</div>
+<div class="section" id="0)-Convenience-function-for-quantity-of-interest-estimate">
+<h2>0) Convenience function for quantity of interest estimate<a class="headerlink" href="#0)-Convenience-function-for-quantity-of-interest-estimate" title="Permalink to this headline">¶</a></h2>
+<p>The easiest way to extract the quantity of interest expectation and standard error for the collapsing sum (VR) approach directly from the trace is to use the <code class="docutils literal notranslate"><span class="pre">extract_Q_estimate(...)</span></code> function as shown here.</p>
+<p>In the remaining part of the notebook we demonstrate the extraction in detail without using this convenience function.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Q_expectation</span><span class="p">,</span> <span class="n">Q_SE</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">step_methods</span><span class="o">.</span><span class="n">mlda</span><span class="o">.</span><span class="n">extract_Q_estimate</span><span class="p">(</span><span class="n">trace</span><span class="o">=</span><span class="n">trace1</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Q_expectation</span><span class="p">,</span> <span class="n">Q_SE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.0004703297567 0.00021337164401881884
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="1)-Extract-quantities-of-interest-from-the-traces">
+<h2>1) Extract quantities of interest from the traces<a class="headerlink" href="#1)-Extract-quantities-of-interest-from-the-traces" title="Permalink to this headline">¶</a></h2>
+<p>This requires some reshaping with numpy. Note that we append the samples from all chains into one long array.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># MLDA without VR</span>
+<span class="n">Q_2</span> <span class="o">=</span> <span class="n">trace2</span><span class="o">.</span><span class="n">get_sampler_stats</span><span class="p">(</span><span class="s2">&quot;Q_2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span><span class="p">))</span>
+
+<span class="c1"># MLDA with VR</span>
+<span class="n">Q_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">trace1</span><span class="o">.</span><span class="n">get_sampler_stats</span><span class="p">(</span><span class="s2">&quot;Q_0&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">*</span> <span class="n">nsub</span> <span class="o">*</span> <span class="n">nsub</span><span class="p">))</span>
+<span class="n">Q_1_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">trace1</span><span class="o">.</span><span class="n">get_sampler_stats</span><span class="p">(</span><span class="s2">&quot;Q_1_0&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">*</span> <span class="n">nsub</span><span class="p">))</span>
+<span class="n">Q_2_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">trace1</span><span class="o">.</span><span class="n">get_sampler_stats</span><span class="p">(</span><span class="s2">&quot;Q_2_1&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span><span class="p">))</span>
+
+<span class="c1"># Estimates</span>
+<span class="n">Q_mean_standard</span> <span class="o">=</span> <span class="n">Q_2</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">Q_mean_vr</span> <span class="o">=</span> <span class="n">Q_0</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">+</span> <span class="n">Q_1_0</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">+</span> <span class="n">Q_2_1</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Q_0 mean = </span><span class="si">{</span><span class="n">Q_0</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Q_1_0 mean = </span><span class="si">{</span><span class="n">Q_1_0</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Q_2_1 mean = </span><span class="si">{</span><span class="n">Q_2_1</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Q_2 mean = </span><span class="si">{</span><span class="n">Q_2</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Standard method:    Mean: </span><span class="si">{</span><span class="n">Q_mean_standard</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;VR method:    Mean: </span><span class="si">{</span><span class="n">Q_mean_vr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Q_0 mean = 2.000456333574186
+Q_1_0 mean = -0.010064924776322594
+Q_2_1 mean = 0.010078920958836788
+Q_2 mean = 1.9999050422427467
+Standard method:    Mean: 1.9999050422427467
+VR method:    Mean: 2.0004703297567
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Calculate-variances-of-Q-quantity-samples">
+<h2>Calculate variances of Q quantity samples<a class="headerlink" href="#Calculate-variances-of-Q-quantity-samples" title="Permalink to this headline">¶</a></h2>
+<p>This shows that the variances of the differences is orders of magnitude smaller than the variance of any of the chains</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Q_2</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.0004159263883659949
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Q_0</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.0010707354594956294
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Q_1_0</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.3121752141533544e-07
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Q_2_1</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.1744502084936136e-07
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Calculate-standard-error-of-each-term-using-ESS">
+<h2>Calculate standard error of each term using ESS<a class="headerlink" href="#Calculate-standard-error-of-each-term-using-ESS" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ess_Q0</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Q_0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+<span class="n">ess_Q_1_0</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Q_1_0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+<span class="n">ess_Q_2_1</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Q_2_1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+<span class="n">ess_Q2</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Q_2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># note that the chain in level 2 has much fewer samples than the chain in level 0 (because of the subsampling rates)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ess_Q2</span><span class="p">,</span> <span class="n">ess_Q0</span><span class="p">,</span> <span class="n">ess_Q_1_0</span><span class="p">,</span> <span class="n">ess_Q_2_1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+3724.6692851986422 23560.50192160188 7932.909230856407 2254.035628246836
+</pre></div></div>
+</div>
+<p>Standard errors are estimated by <span class="math notranslate nohighlight">\(Var(Q) \over ESS(Q)\)</span>. It is clear that the differences have standard errors much lower than levels 0 and 2</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Q_2</span><span class="o">.</span><span class="n">var</span><span class="p">()</span> <span class="o">/</span> <span class="n">ess_Q2</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.1166800500082866e-07
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Q_0</span><span class="o">.</span><span class="n">var</span><span class="p">()</span> <span class="o">/</span> <span class="n">ess_Q0</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+4.544620751538005e-08
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Q_1_0</span><span class="o">.</span><span class="n">var</span><span class="p">()</span> <span class="o">/</span> <span class="n">ess_Q_1_0</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.9146623853450305e-11
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Q_2_1</span><span class="o">.</span><span class="n">var</span><span class="p">()</span> <span class="o">/</span> <span class="n">ess_Q_2_1</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+5.210433206005213e-11
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Calculate-total-standard-errors-of-the-two-competing-estimates-with-different-chunks-of-the-sample">
+<h2>Calculate total standard errors of the two competing estimates with different chunks of the sample<a class="headerlink" href="#Calculate-total-standard-errors-of-the-two-competing-estimates-with-different-chunks-of-the-sample" title="Permalink to this headline">¶</a></h2>
+<p>The graph shows how the errors decay when we collect more samples, demonstrating the gains of the VR technique in terms of standard error reduction.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">step</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="n">Q2_SE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">/</span> <span class="n">step</span><span class="p">))</span>
+<span class="n">Q0_SE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">/</span> <span class="n">step</span><span class="p">))</span>
+<span class="n">Q_1_0_SE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">/</span> <span class="n">step</span><span class="p">))</span>
+<span class="n">Q_2_1_SE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">/</span> <span class="n">step</span><span class="p">))</span>
+<span class="n">E_standard_SE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">/</span> <span class="n">step</span><span class="p">))</span>
+<span class="n">E_VR_SE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">/</span> <span class="n">step</span><span class="p">))</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="n">Q2_SE</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q_2</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">var</span><span class="p">()</span> <span class="o">/</span> <span class="n">az</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Q_2</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+    <span class="n">Q0_SE</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q_0</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">:</span> <span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="n">nsub</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)]</span><span class="o">.</span><span class="n">var</span><span class="p">()</span> <span class="o">/</span> <span class="n">az</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Q_0</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">:</span> <span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="n">nsub</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">Q_1_0_SE</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q_1_0</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">:</span> <span class="n">i</span> <span class="o">*</span> <span class="n">nsub</span><span class="p">]</span><span class="o">.</span><span class="n">var</span><span class="p">()</span> <span class="o">/</span> <span class="n">az</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Q_1_0</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">:</span> <span class="n">i</span> <span class="o">*</span> <span class="n">nsub</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">Q_2_1_SE</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q_2_1</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">var</span><span class="p">()</span> <span class="o">/</span> <span class="n">az</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Q_2_1</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+    <span class="n">E_standard_SE</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">Q2_SE</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="n">E_VR_SE</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">Q0_SE</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">Q_1_0_SE</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">Q_2_1_SE</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="p">]:</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">ScalarFormatter</span><span class="p">())</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="p">),</span> <span class="n">E_standard_SE</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">nchains</span> <span class="o">*</span> <span class="n">ndraws</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="p">),</span> <span class="n">E_VR_SE</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Samples drawn&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Standard error&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;Standard estimator&quot;</span><span class="p">,</span> <span class="s2">&quot;Variance reduction estimator&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7f8e3a954358&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_MLDA_variance_reduction_linear_regression_39_1.png" src="../_images/notebooks_MLDA_variance_reduction_linear_regression_39_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> watermark
+<span class="o">%</span><span class="k">watermark</span> -n -u -v -iv -w
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pymc3 3.9.3
+numpy 1.19.2
+arviz 0.10.0
+last updated: Thu Oct 15 2020
+
+CPython 3.6.9
+IPython 7.16.1
+watermark 2.0.2
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

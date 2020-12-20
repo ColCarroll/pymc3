@@ -1,0 +1,1439 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transformations of a random variable from one space to another. &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../../_static/highlight.min.js"></script>
+    <script src="../../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../../nb_examples/index.html" class="item">Examples</a> <a href="../../learn.html" class="item">Books + Videos</a> <a href="../../api.html" class="item">API</a> <a href="../../developer_guide.html" class="item">Developer Guide</a> <a href="../../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  <div class="section" id="transformations-of-a-random-variable-from-one-space-to-another">
+<h1><a class="toc-backref" href="#id1">Transformations of a random variable from one space to another.</a><a class="headerlink" href="#transformations-of-a-random-variable-from-one-space-to-another" title="Permalink to this headline">¶</a></h1>
+<p>Note that for convenience these entities can be addressed as
+<code class="docutils literal notranslate"><span class="pre">pm.transforms.</span></code><em>X</em> for any name <em>X</em>, although they are actually
+implemented as <code class="docutils literal notranslate"><span class="pre">pm.distributions.transforms.</span></code>*X*.</p>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#transformations-of-a-random-variable-from-one-space-to-another" id="id1">Transformations of a random variable from one space to another.</a></p>
+<ul>
+<li><p><a class="reference internal" href="#transform-instances" id="id2">Transform Instances</a></p></li>
+<li><p><a class="reference internal" href="#transform-base-classes" id="id3">Transform Base Classes</a></p></li>
+<li><p><a class="reference internal" href="#transform-composition-classes" id="id4">Transform Composition Classes</a></p></li>
+<li><p><a class="reference internal" href="#specific-transform-classes" id="id5">Specific Transform Classes</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="transform-instances">
+<h2><a class="toc-backref" href="#id2">Transform Instances</a><a class="headerlink" href="#transform-instances" title="Permalink to this headline">¶</a></h2>
+<p>Transform instances are the entities that should be used in the
+<code class="docutils literal notranslate"><span class="pre">transform</span></code> parameter to a random variable constructor.  These are
+initialized instances of the Transform Classes, which are described
+below.</p>
+<dl class="glossary simple">
+</dl>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">stick_breaking</span></code></dt><dd><p>Instantiation of <a class="reference internal" href="#pymc3.distributions.transforms.StickBreaking" title="pymc3.distributions.transforms.StickBreaking"><code class="xref py py-class docutils literal notranslate"><span class="pre">StickBreaking</span></code></a>
+<a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class for use in the <code class="docutils literal notranslate"><span class="pre">transform</span></code>
+argument of a random variable.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">logodds</span></code></dt><dd><p>Instantiation of
+<a class="reference internal" href="#pymc3.distributions.transforms.LogOdds" title="pymc3.distributions.transforms.LogOdds"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogOdds</span></code></a> <a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class
+for use in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> argument of a random variable.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">interval</span></code></dt><dd><p>Alias of
+<a class="reference internal" href="#pymc3.distributions.transforms.Interval" title="pymc3.distributions.transforms.Interval"><code class="xref py py-class docutils literal notranslate"><span class="pre">Interval</span></code></a> <a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class
+for use in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> argument of a random variable.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">log_exp_m1</span></code></dt><dd><p>Instantiation of
+<a class="reference internal" href="#pymc3.distributions.transforms.LogExpM1" title="pymc3.distributions.transforms.LogExpM1"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogExpM1</span></code></a> <a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class
+for use in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> argument of a random variable.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">lowerbound</span></code></dt><dd><p>Alias of
+<a class="reference internal" href="#pymc3.distributions.transforms.LowerBound" title="pymc3.distributions.transforms.LowerBound"><code class="xref py py-class docutils literal notranslate"><span class="pre">LowerBound</span></code></a> <a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class
+for use in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> argument of a random variable.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">upperbound</span></code></dt><dd><p>Alias of
+<a class="reference internal" href="#pymc3.distributions.transforms.UpperBound" title="pymc3.distributions.transforms.UpperBound"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpperBound</span></code></a> <a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class
+for use in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> argument of a random variable.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ordered</span></code></dt><dd><p>Instantiation of
+<a class="reference internal" href="#pymc3.distributions.transforms.Ordered" title="pymc3.distributions.transforms.Ordered"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ordered</span></code></a> <a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class
+for use in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> argument of a random variable.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">log</span></code></dt><dd><p>Instantiation of
+<a class="reference internal" href="#pymc3.distributions.transforms.Log" title="pymc3.distributions.transforms.Log"><code class="xref py py-class docutils literal notranslate"><span class="pre">Log</span></code></a> <a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class
+for use in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> argument of a random variable.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sum_to_1</span></code></dt><dd><p>Instantiation of
+<a class="reference internal" href="#pymc3.distributions.transforms.SumTo1" title="pymc3.distributions.transforms.SumTo1"><code class="xref py py-class docutils literal notranslate"><span class="pre">SumTo1</span></code></a> <a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class
+for use in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> argument of a random variable.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">circular</span></code></dt><dd><p>Instantiation of
+<a class="reference internal" href="#pymc3.distributions.transforms.Circular" title="pymc3.distributions.transforms.Circular"><code class="xref py py-class docutils literal notranslate"><span class="pre">Circular</span></code></a> <a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> class
+for use in the <code class="docutils literal notranslate"><span class="pre">transform</span></code> argument of a random variable.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="transform-base-classes">
+<h2><a class="toc-backref" href="#id3">Transform Base Classes</a><a class="headerlink" href="#transform-base-classes" title="Permalink to this headline">¶</a></h2>
+<p>Typically the programmer will not use these directly.</p>
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.Transform">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">Transform</code><a class="headerlink" href="#pymc3.distributions.transforms.Transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>A transformation of a random variable from one space into another.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: str</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Transform.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">z</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Transform.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Transform.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Transform.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Transform.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Transform.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Transform.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Transform.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="pymc3.distributions.transforms.transform">
+<code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">transform</code><a class="headerlink" href="#pymc3.distributions.transforms.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#pymc3.distributions.transforms.Transform" title="pymc3.distributions.transforms.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">pymc3.distributions.transforms.Transform</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.TransformedDistribution">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">TransformedDistribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.TransformedDistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>A distribution that has been transformed from one space into another.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dist: Distribution</strong></dt><dd></dd>
+<dt><strong>transform: Transform</strong></dt><dd></dd>
+<dt><strong>args, kwargs</strong></dt><dd><p>arguments to Distribution</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.TransformedDistribution.logp">
+<code class="sig-name descname">logp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.TransformedDistribution.logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate log-probability of Transformed distribution at specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: numeric</strong></dt><dd><p>Value for which log-probability is calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TensorVariable</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.TransformedDistribution.logp_nojac">
+<code class="sig-name descname">logp_nojac</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.TransformedDistribution.logp_nojac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate log-probability of Transformed distribution at specified value
+without jacobian term for transforms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: numeric</strong></dt><dd><p>Value for which log-probability is calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>TensorVariable</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="transform-composition-classes">
+<h2><a class="toc-backref" href="#id4">Transform Composition Classes</a><a class="headerlink" href="#transform-composition-classes" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.Chain">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">Chain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transform_list</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Chain" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="pymc3.distributions.transforms.Chain.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Chain.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Chain.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Chain.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Chain.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Chain.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Chain.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Chain.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.CholeskyCovPacked">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">CholeskyCovPacked</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.CholeskyCovPacked" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="pymc3.distributions.transforms.CholeskyCovPacked.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.CholeskyCovPacked.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.CholeskyCovPacked.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.CholeskyCovPacked.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.CholeskyCovPacked.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.CholeskyCovPacked.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.CholeskyCovPacked.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.CholeskyCovPacked.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="specific-transform-classes">
+<h2><a class="toc-backref" href="#id5">Specific Transform Classes</a><a class="headerlink" href="#specific-transform-classes" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.Log">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">Log</code><a class="headerlink" href="#pymc3.distributions.transforms.Log" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="pymc3.distributions.transforms.Log.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Log.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Log.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Log.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Log.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Log.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Log.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Log.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.LogExpM1">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">LogExpM1</code><a class="headerlink" href="#pymc3.distributions.transforms.LogExpM1" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="pymc3.distributions.transforms.LogExpM1.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LogExpM1.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.LogExpM1.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LogExpM1.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse operation of softplus.</p>
+<dl class="simple">
+<dt>y = Log(Exp(x) - 1)</dt><dd><p>= Log(1 - Exp(-x)) + x</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.LogExpM1.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LogExpM1.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.LogExpM1.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LogExpM1.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.LogOdds">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">LogOdds</code><a class="headerlink" href="#pymc3.distributions.transforms.LogOdds" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="pymc3.distributions.transforms.LogOdds.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LogOdds.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.LogOdds.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LogOdds.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.LogOdds.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LogOdds.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.Interval">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">Interval</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform from real line interval [a,b] to whole real line.</p>
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Interval.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Interval.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Interval.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Interval.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Interval.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Interval.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Interval.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Interval.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.LowerBound">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">LowerBound</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LowerBound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform from real line interval [a,inf] to whole real line.</p>
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.LowerBound.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LowerBound.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.LowerBound.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LowerBound.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.LowerBound.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LowerBound.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.LowerBound.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.LowerBound.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.UpperBound">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">UpperBound</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">b</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.UpperBound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform from real line interval [-inf,b] to whole real line.</p>
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.UpperBound.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.UpperBound.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.UpperBound.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.UpperBound.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.UpperBound.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.UpperBound.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.UpperBound.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.UpperBound.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.Ordered">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">Ordered</code><a class="headerlink" href="#pymc3.distributions.transforms.Ordered" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="pymc3.distributions.transforms.Ordered.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Ordered.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Ordered.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Ordered.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Ordered.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Ordered.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Ordered.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Ordered.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.SumTo1">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">SumTo1</code><a class="headerlink" href="#pymc3.distributions.transforms.SumTo1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms K - 1 dimensional simplex space (k values in [0,1] and that sum to 1) to a K - 1 vector of values in [0,1]
+This Transformation operates on the last dimension of the input tensor.</p>
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.SumTo1.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.SumTo1.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.SumTo1.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.SumTo1.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.SumTo1.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.SumTo1.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.SumTo1.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.SumTo1.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.StickBreaking">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">StickBreaking</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eps</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.StickBreaking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms K - 1 dimensional simplex space (k values in [0,1] and that sum to 1) to a K - 1 vector of real values.
+This is a variant of the isometric logration transformation</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Egozcue, J.J., Pawlowsky-Glahn, V., Mateu-Figueras, G. et al.
+Isometric Logratio Transformations for Compositional Data Analysis.
+Mathematical Geology 35, 279–300 (2003). https://doi.org/10.1023/A:1023818214614
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.StickBreaking.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y_</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.StickBreaking.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.StickBreaking.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.StickBreaking.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.StickBreaking.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.StickBreaking.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.StickBreaking.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y_</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.StickBreaking.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.distributions.transforms.Circular">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.distributions.transforms.</code><code class="sig-name descname">Circular</code><a class="headerlink" href="#pymc3.distributions.transforms.Circular" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms a linear space into a circular one.</p>
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Circular.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Circular.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies inverse of transformation to input variable <cite>z</cite>.
+When transform is used on some distribution <cite>p</cite>, which has observed values <cite>z</cite>, it is used to
+transform the values of <cite>z</cite> correctly to the support of <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: tensor</strong></dt><dd><p>Input tensor to be inverse transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Inverse transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Circular.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Circular.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input variable <cite>x</cite>.
+When transform is used on some distribution <cite>p</cite>, it will transform the random variable <cite>x</cite> after sampling
+from <cite>p</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input tensor to be transformed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>Transformed tensor.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Circular.forward_val">
+<code class="sig-name descname">forward_val</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">point</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Circular.forward_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies transformation forward to input array <cite>x</cite>.
+Similar to <cite>forward</cite> but for constant data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array_like</strong></dt><dd><p>Input array to be transformed.</p>
+</dd>
+<dt><strong>point: array_like, optional</strong></dt><dd><p>Test value used to draw (fix) bounds-like transformations</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>array_like</dt><dd><p>Transformed array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pymc3.distributions.transforms.Circular.jacobian_det">
+<code class="sig-name descname">jacobian_det</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.distributions.transforms.Circular.jacobian_det" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates logarithm of the absolute value of the Jacobian determinant
+of the backward transformation for input <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: tensor</strong></dt><dd><p>Input to calculate Jacobian determinant of.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>tensor</dt><dd><p>The log abs Jacobian determinant of <cite>x</cite> w.r.t. this transform.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

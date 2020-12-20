@@ -1,0 +1,1077 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PyMC3 Developer Guide &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/default.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="_static/highlight.min.js"></script>
+    <script src="_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="nb_tutorials/index.html" class="item">Tutorials</a> <a href="nb_examples/index.html" class="item">Examples</a> <a href="learn.html" class="item">Books + Videos</a> <a href="api.html" class="item">API</a> <a href="#" class="item">Developer Guide</a> <a href="about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  <div class="section" id="pymc3-developer-guide">
+<h1>PyMC3 Developer Guide<a class="headerlink" href="#pymc3-developer-guide" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://docs.pymc.io/">PyMC3</a> is a Python package for Bayesian
+statistical modeling built on top of
+<a class="reference external" href="http://deeplearning.net/software/theano/">Theano</a>. This
+document aims to explain the design and implementation of probabilistic
+programming in PyMC3, with comparisons to other PPL like TensorFlow Probability (TFP)
+and Pyro in mind. A user-facing API
+introduction can be found in the <a class="reference external" href="https://docs.pymc.io/notebooks/api_quickstart.html">API
+quickstart</a>. A more accessible, user facing deep introduction can be found in
+<a class="reference external" href="https://github.com/springcoil/probabilisticprogrammingprimer">Peadar Coyle’s probabilistic programming primer</a></p>
+<div class="section" id="distribution">
+<h2>Distribution<a class="headerlink" href="#distribution" title="Permalink to this headline">¶</a></h2>
+<p>A high-level introduction of <code class="docutils literal notranslate"><span class="pre">Distribution</span></code> in PyMC3 can be found in
+the <a class="reference external" href="https://docs.pymc.io/Probability_Distributions.html">documentation</a>. The source
+code of the probability distributions is nested under
+<a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/distributions/">pymc3/distributions</a>,
+with the <code class="docutils literal notranslate"><span class="pre">Distribution</span></code> class defined in <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/distributions/distribution.py#L23-L44">distribution.py</a>.
+A few important points to highlight in the Distribution Class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Distribution</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Statistical distribution&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="o">...</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="o">...</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="o">...</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<p>In a way, the snippet above represents the unique features of pymc3’s
+<code class="docutils literal notranslate"><span class="pre">Distribution</span></code> class:</p>
+<ul class="simple">
+<li><p>Distribution objects are only usable inside of a <code class="docutils literal notranslate"><span class="pre">Model</span></code> context. If they are created outside of the model context manager, it raises an error.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">Distribution</span></code> requires at least a name argument, and other parameters that defines the Distribution.</p></li>
+<li><p>When a <code class="docutils literal notranslate"><span class="pre">Distribution</span></code> is initialized inside of a Model context, two things happen:</p>
+<ol class="arabic simple">
+<li><p>a stateless distribution is initialized <code class="docutils literal notranslate"><span class="pre">dist</span> <span class="pre">=</span> <span class="pre">{DISTRIBUTION_cls}.dist(*args,</span> <span class="pre">**kwargs)</span></code>;</p></li>
+<li><p>a random variable following the said distribution is added to the model <code class="docutils literal notranslate"><span class="pre">model.Var(name,</span> <span class="pre">dist,</span> <span class="pre">...)</span></code></p></li>
+</ol>
+</li>
+</ul>
+<p>Thus, users who are building models using <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">pm.Model()</span> <span class="pre">...</span></code> should
+be aware that they are never directly exposed to static and stateless
+distributions, but rather random variables that follow some density
+functions. Instead, to access a stateless distribution, you need to call
+<code class="docutils literal notranslate"><span class="pre">pm.SomeDistribution.dist(...)</span></code> or <code class="docutils literal notranslate"><span class="pre">RV.dist</span></code> <em>after</em> you initialized
+<code class="docutils literal notranslate"><span class="pre">RV</span></code> in a model context (see
+<a class="reference external" href="https://docs.pymc.io/Probability_Distributions.html#using-pymc-distributions-without-a-model">https://docs.pymc.io/Probability_Distributions.html#using-pymc-distributions-without-a-model</a>).</p>
+<p>With this distinction in mind, we can take a closer look at the
+stateless distribution part of pymc3 (see distribution api in <a class="reference external" href="https://docs.pymc.io/api/distributions.html">doc</a>), which divided into:</p>
+<ul class="simple">
+<li><p>Continuous</p></li>
+<li><p>Discrete</p></li>
+<li><p>Multivariate</p></li>
+<li><p>Mixture</p></li>
+<li><p>Timeseries</p></li>
+</ul>
+<p>Quote from the doc:</p>
+<blockquote>
+<div><p>All distributions in <code class="docutils literal notranslate"><span class="pre">pm.distributions</span></code> will have two important
+methods: <code class="docutils literal notranslate"><span class="pre">random()</span></code> and <code class="docutils literal notranslate"><span class="pre">logp()</span></code> with the following signatures:</p>
+</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SomeDistribution</span><span class="p">(</span><span class="n">Continuous</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="o">...</span>
+        <span class="k">return</span> <span class="n">random_samples</span>
+
+    <span class="k">def</span> <span class="nf">logp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="o">...</span>
+        <span class="k">return</span> <span class="n">total_log_prob</span>
+</pre></div>
+</div>
+<p>PyMC3 expects the <code class="docutils literal notranslate"><span class="pre">logp()</span></code> method to return a log-probability
+evaluated at the passed value argument. This method is used internally
+by all of the inference methods to calculate the model log-probability,
+which is then used for fitting models. The <code class="docutils literal notranslate"><span class="pre">random()</span></code> method is
+used to simulate values from the variable, and is used internally for
+posterior predictive checks.</p>
+<p>In the PyMC3 <code class="docutils literal notranslate"><span class="pre">Distribution</span></code> class, the <code class="docutils literal notranslate"><span class="pre">logp()</span></code> method is the most
+elementary. As long as you have a well-behaved density function, we can
+use it in the model to build the model log-likelihood function. Random
+number generation is great to have, but sometimes there might not be
+efficient random number generator for some densities. Since a function
+is all you need, you can wrap almost any Theano function into a
+distribution using <code class="docutils literal notranslate"><span class="pre">pm.DensityDist</span></code>
+<a class="reference external" href="https://docs.pymc.io/Probability_Distributions.html#custom-distributions">https://docs.pymc.io/Probability_Distributions.html#custom-distributions</a></p>
+<p>Thus, distributions that are defined in the <code class="docutils literal notranslate"><span class="pre">distributions</span></code> submodule
+(e.g. look at <code class="docutils literal notranslate"><span class="pre">pm.Normal</span></code> in <code class="docutils literal notranslate"><span class="pre">pymc3.distributions.continuous</span></code>), each
+describes a <em>family</em> of probabilistic distribution (no different from
+distribution in other PPL library). Once it is initialised within a
+model context, it contains properties that are related to the random
+variable (<em>e.g.</em> mean/expectation). Note that if the parameters are
+constants, these properties could be the same as the distribution
+properties.</p>
+<div class="section" id="reflection">
+<h3>Reflection<a class="headerlink" href="#reflection" title="Permalink to this headline">¶</a></h3>
+<p>How tensor/value semantics for probability distributions is enabled in pymc3:</p>
+<p>In PyMC3, we treat <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">Normal('x',</span> <span class="pre">0,</span> <span class="pre">1)</span></code> as defining a random
+variable (intercepted and collected under a model context, more on that
+below), and x.dist() as the associated density/mass function
+(distribution in the mathematical sense). It is not perfect, and now
+after a few years learning Bayesian statistics I also realized these
+subtleties (i.e., the distinction between <em>random variable</em> and
+<em>distribution</em>). But when I was learning probabilistic modelling as a
+beginner, I did find this approach to be the easiest and most
+straightforward. In a perfect world, we should have
+<span class="math notranslate nohighlight">\(x \sim \text{Normal}(0, 1)\)</span> which defines a random variable that
+follows a Gaussian distribution, and
+<span class="math notranslate nohighlight">\(\chi = \text{Normal}(0, 1), x \sim \chi\)</span> which define a scalar
+density function that takes input <span class="math notranslate nohighlight">\(x\)</span></p>
+<div class="math notranslate nohighlight">
+\[(``X:=f(x) = 1/sqrt(2*pi) * exp(-.5*x**2)``)\]</div>
+<p>Within a model context, RVs are essentially Theano tensors (more on that
+below). This is different than TFP and pyro, where you need to be more
+explicit about the conversion. For example:</p>
+<p><strong>PyMC3</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">5.</span><span class="p">)</span>             <span class="c1"># ==&gt; pymc3.model.FreeRV, or theano.tensor with logp</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="mf">5.</span><span class="p">)</span> <span class="c1"># ==&gt; pymc3.model.ObservedRV, also has logp properties</span>
+<span class="n">x</span><span class="o">.</span><span class="n">logp</span><span class="p">({</span><span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">})</span>                                  <span class="c1"># ==&gt; -4.0439386</span>
+<span class="n">model</span><span class="o">.</span><span class="n">logp</span><span class="p">({</span><span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">})</span>                              <span class="c1"># ==&gt; -6.6973152</span>
+</pre></div>
+</div>
+<p><strong>TFP</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow.compat.v1</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow_probability</span> <span class="kn">import</span> <span class="n">distributions</span> <span class="k">as</span> <span class="n">tfd</span>
+
+<span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="n">z_dist</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">5.</span><span class="p">)</span>            <span class="c1"># ==&gt; &lt;class &#39;tfp.python.distributions.normal.Normal&#39;&gt;</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z_dist</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>                              <span class="c1"># ==&gt; &lt;class &#39;tensorflow.python.framework.ops.Tensor&#39;&gt;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="mf">5.</span><span class="p">)</span>     <span class="c1"># ==&gt; &lt;class &#39;tensorflow.python.framework.ops.Tensor&#39;&gt;</span>
+    <span class="n">model_logp</span> <span class="o">=</span> <span class="n">z_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">z</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">}))</span>           <span class="c1"># ==&gt; -4.0439386</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">model_logp</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">z</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">}))</span>  <span class="c1"># ==&gt; -6.6973152</span>
+</pre></div>
+</div>
+<p><strong>pyro</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">z_dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">5.</span><span class="p">)</span>           <span class="c1"># ==&gt; &lt;class &#39;pyro.distributions.torch.Normal&#39;&gt;</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">pyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">z_dist</span><span class="p">)</span>                     <span class="c1"># ==&gt; &lt;class &#39;torch.Tensor&#39;&gt;</span>
+<span class="c1"># reset/specify value of z</span>
+<span class="n">z</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="mf">5.</span><span class="p">)</span>    <span class="c1"># ==&gt; &lt;class &#39;torch.Tensor&#39;&gt;</span>
+<span class="n">model_logp</span> <span class="o">=</span> <span class="n">z_dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span>
+<span class="n">x</span>                                                <span class="c1"># ==&gt; -4.0439386</span>
+<span class="n">model_logp</span>                                       <span class="c1"># ==&gt; -6.6973152</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="random-method-and-logp-method-very-different-behind-the-curtain">
+<h3>Random method and logp method, very different behind the curtain<a class="headerlink" href="#random-method-and-logp-method-very-different-behind-the-curtain" title="Permalink to this headline">¶</a></h3>
+<p>In short, the random method is scipy/numpy-based, and the logp method is
+Theano-based. The <code class="docutils literal notranslate"><span class="pre">logp</span></code> method is straightforward - it is a Theano
+function within each distribution. It has the following signature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">logp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="c1"># GET PARAMETERS</span>
+    <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">,</span> <span class="o">...</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params2</span><span class="p">,</span> <span class="o">...</span>
+    <span class="c1"># EVALUATE LOG-LIKELIHOOD FUNCTION, all inputs are (or array that could be convert to) theano tensor</span>
+    <span class="n">total_log_prob</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">total_log_prob</span>
+</pre></div>
+</div>
+<p>In the <code class="docutils literal notranslate"><span class="pre">logp</span></code> method, parameters and values are either Theano tensors,
+or could be converted to tensors. It is rather convenient as the
+evaluation of logp is represented as a tensor (<code class="docutils literal notranslate"><span class="pre">RV.logpt</span></code>), and when
+we linked different <code class="docutils literal notranslate"><span class="pre">logp</span></code> together (e.g., summing all <code class="docutils literal notranslate"><span class="pre">RVs.logpt</span></code>
+to get the model totall logp) the dependence is taken care of by Theano
+when the graph is built and compiled. Again, since the compiled function
+depends on the nodes that already in the graph, whenever you want to generate
+a new function that takes new input tensors you either need to regenerate the graph
+with the appropriate dependencies, or replace the node by editing the existing graph.
+In PyMC3 we use the second approach by using <code class="docutils literal notranslate"><span class="pre">theano.clone()</span></code> when it is needed.</p>
+<p>As explained above, distribution in a <code class="docutils literal notranslate"><span class="pre">pm.Model()</span></code> context
+automatically turn into a tensor with distribution property (pymc3
+random variable). To get the logp of a free_RV is just evaluating the
+<code class="docutils literal notranslate"><span class="pre">logp()</span></code> <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/model.py#L1212-L1213">on
+itself</a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># self is a theano.tensor with a distribution attached</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">logp_sum_unscaledt</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">logp_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">logp_nojac_unscaledt</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">logp_nojac</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or for a ObservedRV. it evaluate the logp on the data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">logp_sum_unscaledt</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">logp_sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">logp_nojac_unscaledt</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">logp_nojac</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, for the random method things are a bit less graceful. As the
+random generator is limited in Theano, all random generation is done in
+scipy/numpy land. In the random method, we have:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># GET PARAMETERS</span>
+    <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">,</span> <span class="o">...</span> <span class="o">=</span> <span class="n">draw_values</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">param1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+                                      <span class="n">point</span><span class="o">=</span><span class="n">point</span><span class="p">,</span>
+                                      <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+    <span class="c1"># GENERATE SAMPLE</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">generate_samples</span><span class="p">(</span><span class="n">SCIPY_OR_NUMPY_RANDOM_FUNCTION</span><span class="p">,</span>
+                               <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">,</span> <span class="o">...</span> <span class="c1"># ==&gt; parameters, type is numpy arrays</span>
+                               <span class="n">dist_shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                               <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">samples</span>
+</pre></div>
+</div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">point</span></code> is a dictionary that contains dependence of
+<code class="docutils literal notranslate"><span class="pre">param1,</span> <span class="pre">param2,</span> <span class="pre">...</span></code>, and <code class="docutils literal notranslate"><span class="pre">draw_values</span></code> generates a (random)
+<code class="docutils literal notranslate"><span class="pre">(size,</span> <span class="pre">)</span> <span class="pre">+</span> <span class="pre">param.shape</span></code> arrays <em>conditioned</em> on the information from
+<code class="docutils literal notranslate"><span class="pre">point</span></code>. This is the backbone for forwarding random simulation. The
+<code class="docutils literal notranslate"><span class="pre">draw_values</span></code> function is a recursive algorithm to try to resolve all
+the dependence outside of Theano, by walking the Theano computational
+graph, it is complicated and a constant pain point for bug fixing:
+<a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/distributions/distribution.py#L217-L529">https://github.com/pymc-devs/pymc3/blob/master/pymc3/distributions/distribution.py#L217-L529</a>
+(But also see a <a class="reference external" href="https://github.com/pymc-devs/pymc3/pull/3273">recent
+PR</a> that use
+interception and context manager to resolve the dependence issue)</p>
+</div>
+</div>
+<div class="section" id="model-context-and-random-variable">
+<h2>Model context and Random Variable<a class="headerlink" href="#model-context-and-random-variable" title="Permalink to this headline">¶</a></h2>
+<p>I like to think that the <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">pm.Model()</span> <span class="pre">...</span></code> is a key syntax feature
+and <em>the</em> signature of PyMC3 model language, and in general a great
+out-of-the-box thinking/usage of the context manager in Python (with
+<a class="reference external" href="https://twitter.com/_szhang/status/890793373740617729">some
+critics</a>, of
+course).</p>
+<p>Essentially <a class="reference external" href="https://www.python.org/dev/peps/pep-0343/">what a context manager
+does</a> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">EXPR</span> <span class="k">as</span> <span class="n">VAR</span><span class="p">:</span>
+    <span class="n">USERCODE</span>
+</pre></div>
+</div>
+<p>which roughly translates into this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">VAR</span> <span class="o">=</span> <span class="n">EXPR</span>
+<span class="n">VAR</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">USERCODE</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">VAR</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>or conceptually:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">EXPR</span> <span class="k">as</span> <span class="n">VAR</span><span class="p">:</span>
+    <span class="c1"># DO SOMETHING</span>
+    <span class="n">USERCODE</span>
+    <span class="c1"># DO SOME ADDITIONAL THINGS</span>
+</pre></div>
+</div>
+<p>So what happened within the <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">pm.Model()</span> <span class="pre">as</span> <span class="pre">model:</span> <span class="pre">...</span></code> block,
+besides the initial set up <code class="docutils literal notranslate"><span class="pre">model</span> <span class="pre">=</span> <span class="pre">pm.Model()</span></code>? Starting from the
+most elementary:</p>
+<div class="section" id="random-variable">
+<h3>Random Variable<a class="headerlink" href="#random-variable" title="Permalink to this headline">¶</a></h3>
+<p>From the above session, we know that when we call eg
+<code class="docutils literal notranslate"><span class="pre">pm.Normal('x',</span> <span class="pre">...)</span></code> within a Model context, it returns a random
+variable. Thus, we have two equivalent ways of adding random variable to
+a model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Which is the same as doing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Both with the same output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>                              <span class="c1"># ==&gt; &lt;class &#39;pymc3.model.FreeRV&#39;&gt;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">)</span>                           <span class="c1"># ==&gt; [x]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">logp</span><span class="p">(</span><span class="mf">5.</span><span class="p">))</span>              <span class="c1"># ==&gt; Elemwise{switch,no_inplace}.0</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">logp</span><span class="p">(</span><span class="mf">5.</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">({}))</span>     <span class="c1"># ==&gt; -13.418938533204672</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">logp</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mf">5.</span><span class="p">}))</span>                    <span class="c1"># ==&gt; -13.418938533204672</span>
+</pre></div>
+</div>
+<p>Looking closer to the classmethod <code class="docutils literal notranslate"><span class="pre">model.Var</span></code>, it is clear that what
+PyMC3 does is an <strong>interception</strong> of the Random Variable, depending on
+the <code class="docutils literal notranslate"><span class="pre">*args</span></code>:
+<a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/model.py#L786-L847">https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/model.py#L786-L847</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">Var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">total_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="o">...</span>
+    <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="s2">&quot;transform&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="n">var</span> <span class="o">=</span> <span class="n">FreeRV</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>             <span class="c1"># ==&gt; FreeRV</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">free_RVs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="n">var</span> <span class="o">=</span> <span class="n">TransformedRV</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>      <span class="c1"># ==&gt; TransformedRV</span>
+            <span class="o">...</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deterministics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_random_variable</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">var</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="n">MultiObservedRV</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>        <span class="c1"># ==&gt; MultiObservedRV</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observed_RVs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">missing_values</span><span class="p">:</span>
+            <span class="o">...</span>                               <span class="c1"># ==&gt; Additional FreeRV if there is missing values</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="n">ObservedRV</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>             <span class="c1"># ==&gt; ObservedRV</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observed_RVs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">missing_values</span><span class="p">:</span>
+            <span class="o">...</span>                               <span class="c1"># ==&gt; Additional FreeRV if there is missing values</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_random_variable</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">var</span>
+</pre></div>
+</div>
+<p>In general, if a variable has observations (<code class="docutils literal notranslate"><span class="pre">observed</span></code> parameter), the RV is defined as an <code class="docutils literal notranslate"><span class="pre">ObservedRV</span></code>,
+otherwise if it has a <code class="docutils literal notranslate"><span class="pre">transformed</span></code> (<code class="docutils literal notranslate"><span class="pre">transform</span></code> parameter) attribute, it is a
+<code class="docutils literal notranslate"><span class="pre">TransformedRV</span></code>, otherwise, it will be the most elementary form: a
+<code class="docutils literal notranslate"><span class="pre">FreeRV</span></code>.  Note that this means that random variables with
+observations cannot be transformed.</p>
+<p>Below, I will take a deeper look into <code class="docutils literal notranslate"><span class="pre">TransformedRV</span></code>. A normal user
+might not necessary come in contact with the concept, as
+<code class="docutils literal notranslate"><span class="pre">TransformedRV</span></code> and <code class="docutils literal notranslate"><span class="pre">TransformedDistribution</span></code> are intentionally not
+user facing.</p>
+<p>Because in PyMC3 there is no bijector class like in TFP or pyro, we only
+have a partial implementation called <code class="docutils literal notranslate"><span class="pre">Transform</span></code>, which implements
+Jacobian correction for forward mapping only (there is no Jacobian
+correction for inverse mapping). The use cases we considered are limited
+to the set of distributions that are bounded, and the transformation
+maps the bounded set to the real line - see
+<a class="reference external" href="https://docs.pymc.io/notebooks/api_quickstart.html#Automatic-transforms-of-bounded-RVs">doc</a>.
+However, other transformations are possible.
+In general, PyMC3 does not provide explicit functionality to transform
+one distribution to another. Instead, a dedicated distribution is
+usually created in order to optimise performance. But getting a
+<code class="docutils literal notranslate"><span class="pre">TransformedDistribution</span></code> is also possible (see also in
+<a class="reference external" href="https://docs.pymc.io/notebooks/api_quickstart.html#Transformed-distributions-and-changes-of-variables">doc</a>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tr</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">transforms</span>
+<span class="k">class</span> <span class="nc">Exp</span><span class="p">(</span><span class="n">tr</span><span class="o">.</span><span class="n">ElemwiseTransform</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;exp&quot;</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tt</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tt</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">jacobian_det</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">tt</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="n">lognorm</span> <span class="o">=</span> <span class="n">Exp</span><span class="p">()</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+<span class="n">lognorm</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">pymc3</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">TransformedDistribution</span> <span class="n">at</span> <span class="mh">0x7f1536749b00</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Now, back to <code class="docutils literal notranslate"><span class="pre">model.RV(...)</span></code> - things returned from <code class="docutils literal notranslate"><span class="pre">model.RV(...)</span></code>
+are Theano tensor variables, and it is clear from looking at
+<code class="docutils literal notranslate"><span class="pre">TransformedRV</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TransformedRV</span><span class="p">(</span><span class="n">TensorVariable</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>as for <code class="docutils literal notranslate"><span class="pre">FreeRV</span></code> and <code class="docutils literal notranslate"><span class="pre">ObservedRV</span></code>, they are <code class="docutils literal notranslate"><span class="pre">TensorVariable</span></code>s with
+<code class="docutils literal notranslate"><span class="pre">Factor</span></code> as mixin:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FreeRV</span><span class="p">(</span><span class="n">Factor</span><span class="p">,</span> <span class="n">TensorVariable</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Factor</span></code> basically <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/model.py#L195-L276">enable and assign the
+logp</a>
+(representated as a tensor also) property to a Theano tensor (thus
+making it a random variable). For a <code class="docutils literal notranslate"><span class="pre">TransformedRV</span></code>, it transforms the
+distribution into a <code class="docutils literal notranslate"><span class="pre">TransformedDistribution</span></code>, and then <code class="docutils literal notranslate"><span class="pre">model.Var</span></code> is
+called again to added the RV associated with the
+<code class="docutils literal notranslate"><span class="pre">TransformedDistribution</span></code> as a <code class="docutils literal notranslate"><span class="pre">FreeRV</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">transformed</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span>
+            <span class="n">transformed_name</span><span class="p">,</span> <span class="n">transform</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">distribution</span><span class="p">),</span> <span class="n">total_size</span><span class="o">=</span><span class="n">total_size</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>note: after <code class="docutils literal notranslate"><span class="pre">transform.apply(distribution)</span></code> its <code class="docutils literal notranslate"><span class="pre">.transform</span></code>
+porperty is set to <code class="docutils literal notranslate"><span class="pre">None</span></code>, thus making sure that the above call will
+only add one <code class="docutils literal notranslate"><span class="pre">FreeRV</span></code>. In another word, you <em>cannot</em> do chain
+transformation by nested applying multiple transforms to a Distribution
+(however, you can use <a class="reference external" href="https://docs.pymc.io/notebooks/api_quickstart.html?highlight=chain%20transformation">Chain
+transformation</a>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Lognormal</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">tr</span><span class="o">.</span><span class="n">Log</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">transform</span>           <span class="c1"># ==&gt; pymc3.distributions.transforms.Log</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">z2</span> <span class="o">=</span> <span class="n">Exp</span><span class="p">()</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">z2</span><span class="o">.</span><span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span>  <span class="c1"># ==&gt; True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="additional-things-that-pm-model-does">
+<h3>Additional things that <code class="docutils literal notranslate"><span class="pre">pm.Model</span></code> does<a class="headerlink" href="#additional-things-that-pm-model-does" title="Permalink to this headline">¶</a></h3>
+<p>In a way, <code class="docutils literal notranslate"><span class="pre">pm.Model</span></code> is a tape machine that records what is being
+added to the model, it keeps track the random variables (observed or
+unobserved) and potential term (additional tensor that to be added to
+the model logp), and also deterministic transformation (as bookkeeping):
+named_vars, free_RVs, observed_RVs, deterministics, potentials,
+missing_values. The model context then computes some simple model
+properties, builds a bijection mapping that transforms between
+dictionary and numpy/Theano ndarray, thus allowing the <code class="docutils literal notranslate"><span class="pre">logp</span></code>/<code class="docutils literal notranslate"><span class="pre">dlogp</span></code> functions
+to have two equivalent versions: one takes a <code class="docutils literal notranslate"><span class="pre">dict</span></code> as input and the other
+takes an <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> as input. More importantly, a <code class="docutils literal notranslate"><span class="pre">pm.Model()</span></code> contains methods
+to compile Theano functions that take Random Variables (that are also
+initialised within the same model) as input, for example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">test_point</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">dict_to_array</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">test_point</span><span class="p">))</span>  <span class="c1"># ==&gt; m.bijection.map(m.test_point)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bijection</span><span class="o">.</span><span class="n">rmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">20</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]),</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])}</span>
+<span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">]</span>
+<span class="p">{</span><span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">10.</span><span class="p">,</span> <span class="mf">11.</span><span class="p">,</span> <span class="mf">12.</span><span class="p">,</span> <span class="mf">13.</span><span class="p">,</span> <span class="mf">14.</span><span class="p">,</span> <span class="mf">15.</span><span class="p">,</span> <span class="mf">16.</span><span class="p">,</span> <span class="mf">17.</span><span class="p">,</span> <span class="mf">18.</span><span class="p">,</span> <span class="mf">19.</span><span class="p">]),</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">,</span> <span class="mf">7.</span><span class="p">,</span> <span class="mf">8.</span><span class="p">,</span> <span class="mf">9.</span><span class="p">])}</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;logp&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">,</span> <span class="nb">dir</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;d2logp&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;d2logp_nojac&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;datalogpt&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;dlogp&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;dlogp_array&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;dlogp_nojac&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;fastd2logp&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;fastd2logp_nojac&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;fastdlogp&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;fastdlogp_nojac&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;fastlogp&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;fastlogp_nojac&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;logp&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;logp_array&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;logp_dlogp_function&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;logp_elemwise&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;logp_nojac&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;logp_nojact&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;logpt&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;varlogpt&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="logp-and-dlogp">
+<h2>Logp and dlogp<a class="headerlink" href="#logp-and-dlogp" title="Permalink to this headline">¶</a></h2>
+<p>The model collects all the random variables (everything in
+<code class="docutils literal notranslate"><span class="pre">model.free_RVs</span></code> and <code class="docutils literal notranslate"><span class="pre">model.observed_RVs</span></code>) and potential term, and
+sum them together to get the model logp:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@property</span>
+<span class="k">def</span> <span class="nf">logpt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Theano scalar of log-probability of the model&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>
+        <span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">logpt</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_RVs</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">potentials</span>
+        <span class="n">logp</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">tt</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span> <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="n">factors</span><span class="p">])</span>
+        <span class="o">...</span>
+        <span class="k">return</span> <span class="n">logp</span>
+</pre></div>
+</div>
+<p>which returns a Theano tensor that its value depends on the free
+parameters in the model (i.e., its parent nodes from the Theano
+graph).You can evaluate or compile into a python callable (that you can
+pass numpy as input args). Note that the logp tensor depends on its
+input in the Theano graph, thus you cannot pass new tensor to generate a
+logp function. For similar reason, in PyMC3 we do graph copying a lot
+using theano.clone to replace the inputs to a tensor.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="mf">2.5</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">basic_RVs</span><span class="p">)</span>    <span class="c1"># ==&gt; [z, x, y]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">)</span>     <span class="c1"># ==&gt; [z, x]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">logpt</span><span class="p">)</span>         <span class="c1"># ==&gt; theano.tensor.var.TensorVariable</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">logpt</span><span class="o">.</span><span class="n">eval</span><span class="p">({</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">(</span><span class="o">-</span><span class="mf">51.25369126</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>PyMC3 then compiles a logp function with gradient that takes
+<code class="docutils literal notranslate"><span class="pre">model.free_RVs</span></code> as input and <code class="docutils literal notranslate"><span class="pre">model.logpt</span></code> as output. It could be a
+subset of tensors in <code class="docutils literal notranslate"><span class="pre">model.free_RVs</span></code> if we want a conditional
+logp/dlogp function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">logp_dlogp_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grad_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">grad_vars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">grad_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">typefilter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">,</span> <span class="n">continuous_types</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="o">...</span>
+    <span class="n">varnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">grad_vars</span><span class="p">]</span>  <span class="c1"># In a simple case with only continous RVs,</span>
+                                                <span class="c1"># this is all the free_RVs</span>
+    <span class="n">extra_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">free_RVs</span> <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">varnames</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">ValueGradFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logpt</span><span class="p">,</span> <span class="n">grad_vars</span><span class="p">,</span> <span class="n">extra_vars</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">ValueGradFunction</span></code> is a callable class which isolates part of the
+Theano graph to compile additional Theano functions. PyMC3 relies on
+<code class="docutils literal notranslate"><span class="pre">theano.clone</span></code> to copy the <code class="docutils literal notranslate"><span class="pre">model.logpt</span></code> and replace its input. It
+does not edit or rewrite the graph directly.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ValueGradFunction</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Create a theano function that computes a value and its gradient.</span>
+<span class="sd">    ...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logpt</span><span class="p">,</span> <span class="n">grad_vars</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="p">[],</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">casting</span><span class="o">=</span><span class="s1">&#39;no&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="o">...</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grad_vars</span> <span class="o">=</span> <span class="n">grad_vars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_vars</span> <span class="o">=</span> <span class="n">extra_vars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_var_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">extra_vars</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logpt</span> <span class="o">=</span> <span class="n">logpt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ordering</span> <span class="o">=</span> <span class="n">ArrayOrdering</span><span class="p">(</span><span class="n">grad_vars</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ordering</span><span class="o">.</span><span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_are_set</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="o">...</span>
+
+        <span class="c1"># Extra vars are a subset of free_RVs that are not input to the compiled function.</span>
+        <span class="c1"># But nonetheless logpt depends on these RVs.</span>
+        <span class="c1"># This is set up as a dict of theano.shared tensors, but givens (a list of</span>
+        <span class="c1"># tuple(free_RVs, theano.shared)) is the actual list that goes into the theano function</span>
+        <span class="n">givens</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_vars_shared</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">extra_vars</span><span class="p">:</span>
+            <span class="n">shared</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">shared</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span><span class="p">,</span> <span class="n">var</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_shared__&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_extra_vars_shared</span><span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">shared</span>
+            <span class="n">givens</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">var</span><span class="p">,</span> <span class="n">shared</span><span class="p">))</span>
+
+        <span class="c1"># See the implementation below. Basically, it clones the logpt and replaces its</span>
+        <span class="c1"># input with a *single* 1d theano tensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vars_joined</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logpt_joined</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_joined</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logpt</span><span class="p">,</span> <span class="n">grad_vars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ordering</span><span class="o">.</span><span class="n">vmap</span><span class="p">)</span>
+
+        <span class="n">grad</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_logpt_joined</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_joined</span><span class="p">)</span>
+        <span class="n">grad</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;__grad&#39;</span>
+
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_vars_joined</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_theano_function</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">function</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_logpt_joined</span><span class="p">,</span> <span class="n">grad</span><span class="p">],</span> <span class="n">givens</span><span class="o">=</span><span class="n">givens</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_build_joined</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logpt</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">vmap</span><span class="p">):</span>
+        <span class="n">args_joined</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">vector</span><span class="p">(</span><span class="s1">&#39;__args_joined&#39;</span><span class="p">)</span>
+        <span class="n">args_joined</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">joined_slices</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">vmap</span> <span class="ow">in</span> <span class="n">vmap</span><span class="p">:</span>
+            <span class="n">sliced</span> <span class="o">=</span> <span class="n">args_joined</span><span class="p">[</span><span class="n">vmap</span><span class="o">.</span><span class="n">slc</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vmap</span><span class="o">.</span><span class="n">shp</span><span class="p">)</span>
+            <span class="n">sliced</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">vmap</span><span class="o">.</span><span class="n">var</span>
+            <span class="n">joined_slices</span><span class="p">[</span><span class="n">vmap</span><span class="o">.</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">sliced</span>
+
+        <span class="n">replace</span> <span class="o">=</span> <span class="p">{</span><span class="n">var</span><span class="p">:</span> <span class="n">joined_slices</span><span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">args</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">args_joined</span><span class="p">,</span> <span class="n">theano</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">logpt</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">grad_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="o">...</span>
+        <span class="n">logp</span><span class="p">,</span> <span class="n">dlogp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_theano_function</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">logp</span><span class="p">,</span> <span class="n">dlogp</span>
+
+
+    <span class="k">def</span> <span class="nf">set_extra_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extra_vars</span><span class="p">):</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">get_extra_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="o">...</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">profile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">dict_to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">array_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">array_to_full_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert an array to a dictionary with grad_vars and extra_vars.&quot;&quot;&quot;</span>
+        <span class="o">...</span>
+
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>The important parts of the above function is highlighted and commented.
+On a high level, it allows us to build conditional logp function and its
+gradient easily. Here is a taste of how it works in action:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inputlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">]</span>
+
+<span class="n">func</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">logp_dlogp_function</span><span class="p">()</span>
+<span class="n">func</span><span class="o">.</span><span class="n">set_extra_values</span><span class="p">({})</span>
+<span class="n">input_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">,</span> <span class="n">inputlist</span><span class="p">)}</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+<span class="n">input_array</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">dict_to_array</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">input_array</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot; ===== &quot;</span><span class="p">)</span>
+<span class="n">func</span><span class="p">(</span><span class="n">input_array</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.7202002</span> <span class="p">,</span>  <span class="mf">0.58712205</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.44120196</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.53153001</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.36028732</span><span class="p">,</span>
+       <span class="o">-</span><span class="mf">1.49098414</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.80046792</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.26351819</span><span class="p">,</span>  <span class="mf">1.91841949</span><span class="p">,</span>  <span class="mf">1.60004128</span><span class="p">]),</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mf">0.01490006</span><span class="p">,</span>  <span class="mf">0.60958275</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.06955203</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.42430833</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.43392303</span><span class="p">,</span>
+        <span class="mf">1.13713493</span><span class="p">,</span>  <span class="mf">0.31650495</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.62582879</span><span class="p">,</span>  <span class="mf">0.75642811</span><span class="p">,</span>  <span class="mf">0.50114527</span><span class="p">])}</span>
+<span class="p">[</span><span class="o">-</span><span class="mf">0.7202002</span>   <span class="mf">0.58712205</span> <span class="o">-</span><span class="mf">1.44120196</span> <span class="o">-</span><span class="mf">0.53153001</span> <span class="o">-</span><span class="mf">0.36028732</span> <span class="o">-</span><span class="mf">1.49098414</span>
+ <span class="o">-</span><span class="mf">0.80046792</span> <span class="o">-</span><span class="mf">0.26351819</span>  <span class="mf">1.91841949</span>  <span class="mf">1.60004128</span>  <span class="mf">0.01490006</span>  <span class="mf">0.60958275</span>
+ <span class="o">-</span><span class="mf">0.06955203</span> <span class="o">-</span><span class="mf">0.42430833</span> <span class="o">-</span><span class="mf">1.43392303</span>  <span class="mf">1.13713493</span>  <span class="mf">0.31650495</span> <span class="o">-</span><span class="mf">0.62582879</span>
+  <span class="mf">0.75642811</span>  <span class="mf">0.50114527</span><span class="p">]</span>
+ <span class="o">=====</span>
+<span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="o">-</span><span class="mf">51.0769075</span><span class="p">),</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">0.74230226</span><span class="p">,</span>  <span class="mf">0.01658948</span><span class="p">,</span>  <span class="mf">1.38606194</span><span class="p">,</span>  <span class="mf">0.11253699</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.07003284</span><span class="p">,</span>
+         <span class="mf">2.64302891</span><span class="p">,</span>  <span class="mf">1.12497754</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.35967542</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.18117557</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.11489642</span><span class="p">,</span>
+         <span class="mf">0.98281586</span><span class="p">,</span>  <span class="mf">1.69545542</span><span class="p">,</span>  <span class="mf">0.34626619</span><span class="p">,</span>  <span class="mf">1.61069443</span><span class="p">,</span>  <span class="mf">2.79155183</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.91020295</span><span class="p">,</span>  <span class="mf">0.60094326</span><span class="p">,</span>  <span class="mf">2.08022672</span><span class="p">,</span>  <span class="mf">2.8799075</span> <span class="p">,</span>  <span class="mf">2.81681213</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">irv</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Condition Logp: take </span><span class="si">%s</span><span class="s2"> as input and conditioned on the rest.&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">[</span><span class="n">irv</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+<span class="n">func_conditional</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">logp_dlogp_function</span><span class="p">(</span><span class="n">grad_vars</span><span class="o">=</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">[</span><span class="n">irv</span><span class="p">]])</span>
+<span class="n">func_conditional</span><span class="o">.</span><span class="n">set_extra_values</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+<span class="n">input_array2</span> <span class="o">=</span> <span class="n">func_conditional</span><span class="o">.</span><span class="n">dict_to_array</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">input_array2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot; ===== &quot;</span><span class="p">)</span>
+<span class="n">func_conditional</span><span class="p">(</span><span class="n">input_array2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Condition</span> <span class="n">Logp</span><span class="p">:</span> <span class="n">take</span> <span class="n">x</span> <span class="k">as</span> <span class="nb">input</span> <span class="ow">and</span> <span class="n">conditioned</span> <span class="n">on</span> <span class="n">the</span> <span class="n">rest</span><span class="o">.</span>
+<span class="p">[</span> <span class="mf">0.01490006</span>  <span class="mf">0.60958275</span> <span class="o">-</span><span class="mf">0.06955203</span> <span class="o">-</span><span class="mf">0.42430833</span> <span class="o">-</span><span class="mf">1.43392303</span>  <span class="mf">1.13713493</span>
+  <span class="mf">0.31650495</span> <span class="o">-</span><span class="mf">0.62582879</span>  <span class="mf">0.75642811</span>  <span class="mf">0.50114527</span><span class="p">]</span>
+ <span class="o">=====</span>
+<span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="o">-</span><span class="mf">51.0769075</span><span class="p">),</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">0.98281586</span><span class="p">,</span>  <span class="mf">1.69545542</span><span class="p">,</span>  <span class="mf">0.34626619</span><span class="p">,</span>  <span class="mf">1.61069443</span><span class="p">,</span>  <span class="mf">2.79155183</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.91020295</span><span class="p">,</span>  <span class="mf">0.60094326</span><span class="p">,</span>  <span class="mf">2.08022672</span><span class="p">,</span>  <span class="mf">2.8799075</span> <span class="p">,</span>  <span class="mf">2.81681213</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>So why is this necessary? One can imagine that we just compile one logp
+function, and do bookkeeping ourselves. For example, we can build the
+logp function in Theano directly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">theano</span>
+<span class="n">func</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">logpt</span><span class="p">)</span>
+<span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">inputlist</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">(</span><span class="o">-</span><span class="mf">51.0769075</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logpt_grad</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">logpt</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">)</span>
+<span class="n">func_d</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">,</span> <span class="n">logpt_grad</span><span class="p">)</span>
+<span class="n">func_d</span><span class="p">(</span><span class="o">*</span><span class="n">inputlist</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">array</span><span class="p">([</span> <span class="mf">0.74230226</span><span class="p">,</span>  <span class="mf">0.01658948</span><span class="p">,</span>  <span class="mf">1.38606194</span><span class="p">,</span>  <span class="mf">0.11253699</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.07003284</span><span class="p">,</span>
+         <span class="mf">2.64302891</span><span class="p">,</span>  <span class="mf">1.12497754</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.35967542</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.18117557</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.11489642</span><span class="p">]),</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">0.98281586</span><span class="p">,</span>  <span class="mf">1.69545542</span><span class="p">,</span>  <span class="mf">0.34626619</span><span class="p">,</span>  <span class="mf">1.61069443</span><span class="p">,</span>  <span class="mf">2.79155183</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.91020295</span><span class="p">,</span>  <span class="mf">0.60094326</span><span class="p">,</span>  <span class="mf">2.08022672</span><span class="p">,</span>  <span class="mf">2.8799075</span> <span class="p">,</span>  <span class="mf">2.81681213</span><span class="p">])]</span>
+</pre></div>
+</div>
+<p>Similarly, build a conditional logp:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">shared</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">shared</span><span class="p">(</span><span class="n">inputlist</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">func2</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">function</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">m</span><span class="o">.</span><span class="n">logpt</span><span class="p">,</span> <span class="n">givens</span><span class="o">=</span><span class="p">[(</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shared</span><span class="p">)])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">func2</span><span class="p">(</span><span class="n">inputlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="n">logpt_grad2</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">logpt</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">func_d2</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">function</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">logpt_grad2</span><span class="p">,</span> <span class="n">givens</span><span class="o">=</span><span class="p">[(</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shared</span><span class="p">)])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">func_d2</span><span class="p">(</span><span class="n">inputlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">51.07690750130328</span>
+<span class="p">[</span> <span class="mf">0.74230226</span>  <span class="mf">0.01658948</span>  <span class="mf">1.38606194</span>  <span class="mf">0.11253699</span> <span class="o">-</span><span class="mf">1.07003284</span>  <span class="mf">2.64302891</span>
+  <span class="mf">1.12497754</span> <span class="o">-</span><span class="mf">0.35967542</span> <span class="o">-</span><span class="mf">1.18117557</span> <span class="o">-</span><span class="mf">1.11489642</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The above also gives the same logp and gradient as the output from
+<code class="docutils literal notranslate"><span class="pre">model.logp_dlogp_function</span></code>. But the difficulty is to compile
+everything into a single function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">func_logp_and_grad</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">,</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">logpt</span><span class="p">,</span> <span class="n">logpt_grad</span><span class="p">])</span>  <span class="c1"># ==&gt; ERROR</span>
+</pre></div>
+</div>
+<p>We want to have a function that return the evaluation and its gradient
+re each input: <code class="docutils literal notranslate"><span class="pre">value,</span> <span class="pre">grad</span> <span class="pre">=</span> <span class="pre">f(x)</span></code>, but the naive implementation does
+not work. We can of course wrap 2 functions - one for logp one for dlogp
+- and output a list. But that would mean we need to call 2 functions. In
+addition, when we write code using python logic to do bookkeeping when
+we build our conditional logp. Using <code class="docutils literal notranslate"><span class="pre">theano.clone</span></code>, we always have
+the input to the Theano function being a 1d vector (instead of a list of
+RV that each can have very different shape), thus it is very easy to do
+matrix operation like rotation etc.</p>
+<div class="section" id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h3>
+<div class="line-block">
+<div class="line">The current setup is quite powerful, as the Theano compiled function
+is fairly fast to compile and to call. Also, when we are repeatedly
+calling a conditional logp function, external RV only need to reset
+once. However, there are still significant overheads when we are
+passing values between Theano graph and numpy. That is the reason we
+often see no advantage in using GPU, because the data is copying
+between GPU and CPU at each function call - and for a small model, the
+result is a slower inference under GPU than CPU.</div>
+<div class="line">Also, <code class="docutils literal notranslate"><span class="pre">theano.clone</span></code> is too convenient (pymc internal joke is that
+it is like a drug - very addictive). If all the operation happens in
+the graph (including the conditioning and setting value), I see no
+need to isolate part of the graph (via graph copying or graph
+rewriting) for building model and running inference.</div>
+<div class="line">Moreover, if we are limiting to the problem that we can solved most
+confidently - model with all continous unknown parameters that could
+be sampled with dynamic HMC, there is even less need to think about
+graph cloning/rewriting.</div>
+</div>
+</div>
+</div>
+<div class="section" id="inference">
+<h2>Inference<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mcmc">
+<h3>MCMC<a class="headerlink" href="#mcmc" title="Permalink to this headline">¶</a></h3>
+<p>The ability for model instance to generate conditional logp and dlogp
+function enable one of the unique feature of PyMC3 - <a class="reference external" href="https://docs.pymc.io/notebooks/sampling_compound_step.html">CompoundStep
+method</a>.
+On a conceptual level it is a Metropolis-within-Gibbs sampler. User can
+<a class="reference external" href="https://docs.pymc.io/notebooks/sampling_compound_step.html?highlight=compoundstep#Specify-compound-steps">specify different sampler of different
+RVs</a>.
+Alternatively, it is implemented as yet another interceptor: the
+<code class="docutils literal notranslate"><span class="pre">pm.sample(...)</span></code> call will try to <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/sampling.py#L86-L152">assign the best step methods to
+different
+free_RVs</a>
+(e.g., NUTS if all free_RVs are continous). Then, (conditional) logp
+function(s) are compiled, and the sampler called each sampler within the
+list of CompoundStep in a for-loop for one sample circle.</p>
+<p>For each sampler, it implements a <code class="docutils literal notranslate"><span class="pre">step.step</span></code> method to perform MH
+updates. Each time a dictionary (<code class="docutils literal notranslate"><span class="pre">point</span></code> in <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code> land, same
+structure as <code class="docutils literal notranslate"><span class="pre">model.test_point</span></code>) is passed as input and output a new
+dictionary with the free_RVs being sampled now has a new value (if
+accepted, see
+<a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/step_methods/compound.py#L27">here</a>
+and
+<a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/step_methods/compound.py#L41">here</a>).
+There are some example in the <a class="reference external" href="https://docs.pymc.io/notebooks/sampling_compound_step.html#Specify-compound-steps">CompoundStep
+doc</a>.</p>
+<div class="section" id="transition-kernel">
+<h4>Transition kernel<a class="headerlink" href="#transition-kernel" title="Permalink to this headline">¶</a></h4>
+<p>The base class for most MCMC sampler (except SMC) is in
+<a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/step_methods/arraystep.py">ArrayStep</a>.
+You can see that the <code class="docutils literal notranslate"><span class="pre">step.step()</span></code> is mapping the <code class="docutils literal notranslate"><span class="pre">point</span></code> into an
+array, and call <code class="docutils literal notranslate"><span class="pre">self.astep()</span></code>, which is an array in, array out
+function. A pymc3 model compile a conditional logp/dlogp function that
+replace the input RVs with a shared 1D tensor (flatten and stack view of
+the original RVs). And the transition kernel (i.e., <code class="docutils literal notranslate"><span class="pre">.astep()</span></code>) takes
+array as input and output an array. See for example in the <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/step_methods/metropolis.py#L139-L173">MH
+sampler</a>.</p>
+<p>This is of course very different compare to the transition kernel in eg
+TFP, which is a tenor in tensor out function. Moreover, transition
+kernels in TFP do not flatten the tensors, see eg docstring of
+<a class="reference external" href="https://github.com/tensorflow/probability/blob/master/tensorflow_probability/python/mcmc/random_walk_metropolis.py">tensorflow_probability/python/mcmc/random_walk_metropolis.py</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>new_state_fn: Python callable which takes a list of state parts and a
+  seed; returns a same-type `list` of `Tensor`s, each being a perturbation
+  of the input state parts. The perturbation distribution is assumed to be
+  a symmetric distribution centered at the input state part.
+  Default value: `None` which is mapped to
+    `tfp.mcmc.random_walk_normal_fn()`.
+</pre></div>
+</div>
+</div>
+<div class="section" id="dynamic-hmc">
+<h4>Dynamic HMC<a class="headerlink" href="#dynamic-hmc" title="Permalink to this headline">¶</a></h4>
+<p>We love NUTS, or to be more precise Dynamic HMC with complex stopping
+rules. This part is actually all done outside of Theano, for NUTS, it
+includes: the leapfrog, dual averaging, tunning of mass matrix and step
+size, the tree building, sampler related statistics like divergence and
+energy checking. We actually have a Theano version of HMC, but it has never
+been used, and has been removed from the main repository. It can still be
+found in the <a class="reference external" href="https://github.com/pymc-devs/pymc3/pull/3734/commits/0fdae8207fd14f66635f3673ef267b2b8817aa68">git history</a>,
+though.</p>
+</div>
+</div>
+<div class="section" id="variational-inference-vi">
+<h3>Variational Inference (VI)<a class="headerlink" href="#variational-inference-vi" title="Permalink to this headline">¶</a></h3>
+<p>The design of the VI module takes a different approach than
+MCMC - it has a functional design, and everything is done within Theano
+(i.e., Optimization and building the variational objective). The base
+class of variational inference is
+<a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/variational/inference.py">pymc3.variational.Inference</a>,
+where it builds the objective function by calling:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">objective</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">approx</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)(</span><span class="n">tf</span><span class="p">)</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>Where:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>op     : Operator class
+approx : Approximation class or instance
+tf     : TestFunction instance
+kwargs : kwargs passed to :class:`Operator`
+</pre></div>
+</div>
+<p>The design is inspired by the great work <a class="reference external" href="https://arxiv.org/abs/1610.09033">Operator Variational
+Inference</a>. <code class="docutils literal notranslate"><span class="pre">Inference</span></code> object is
+a very high level of VI implementation. It uses primitives: Operator,
+Approximation, and Test functions to combine them into single objective
+function. Currently we do not care too much about the test function, it
+is usually not required (and not implemented). The other primitives are
+defined as base classes in <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/variational/opvi.py">this
+file</a>.
+We use inheritance to easily implement a broad class of VI methods
+leaving a lot of flexibility for further extensions.</p>
+<p>For example, consider ADVI. We know that in the high-level, we are
+approximating the posterior in the latent space with a diagonal
+Multivariate Gaussian. In another word, we are approximating each elements in
+<code class="docutils literal notranslate"><span class="pre">model.free_RVs</span></code> with a Gaussian. Below is what happen in the set up:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">ADVI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">MeanField</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<span class="c1"># ==&gt; In the super class KLqp</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">KLqp</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">KL</span><span class="p">,</span> <span class="n">MeanField</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">)</span>
+<span class="c1"># ==&gt; In the super class Inference</span>
+    <span class="o">...</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">objective</span> <span class="o">=</span> <span class="n">KL</span><span class="p">(</span><span class="n">MeanField</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">KL</span></code> is Operator based on Kullback Leibler Divergence (it does
+not need any test function).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">datalogp_norm</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logq_norm</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">varlogp_norm</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Since the logp and logq are from the approximation, let’s dive in
+further on it (there is another abstraction here - <code class="docutils literal notranslate"><span class="pre">Group</span></code> - that
+allows you to combine approximation into new approximation, but we will
+skip this for now and only consider <code class="docutils literal notranslate"><span class="pre">SingleGroupApproximation</span></code> like
+<code class="docutils literal notranslate"><span class="pre">MeanField</span></code>): The definition of <code class="docutils literal notranslate"><span class="pre">datalogp_norm</span></code>, <code class="docutils literal notranslate"><span class="pre">logq_norm</span></code>,
+<code class="docutils literal notranslate"><span class="pre">varlogp_norm</span></code> are in
+<a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/variational/opvi.py">variational/opvi</a>,
+strip away the normalizing term, <code class="docutils literal notranslate"><span class="pre">datalogp</span></code> and <code class="docutils literal notranslate"><span class="pre">varlogp</span></code> are
+expectation of the variational free_RVs and data logp - we clone the
+datalogp and varlogp from the model, replace its input with Theano
+tensor that <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/variational/opvi.py#L1098-L1111">samples from the variational
+posterior</a>.
+For ADVI, these samples are from <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/variational/approximations.py#L84-L89">a
+Gaussian</a>.
+Note that the samples from the posterior approximations are usually 1
+dimension more, so that we can compute the expectation and get the
+gradient of the expectation (by computing the <a class="reference external" href="http://blog.shakirm.com/2015/10/machine-learning-trick-of-the-day-4-reparameterisation-tricks/">expectation of the
+gradient!</a>).
+As for the <code class="docutils literal notranslate"><span class="pre">logq</span></code> since it is a Gaussian <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/variational/approximations.py#L91-L97">it is pretty
+straightforward to evaluate</a>.</p>
+<div class="section" id="some-challenges-and-insights-from-implementing-vi">
+<h4>Some challenges and insights from implementing VI.<a class="headerlink" href="#some-challenges-and-insights-from-implementing-vi" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p>Graph based approach was helpful, but Theano had no direct access to
+previously created nodes in the computational graph. you can find a
+lot of <code class="docutils literal notranslate"><span class="pre">&#64;node_property</span></code> usages in implementation. This is done to
+cache nodes. TensorFlow has graph utils for that that could
+potentially help in doing this. On the other hand graph management in
+Tensorflow seemed to more tricky than expected. The high level reason
+is that graph is an add only container</p></li>
+<li><p>There were few fixed bugs not obvoius in the first place. Theano has
+a tool to manipulate the graph (<code class="docutils literal notranslate"><span class="pre">theano.clone</span></code>) and this tool
+requires extremely careful treatment when doing a lot of graph
+replacements at different level.</p></li>
+<li><p>We coined a term <code class="docutils literal notranslate"><span class="pre">theano.clone</span></code> curse. We got extremely dependent
+on this feature. Internal usages are uncountable:</p>
+<ul>
+<li><p>we use this to <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/model.py#L972">vectorize the
+model</a>
+for both MCMC and VI to speed up computations</p></li>
+<li><p>we use this to <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/master/pymc3/variational/opvi.py#L1483">create sampling
+graph</a>
+for VI. This is the case you want posterior predictive as a part
+of computational graph.</p></li>
+</ul>
+</li>
+</ul>
+<p>As this is the core of the VI process, we were trying to replicate this pattern
+in TF. However, when <code class="docutils literal notranslate"><span class="pre">theano.clone</span></code> is called, Theano creates a new part of the graph that can
+be collected by garbage collector, but TF’s graph is add only. So we
+should solve the problem of replacing input in a different way.</p>
+</div>
+</div>
+</div>
+<div class="section" id="forward-sampling">
+<h2>Forward sampling<a class="headerlink" href="#forward-sampling" title="Permalink to this headline">¶</a></h2>
+<p>As explained above, in distribution we have method to walk the model
+dependence graph and generate forward random sample in scipy/numpy. This
+allows us to do prior predictive samples using
+<code class="docutils literal notranslate"><span class="pre">pymc3.sampling.sample_prior_predictive</span></code> see <a class="reference external" href="https://github.com/pymc-devs/pymc3/blob/6d07591962a6c135640a3c31903eba66b34e71d8/pymc3/sampling.py#L1303-L1345">code</a>.
+It is a fairly fast batch operation, but we have quite a lot of bugs and
+edge case especially in high dimensions. The biggest pain point is the
+automatic broadcasting. As in the batch random generation, we want to
+generate (n_sample, ) + RV.shape random samples. In some cases, where
+we broadcast RV1 and RV2 to create a RV3 that has one more batch shape,
+we get error (even worse, wrong answer with silent error).</p>
+<p>The good news is, we are fixing these errors with the amazing works from [lucianopaz](<a class="reference external" href="https://github.com/lucianopaz">https://github.com/lucianopaz</a>) and
+others. The challenge and some summary of the solution could be found in Luciano’s [blog post](<a class="reference external" href="https://lucianopaz.github.io/2019/08/19/pymc3-shape-handling/">https://lucianopaz.github.io/2019/08/19/pymc3-shape-handling/</a>)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">sd</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s1">&#39;sd&#39;</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sd</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_prior_predictive</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="n">trace</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="c1"># ==&gt; should be (100, 2, 5, 10)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>There are also other error related random sample generation (e.g.,
+<a class="reference external" href="https://github.com/pymc-devs/pymc3/issues/3270">Mixture is currently
+broken</a>).</p>
+</div>
+<div class="section" id="extending-pymc3">
+<h2>Extending PyMC3<a class="headerlink" href="#extending-pymc3" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Custom Inference method</dt><dd><ul>
+<li><p><a class="reference external" href="https://github.com/junpenglao/Planet_Sakaar_Data_Science/blob/master/Ports/Inferencing%20Linear%20Mixed%20Model%20with%20EM.ipynb">Inferencing Linear Mixed Model with EM.ipynb</a></p></li>
+<li><p><a class="reference external" href="https://github.com/junpenglao/Planet_Sakaar_Data_Science/blob/master/Ports/Laplace%20approximation%20in%20pymc3.ipynb">Laplace approximation in  pymc3.ipynb</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Connecting it to other library within a model</dt><dd><ul>
+<li><p><a class="reference external" href="https://docs.pymc.io/notebooks/blackbox_external_likelihood.html">Using “black box” likelihood function by creating a custom Theano Op</a></p></li>
+<li><p>Using emcee</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Using other library for inference</dt><dd><ul>
+<li><p>Connecting to Julia for solving ODE (with gradient for solution that can be used in NUTS)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="what-we-got-wrong">
+<h2>What we got wrong<a class="headerlink" href="#what-we-got-wrong" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="shape">
+<h3>Shape<a class="headerlink" href="#shape" title="Permalink to this headline">¶</a></h3>
+<p>One of the pain point we often face is the issue of shape. The approach
+in TFP and pyro is currently much more rigorous. Adrian’s PR
+(<a class="reference external" href="https://github.com/pymc-devs/pymc3/pull/2833">https://github.com/pymc-devs/pymc3/pull/2833</a>) might fix this problem,
+but likely it is a huge effort of refactoring. I implemented quite a lot
+of patches for mixture distribution, but still they are not done very
+naturally.</p>
+</div>
+<div class="section" id="random-methods-in-numpy">
+<h3>Random methods in numpy<a class="headerlink" href="#random-methods-in-numpy" title="Permalink to this headline">¶</a></h3>
+<p>There is a lot of complex logic for sampling from random variables, and
+because it is all in Python, we can’t transform a sampling graph
+further. Unfortunately, Theano does not have code to sample from various
+distributions and we didn’t want to write that our own.</p>
+</div>
+<div class="section" id="samplers-are-in-python">
+<h3>Samplers are in Python<a class="headerlink" href="#samplers-are-in-python" title="Permalink to this headline">¶</a></h3>
+<p>While having the samplers be written in Python allows for a lot of
+flexibility and intuitive for experiment (writing e.g. NUTS in Theano is
+also very difficult), it comes at a performance penalty and makes
+sampling on the GPU very inefficient because memory needs to be copied
+for every logp evaluation.</p>
+</div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

@@ -1,0 +1,1736 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Probabilistic Matrix Factorization for Making Personalized Recommendations &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Probabilistic-Matrix-Factorization-for-Making-Personalized-Recommendations">
+<h1>Probabilistic Matrix Factorization for Making Personalized Recommendations<a class="headerlink" href="#Probabilistic-Matrix-Factorization-for-Making-Personalized-Recommendations" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;seaborn-darkgrid&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running on PyMC3 v</span><span class="si">{</span><span class="n">pm</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Running on PyMC3 v3.9.0
+</pre></div></div>
+</div>
+<div class="section" id="Motivation">
+<h2>Motivation<a class="headerlink" href="#Motivation" title="Permalink to this headline">¶</a></h2>
+<p>So you are browsing for something to watch on Netflix and just not liking the suggestions. You just know you can do better. All you need to do is collect some ratings data from yourself and friends and build a recommendation algorithm. This notebook will guide you in doing just that!</p>
+<p>We’ll start out by getting some intuition for how our model will work. Then we’ll formalize our intuition. Afterwards, we’ll examine the dataset we are going to use. Once we have some notion of what our data looks like, we’ll define some baseline methods for predicting preferences for movies. Following that, we’ll look at Probabilistic Matrix Factorization (PMF), which is a more sophisticated Bayesian method for predicting preferences. Having detailed the PMF model, we’ll use PyMC3 for MAP
+estimation and MCMC inference. Finally, we’ll compare the results obtained with PMF to those obtained from our baseline methods and discuss the outcome.</p>
+</div>
+<div class="section" id="Intuition">
+<h2>Intuition<a class="headerlink" href="#Intuition" title="Permalink to this headline">¶</a></h2>
+<p>Normally if we want recommendations for something, we try to find people who are similar to us and ask their opinions. If Bob, Alice, and Monty are all similar to me, and they all like crime dramas, I’ll probably like crime dramas. Now this isn’t always true. It depends on what we consider to be “similar”. In order to get the best bang for our buck, we really want to look for people who have the most similar taste. Taste being a complex beast, we’d probably like to break it down into something
+more understandable. We might try to characterize each movie in terms of various factors. Perhaps films can be moody, light-hearted, cinematic, dialogue-heavy, big-budget, etc. Now imagine we go through IMDB and assign each movie a rating in each of the categories. How moody is it? How much dialogue does it have? What’s its budget? Perhaps we use numbers between 0 and 1 for each category. Intuitively, we might call this the film’s profile.</p>
+<p>Now let’s suppose we go back to those 5 movies we rated. At this point, we can get a richer picture of our own preferences by looking at the film profiles of each of the movies we liked and didn’t like. Perhaps we take the averages across the 5 film profiles and call this our ideal type of film. In other words, we have computed some notion of our inherent <em>preferences</em> for various types of movies. Suppose Bob, Alice, and Monty all do the same. Now we can compare our preferences and determine how
+similar each of us really are. I might find that Bob is the most similar and the other two are still more similar than other people, but not as much as Bob. So I want recommendations from all three people, but when I make my final decision, I’m going to put more weight on Bob’s recommendation than those I get from Alice and Monty.</p>
+<p>While the above procedure sounds fairly effective as is, it also reveals an unexpected additional source of information. If we rated a particular movie highly, and we know its film profile, we can compare with the profiles of other movies. If we find one with very close numbers, it is probable we’ll also enjoy this movie. Both this approach and the one above are commonly known as <em>neighborhood approaches</em>. Techniques that leverage both of these approaches simultaneously are often called
+<em>collaborative filtering</em> <a class="reference external" href="http://www2.research.att.com/~volinsky/papers/ieeecomputer.pdf">[1]</a>. The first approach we talked about uses user-user similarity, while the second uses item-item similarity. Ideally, we’d like to use both sources of information. The idea is we have a lot of items available to us, and we’d like to work together with others to filter the list of items down to those we’ll each like best. My list should have the items I’ll like best at the top and those I’ll like
+least at the bottom. Everyone else wants the same. If I get together with a bunch of other people, we all watch 5 movies, and we have some efficient computational process to determine similarity, we can very quickly order the movies to our liking.</p>
+</div>
+<div class="section" id="Formalization">
+<h2>Formalization<a class="headerlink" href="#Formalization" title="Permalink to this headline">¶</a></h2>
+<p>Let’s take some time to make the intuitive notions we’ve been discussing more concrete. We have a set of <span class="math notranslate nohighlight">\(M\)</span> movies, or <em>items</em> (<span class="math notranslate nohighlight">\(M = 100\)</span> in our example above). We also have <span class="math notranslate nohighlight">\(N\)</span> people, whom we’ll call <em>users</em> of our recommender system. For each item, we’d like to find a <span class="math notranslate nohighlight">\(D\)</span> dimensional factor composition (film profile above) to describe the item. Ideally, we’d like to do this without actually going through and manually labeling all of the movies. Manual labeling would
+be both slow and error-prone, as different people will likely label movies differently. So we model each movie as a <span class="math notranslate nohighlight">\(D\)</span> dimensional vector, which is its latent factor composition. Furthermore, we expect each user to have some preferences, but without our manual labeling and averaging procedure, we have to rely on the latent factor compositions to learn <span class="math notranslate nohighlight">\(D\)</span> dimensional latent preference vectors for each user. The only thing we get to observe is the <span class="math notranslate nohighlight">\(N \times M\)</span> ratings matrix
+<span class="math notranslate nohighlight">\(R\)</span> provided by the users. Entry <span class="math notranslate nohighlight">\(R_{ij}\)</span> is the rating user <span class="math notranslate nohighlight">\(i\)</span> gave to item <span class="math notranslate nohighlight">\(j\)</span>. Many of these entries may be missing, since most users will not have rated all 100 movies. Our goal is to fill in the missing values with predicted ratings based on the latent variables <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span>. We denote the predicted ratings by <span class="math notranslate nohighlight">\(R_{ij}^*\)</span>. We also define an indicator matrix <span class="math notranslate nohighlight">\(I\)</span>, with entry <span class="math notranslate nohighlight">\(I_{ij} = 0\)</span> if <span class="math notranslate nohighlight">\(R_{ij}\)</span> is missing and <span class="math notranslate nohighlight">\(I_{ij} = 1\)</span>
+otherwise.</p>
+<p>So we have an <span class="math notranslate nohighlight">\(N \times D\)</span> matrix of user preferences which we’ll call <span class="math notranslate nohighlight">\(U\)</span> and an <span class="math notranslate nohighlight">\(M \times D\)</span> factor composition matrix we’ll call <span class="math notranslate nohighlight">\(V\)</span>. We also have a <span class="math notranslate nohighlight">\(N \times M\)</span> rating matrix we’ll call <span class="math notranslate nohighlight">\(R\)</span>. We can think of each row <span class="math notranslate nohighlight">\(U_i\)</span> as indications of how much each user prefers each of the <span class="math notranslate nohighlight">\(D\)</span> latent factors. Each row <span class="math notranslate nohighlight">\(V_j\)</span> can be thought of as how much each item can be described by each of the latent factors. In order to make a recommendation, we
+need a suitable prediction function which maps a user preference vector <span class="math notranslate nohighlight">\(U_i\)</span> and an item latent factor vector <span class="math notranslate nohighlight">\(V_j\)</span> to a predicted ranking. The choice of this prediction function is an important modeling decision, and a variety of prediction functions have been used. Perhaps the most common is the dot product of the two vectors, <span class="math notranslate nohighlight">\(U_i \cdot V_j\)</span> <a class="reference external" href="http://www2.research.att.com/~volinsky/papers/ieeecomputer.pdf">[1]</a>.</p>
+<p>To better understand CF techniques, let us explore a particular example. Imagine we are seeking to recommend movies using a model which infers five latent factors, <span class="math notranslate nohighlight">\(V_j\)</span>, for <span class="math notranslate nohighlight">\(j = 1,2,3,4,5\)</span>. In reality, the latent factors are often unexplainable in a straightforward manner, and most models make no attempt to understand what information is being captured by each factor. However, for the purposes of explanation, let us assume the five latent factors might end up capturing the film
+profile we were discussing above. So our five latent factors are: moody, light-hearted, cinematic, dialogue, and budget. Then for a particular user <span class="math notranslate nohighlight">\(i\)</span>, imagine we infer a preference vector <span class="math notranslate nohighlight">\(U_i = &lt;0.5, 0.1, 1.5, 1.1, 0.3&gt;\)</span>. Also, for a particular item <span class="math notranslate nohighlight">\(j\)</span>, we infer these values for the latent factors: <span class="math notranslate nohighlight">\(V_j = &lt;0.5, 1.5, 1.25, 0.8, 0.9&gt;\)</span>. Using the dot product as the prediction function, we would calculate 3.425 as the ranking for that item, which is more or less a neutral
+preference given our 1 to 5 rating scale.</p>
+<div class="math notranslate nohighlight">
+\[0.5 \times 0.5 + 0.1 \times 1.5 + 1.5 \times 1.25 + 1.1 \times 0.8 + 0.3 \times 0.9 = 3.425\]</div>
+</div>
+<div class="section" id="Data">
+<h2>Data<a class="headerlink" href="#Data" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://grouplens.org/datasets/movielens/100k/">MovieLens 100k dataset</a> was collected by the GroupLens Research Project at the University of Minnesota. This data set consists of 100,000 ratings (1-5) from 943 users on 1682 movies. Each user rated at least 20 movies, and be have basic information on the users (age, gender, occupation, zip). Each movie includes basic information like title, release date, video release date, and genre. We will implement a model that is suitable for
+collaborative filtering on this data and evaluate it in terms of root mean squared error (RMSE) to validate the results.</p>
+<p>The data was collected through the MovieLens web site (movielens.umn.edu) during the seven-month period from September 19th, 1997 through April 22nd, 1998. This data has been cleaned up - users who had less than 20 ratings or did not have complete demographic information were removed from this data set.</p>
+<p>Let’s begin by exploring our data. We want to get a general feel for what it looks like and a sense for what sort of patterns it might contain. Here are the user rating data:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;ml_100k_u.data&quot;</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;userid&quot;</span><span class="p">,</span> <span class="s2">&quot;itemid&quot;</span><span class="p">,</span> <span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="s2">&quot;timestamp&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>userid</th>
+      <th>itemid</th>
+      <th>rating</th>
+      <th>timestamp</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>196</td>
+      <td>242</td>
+      <td>3</td>
+      <td>881250949</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>186</td>
+      <td>302</td>
+      <td>3</td>
+      <td>891717742</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>22</td>
+      <td>377</td>
+      <td>1</td>
+      <td>878887116</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>244</td>
+      <td>51</td>
+      <td>2</td>
+      <td>880606923</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>166</td>
+      <td>346</td>
+      <td>1</td>
+      <td>886397596</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>And here is the movie detail data:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># fmt: off</span>
+<span class="n">movie_columns</span>  <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;movie id&#39;</span><span class="p">,</span> <span class="s1">&#39;movie title&#39;</span><span class="p">,</span> <span class="s1">&#39;release date&#39;</span><span class="p">,</span> <span class="s1">&#39;video release date&#39;</span><span class="p">,</span> <span class="s1">&#39;IMDb URL&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;unknown&#39;</span><span class="p">,</span><span class="s1">&#39;Action&#39;</span><span class="p">,</span><span class="s1">&#39;Adventure&#39;</span><span class="p">,</span> <span class="s1">&#39;Animation&#39;</span><span class="p">,</span><span class="s2">&quot;Children&#39;s&quot;</span><span class="p">,</span> <span class="s1">&#39;Comedy&#39;</span><span class="p">,</span> <span class="s1">&#39;Crime&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;Documentary&#39;</span><span class="p">,</span> <span class="s1">&#39;Drama&#39;</span><span class="p">,</span> <span class="s1">&#39;Fantasy&#39;</span><span class="p">,</span> <span class="s1">&#39;Film-Noir&#39;</span><span class="p">,</span> <span class="s1">&#39;Horror&#39;</span><span class="p">,</span> <span class="s1">&#39;Musical&#39;</span><span class="p">,</span> <span class="s1">&#39;Mystery&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;Romance&#39;</span><span class="p">,</span> <span class="s1">&#39;Sci-Fi&#39;</span><span class="p">,</span> <span class="s1">&#39;Thriller&#39;</span><span class="p">,</span> <span class="s1">&#39;War&#39;</span><span class="p">,</span> <span class="s1">&#39;Western&#39;</span><span class="p">]</span>
+<span class="c1"># fmt: on</span>
+<span class="n">movies</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;ml_100k_u.item&quot;</span><span class="p">),</span>
+    <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;|&quot;</span><span class="p">,</span>
+    <span class="n">names</span><span class="o">=</span><span class="n">movie_columns</span><span class="p">,</span>
+    <span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;movie id&quot;</span><span class="p">,</span>
+    <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;release date&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">movies</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>movie title</th>
+      <th>release date</th>
+      <th>video release date</th>
+      <th>IMDb URL</th>
+      <th>unknown</th>
+      <th>Action</th>
+      <th>Adventure</th>
+      <th>Animation</th>
+      <th>Children's</th>
+      <th>Comedy</th>
+      <th>...</th>
+      <th>Fantasy</th>
+      <th>Film-Noir</th>
+      <th>Horror</th>
+      <th>Musical</th>
+      <th>Mystery</th>
+      <th>Romance</th>
+      <th>Sci-Fi</th>
+      <th>Thriller</th>
+      <th>War</th>
+      <th>Western</th>
+    </tr>
+    <tr>
+      <th>movie id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>Toy Story (1995)</td>
+      <td>1995-01-01</td>
+      <td>NaN</td>
+      <td>http://us.imdb.com/M/title-exact?Toy%20Story%2...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>GoldenEye (1995)</td>
+      <td>1995-01-01</td>
+      <td>NaN</td>
+      <td>http://us.imdb.com/M/title-exact?GoldenEye%20(...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Four Rooms (1995)</td>
+      <td>1995-01-01</td>
+      <td>NaN</td>
+      <td>http://us.imdb.com/M/title-exact?Four%20Rooms%...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Get Shorty (1995)</td>
+      <td>1995-01-01</td>
+      <td>NaN</td>
+      <td>http://us.imdb.com/M/title-exact?Get%20Shorty%...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Copycat (1995)</td>
+      <td>1995-01-01</td>
+      <td>NaN</td>
+      <td>http://us.imdb.com/M/title-exact?Copycat%20(1995)</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 23 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Extract the ratings from the DataFrame</span>
+<span class="n">ratings</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">rating</span>
+
+<span class="c1"># Plot histogram</span>
+<span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_probabilistic_matrix_factorization_7_0.png" src="../_images/notebooks_probabilistic_matrix_factorization_7_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">data</span><span class="o">.</span><span class="n">rating</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+count    100000.000000
+mean          3.529860
+std           1.125674
+min           1.000000
+25%           3.000000
+50%           4.000000
+75%           4.000000
+max           5.000000
+Name: rating, dtype: float64
+</pre></div></div>
+</div>
+<p>This must be a decent batch of movies. From our exploration above, we know most ratings are in the range 3 to 5, and positive ratings are more likely than negative ratings. Let’s look at the means for each movie to see if we have any particularly good (or bad) movie here.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">movie_means</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">movies</span><span class="p">[</span><span class="s2">&quot;movie title&quot;</span><span class="p">],</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;itemid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;movie title&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rating</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">movie_means</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Mean ratings for 50 movies&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_probabilistic_matrix_factorization_10_0.png" src="../_images/notebooks_probabilistic_matrix_factorization_10_0.png" />
+</div>
+</div>
+<p>While the majority of the movies generally get positive feedback from users, there are definitely a few that stand out as bad. Let’s take a look at the worst and best movies, just for fun:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">movie_means</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Top 30 movies in data set&quot;</span><span class="p">)</span>
+<span class="n">movie_means</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Bottom 30 movies in data set&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_probabilistic_matrix_factorization_12_0.png" src="../_images/notebooks_probabilistic_matrix_factorization_12_0.png" />
+</div>
+</div>
+<p>Make sense to me. We now know there are definite popularity differences between the movies. Some of them are simply better than others, and some are downright lousy. Looking at the movie means allowed us to discover these general trends. Perhaps there are similar trends across users. It might be the case that some users are simply more easily entertained than others. Let’s take a look.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">user_means</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;userid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rating</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">user_means</span><span class="p">)),</span> <span class="n">user_means</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;k-&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">user_means</span><span class="p">)),</span> <span class="n">user_means</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="c1"># 1000 labels is nonsensical</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Rating&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">user_means</span><span class="p">)</span><span class="si">}</span><span class="s2"> average ratings per user&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">user_means</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_probabilistic_matrix_factorization_14_0.png" src="../_images/notebooks_probabilistic_matrix_factorization_14_0.png" />
+</div>
+</div>
+<p>We see even more significant trends here. Some users rate nearly everything highly, and some (though not as many) rate nearly everything negatively. These observations will come in handy when considering models to use for predicting user preferences on unseen movies.</p>
+</div>
+<div class="section" id="Methods">
+<h2>Methods<a class="headerlink" href="#Methods" title="Permalink to this headline">¶</a></h2>
+<p>Having explored the data, we’re now ready to dig in and start addressing the problem. We want to predict how much each user is going to like all of the movies he or she has not yet read.</p>
+<div class="section" id="Baselines">
+<h3>Baselines<a class="headerlink" href="#Baselines" title="Permalink to this headline">¶</a></h3>
+<p>Every good analysis needs some kind of baseline methods to compare against. It’s difficult to claim we’ve produced good results if we have no reference point for what defines “good”. We’ll define three very simple baseline methods and find the RMSE using these methods. Our goal will be to obtain lower RMSE scores with whatever model we produce.</p>
+<div class="section" id="Uniform-Random-Baseline">
+<h4>Uniform Random Baseline<a class="headerlink" href="#Uniform-Random-Baseline" title="Permalink to this headline">¶</a></h4>
+<p>Our first baseline is about as dead stupid as you can get. Every place we see a missing value in <span class="math notranslate nohighlight">\(R\)</span>, we’ll simply fill it with a number drawn uniformly at random in the range [1, 5]. We expect this method to do the worst by far.</p>
+<div class="math notranslate nohighlight">
+\[R_{ij}^* \sim Uniform\]</div>
+</div>
+<div class="section" id="Global-Mean-Baseline">
+<h4>Global Mean Baseline<a class="headerlink" href="#Global-Mean-Baseline" title="Permalink to this headline">¶</a></h4>
+<p>This method is only slightly better than the last. Wherever we have a missing value, we’ll fill it in with the mean of all observed ratings.</p>
+<div class="math notranslate nohighlight">
+\[\text{global_mean} = \frac{1}{N \times M} \sum_{i=1}^N \sum_{j=1}^M I_{ij}(R_{ij})\]</div>
+<div class="math notranslate nohighlight">
+\[R_{ij}^* = \text{global_mean}\]</div>
+</div>
+<div class="section" id="Mean-of-Means-Baseline">
+<h4>Mean of Means Baseline<a class="headerlink" href="#Mean-of-Means-Baseline" title="Permalink to this headline">¶</a></h4>
+<p>Now we’re going to start getting a bit smarter. We imagine some users might be easily amused, and inclined to rate all movies more highly. Other users might be the opposite. Additionally, some movies might simply be more witty than others, so all users might rate some movies more highly than others in general. We can clearly see this in our graph of the movie means above. We’ll attempt to capture these general trends through per-user and per-movie rating means. We’ll also incorporate the global
+mean to smooth things out a bit. So if we see a missing value in cell <span class="math notranslate nohighlight">\(R_{ij}\)</span>, we’ll average the global mean with the mean of <span class="math notranslate nohighlight">\(U_i\)</span> and the mean of <span class="math notranslate nohighlight">\(V_j\)</span> and use that value to fill it in.</p>
+<div class="math notranslate nohighlight">
+\[\text{user_means} = \frac{1}{M} \sum_{j=1}^M I_{ij}(R_{ij})\]</div>
+<div class="math notranslate nohighlight">
+\[\text{movie_means} = \frac{1}{N} \sum_{i=1}^N I_{ij}(R_{ij})\]</div>
+<div class="math notranslate nohighlight">
+\[R_{ij}^* = \frac{1}{3} \left(\text{user_means}_i + \text{ movie_means}_j + \text{ global_mean} \right)\]</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Create a base class with scaffolding for our 3 baselines.</span>
+
+
+<span class="k">def</span> <span class="nf">split_title</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Change &quot;BaselineMethod&quot; to &quot;Baseline Method&quot;.&quot;&quot;&quot;</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="n">title</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">title</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isupper</span><span class="p">():</span>
+            <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
+    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Baseline</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Calculate baseline predictions.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Simple heuristic-based transductive learning to fill in missing</span>
+<span class="sd">        values in data matrix.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_data</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;baseline prediction not implemented for base class&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">rmse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate root mean squared error for predictions on test data.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">rmse</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">split_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="c1"># Implement the 3 baselines.</span>
+
+
+<span class="k">class</span> <span class="nc">UniformRandomBaseline</span><span class="p">(</span><span class="n">Baseline</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fill missing values with uniform random values.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_data</span><span class="p">):</span>
+        <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+        <span class="n">masked_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">nan_mask</span><span class="p">)</span>
+        <span class="n">pmin</span><span class="p">,</span> <span class="n">pmax</span> <span class="o">=</span> <span class="n">masked_train</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">masked_train</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">nan_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">train_data</span><span class="p">[</span><span class="n">nan_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">pmin</span><span class="p">,</span> <span class="n">pmax</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predicted</span> <span class="o">=</span> <span class="n">train_data</span>
+
+
+<span class="k">class</span> <span class="nc">GlobalMeanBaseline</span><span class="p">(</span><span class="n">Baseline</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fill in missing values using the global mean.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_data</span><span class="p">):</span>
+        <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+        <span class="n">train_data</span><span class="p">[</span><span class="n">nan_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">train_data</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predicted</span> <span class="o">=</span> <span class="n">train_data</span>
+
+
+<span class="k">class</span> <span class="nc">MeanOfMeansBaseline</span><span class="p">(</span><span class="n">Baseline</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fill in missing values using mean of user/item/global means.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_data</span><span class="p">):</span>
+        <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+        <span class="n">masked_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">nan_mask</span><span class="p">)</span>
+        <span class="n">global_mean</span> <span class="o">=</span> <span class="n">masked_train</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">user_means</span> <span class="o">=</span> <span class="n">masked_train</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">item_means</span> <span class="o">=</span> <span class="n">masked_train</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predicted</span> <span class="o">=</span> <span class="n">train_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">train_data</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">isMA</span><span class="p">(</span><span class="n">item_means</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">predicted</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">global_mean</span><span class="p">,</span> <span class="n">user_means</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">predicted</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">global_mean</span><span class="p">,</span> <span class="n">user_means</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">item_means</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
+
+
+<span class="n">baseline_methods</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">baseline_methods</span><span class="p">[</span><span class="s2">&quot;ur&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UniformRandomBaseline</span>
+<span class="n">baseline_methods</span><span class="p">[</span><span class="s2">&quot;gm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">GlobalMeanBaseline</span>
+<span class="n">baseline_methods</span><span class="p">[</span><span class="s2">&quot;mom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MeanOfMeansBaseline</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">num_users</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">userid</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">num_items</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">itemid</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">sparsity</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">num_users</span> <span class="o">*</span> <span class="n">num_items</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Users: </span><span class="si">{</span><span class="n">num_users</span><span class="si">}</span><span class="se">\n</span><span class="s2">Movies: </span><span class="si">{</span><span class="n">num_items</span><span class="si">}</span><span class="se">\n</span><span class="s2">Sparsity: </span><span class="si">{</span><span class="n">sparsity</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">dense_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s2">&quot;userid&quot;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;itemid&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">&quot;rating&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Users: 943
+Movies: 1682
+Sparsity: 0.9369533063577546
+</pre></div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Probabilistic-Matrix-Factorization">
+<h2>Probabilistic Matrix Factorization<a class="headerlink" href="#Probabilistic-Matrix-Factorization" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://papers.nips.cc/paper/3208-probabilistic-matrix-factorization.pdf">Probabilistic Matrix Factorization (PMF)</a> [3] is a probabilistic approach to the collaborative filtering problem that takes a Bayesian perspective. The ratings <span class="math notranslate nohighlight">\(R\)</span> are modeled as draws from a Gaussian distribution. The mean for <span class="math notranslate nohighlight">\(R_{ij}\)</span> is <span class="math notranslate nohighlight">\(U_i V_j^T\)</span>. The precision <span class="math notranslate nohighlight">\(\alpha\)</span> is a fixed parameter that reflects the uncertainty of the estimations; the normal distribution is commonly reparameterized
+in terms of precision, which is the inverse of the variance. Complexity is controlled by placing zero-mean spherical Gaussian priors on <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span>. In other words, each row of <span class="math notranslate nohighlight">\(U\)</span> is drawn from a multivariate Gaussian with mean <span class="math notranslate nohighlight">\(\mu = 0\)</span> and precision which is some multiple of the identity matrix <span class="math notranslate nohighlight">\(I\)</span>. Those multiples are <span class="math notranslate nohighlight">\(\alpha_U\)</span> for <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(\alpha_V\)</span> for <span class="math notranslate nohighlight">\(V\)</span>. So our model is defined by:</p>
+<p><span class="math notranslate nohighlight">\(\newcommand\given[1][]{\:#1\vert\:}\)</span></p>
+<div class="math notranslate nohighlight">
+\[P(R \given U, V, \alpha^2) =
+    \prod_{i=1}^N \prod_{j=1}^M
+        \left[ \mathcal{N}(R_{ij} \given U_i V_j^T, \alpha^{-1}) \right]^{I_{ij}}\]</div>
+<div class="math notranslate nohighlight">
+\[P(U \given \alpha_U^2) =
+    \prod_{i=1}^N \mathcal{N}(U_i \given 0, \alpha_U^{-1} \boldsymbol{I})\]</div>
+<div class="math notranslate nohighlight">
+\[P(V \given \alpha_U^2) =
+    \prod_{j=1}^M \mathcal{N}(V_j \given 0, \alpha_V^{-1} \boldsymbol{I})\]</div>
+<p>Given small precision parameters, the priors on <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> ensure our latent variables do not grow too far from 0. This prevents overly strong user preferences and item factor compositions from being learned. This is commonly known as complexity control, where the complexity of the model here is measured by the magnitude of the latent variables. Controlling complexity like this helps prevent overfitting, which allows the model to generalize better for unseen data. We must also
+choose an appropriate <span class="math notranslate nohighlight">\(\alpha\)</span> value for the normal distribution for <span class="math notranslate nohighlight">\(R\)</span>. So the challenge becomes choosing appropriate values for <span class="math notranslate nohighlight">\(\alpha_U\)</span>, <span class="math notranslate nohighlight">\(\alpha_V\)</span>, and <span class="math notranslate nohighlight">\(\alpha\)</span>. This challenge can be tackled with the soft weight-sharing methods discussed by <a class="reference external" href="http://www.cs.toronto.edu/~fritz/absps/sunspots.pdf">Nowland and Hinton, 1992</a> [4]. However, for the purposes of this analysis, we will stick to using point estimates obtained from our data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">theano</span>
+
+<span class="c1"># Enable on-the-fly graph computations, but ignore</span>
+<span class="c1"># absence of intermediate test values.</span>
+<span class="n">theano</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">compute_test_value</span> <span class="o">=</span> <span class="s2">&quot;ignore&quot;</span>
+
+<span class="c1"># Set up logging.</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">PMF</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Probabilistic Matrix Factorization model using pymc3.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;Build the Probabilistic Matrix Factorization model using pymc3.</span>
+
+<span class="sd">        :param np.ndarray train: The training data to use for learning the model.</span>
+<span class="sd">        :param int dim: Dimensionality of the model; number of latent factors.</span>
+<span class="sd">        :param int alpha: Fixed precision for the likelihood function.</span>
+<span class="sd">        :param float std: Amount of noise to use for model initialization.</span>
+<span class="sd">        :param (tuple of int) bounds: (lower, upper) bound of ratings.</span>
+<span class="sd">            These bounds will simply be used to cap the estimates produced for R.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="c1"># Perform mean value imputation</span>
+        <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">nan_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="c1"># Low precision reflects uncertainty; prevents overfitting.</span>
+        <span class="c1"># Set to the mean variance across users and items.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha_u</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha_v</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="c1"># Specify the model.</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;building the PMF model&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">pmf</span><span class="p">:</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MvNormal</span><span class="p">(</span>
+                <span class="s2">&quot;U&quot;</span><span class="p">,</span>
+                <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">tau</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha_u</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">dim</span><span class="p">),</span>
+                <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span>
+                <span class="n">testval</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span> <span class="o">*</span> <span class="n">std</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">V</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MvNormal</span><span class="p">(</span>
+                <span class="s2">&quot;V&quot;</span><span class="p">,</span>
+                <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">tau</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha_v</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">dim</span><span class="p">),</span>
+                <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span>
+                <span class="n">testval</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span> <span class="o">*</span> <span class="n">std</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">R</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span>
+                <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="p">(</span><span class="n">U</span> <span class="o">@</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="p">)[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">],</span> <span class="n">tau</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;done building the PMF model&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">pmf</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+</div>
+<p>We’ll also need functions for calculating the MAP and performing sampling on our PMF model. When the observation noise variance <span class="math notranslate nohighlight">\(\alpha\)</span> and the prior variances <span class="math notranslate nohighlight">\(\alpha_U\)</span> and <span class="math notranslate nohighlight">\(\alpha_V\)</span> are all kept fixed, maximizing the log posterior is equivalent to minimizing the sum-of-squared-errors objective function with quadratic regularization terms.</p>
+<div class="math notranslate nohighlight">
+\[E = \frac{1}{2} \sum_{i=1}^N \sum_{j=1}^M I_{ij} (R_{ij} - U_i V_j^T)^2 + \frac{\lambda_U}{2} \sum_{i=1}^N \|U\|_{Fro}^2 + \frac{\lambda_V}{2} \sum_{j=1}^M \|V\|_{Fro}^2,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lambda_U = \alpha_U / \alpha\)</span>, <span class="math notranslate nohighlight">\(\lambda_V = \alpha_V / \alpha\)</span>, and <span class="math notranslate nohighlight">\(\|\cdot\|_{Fro}^2\)</span> denotes the Frobenius norm [3]. Minimizing this objective function gives a local minimum, which is essentially a maximum a posteriori (MAP) estimate. While it is possible to use a fast Stochastic Gradient Descent procedure to find this MAP, we’ll be finding it using the utilities built into <code class="docutils literal notranslate"><span class="pre">pymc3</span></code>. In particular, we’ll use <code class="docutils literal notranslate"><span class="pre">find_MAP</span></code> with Powell optimization
+(<code class="docutils literal notranslate"><span class="pre">scipy.optimize.fmin_powell</span></code>). Having found this MAP estimate, we can use it as our starting point for MCMC sampling.</p>
+<p>Since it is a reasonably complex model, we expect the MAP estimation to take some time. So let’s save it after we’ve found it. Note that we define a function for finding the MAP below, assuming it will receive a namespace with some variables in it. Then we attach that function to the PMF class, where it will have such a namespace after initialization. The PMF class is defined in pieces this way so I can say a few things between each piece to make it clearer.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">_find_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find mode of posterior using L-BFGS-B optimization.&quot;&quot;&quot;</span>
+    <span class="n">tstart</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;finding PMF MAP using L-BFGS-B optimization...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_map</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">find_MAP</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">)</span>
+
+    <span class="n">elapsed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;found PMF MAP in </span><span class="si">%d</span><span class="s2"> seconds&quot;</span> <span class="o">%</span> <span class="n">elapsed</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span>
+
+
+<span class="k">def</span> <span class="nf">_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_map</span><span class="p">()</span>
+
+
+<span class="c1"># Update our class with the new MAP infrastructure.</span>
+<span class="n">PMF</span><span class="o">.</span><span class="n">find_map</span> <span class="o">=</span> <span class="n">_find_map</span>
+<span class="n">PMF</span><span class="o">.</span><span class="n">map</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_map</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>So now our PMF class has a <code class="docutils literal notranslate"><span class="pre">map</span></code> <code class="docutils literal notranslate"><span class="pre">property</span></code> which will either be found using Powell optimization or loaded from a previous optimization. Once we have the MAP, we can use it as a starting point for our MCMC sampler. We’ll need a sampling function in order to draw MCMC samples to approximate the posterior distribution of the PMF model.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Draw MCMC samples.</span>
+<span class="k">def</span> <span class="nf">_draw_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;chains&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="c1"># Update our class with the sampling infrastructure.</span>
+<span class="n">PMF</span><span class="o">.</span><span class="n">draw_samples</span> <span class="o">=</span> <span class="n">_draw_samples</span>
+</pre></div>
+</div>
+</div>
+<p>We could define some kind of default trace property like we did for the MAP, but that would mean using possibly nonsensical values for <code class="docutils literal notranslate"><span class="pre">nsamples</span></code> and <code class="docutils literal notranslate"><span class="pre">cores</span></code>. Better to leave it as a non-optional call to <code class="docutils literal notranslate"><span class="pre">draw_samples</span></code>. Finally, we’ll need a function to make predictions using our inferred values for <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span>. For user <span class="math notranslate nohighlight">\(i\)</span> and movie <span class="math notranslate nohighlight">\(j\)</span>, a prediction is generated by drawing from <span class="math notranslate nohighlight">\(\mathcal{N}(U_i V_j^T, \alpha)\)</span>. To generate predictions from the sampler, we
+generate an <span class="math notranslate nohighlight">\(R\)</span> matrix for each <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> sampled, then we combine these by averaging over the <span class="math notranslate nohighlight">\(K\)</span> samples.</p>
+<div class="math notranslate nohighlight">
+\[P(R_{ij}^* \given R, \alpha, \alpha_U, \alpha_V) \approx
+    \frac{1}{K} \sum_{k=1}^K \mathcal{N}(U_i V_j^T, \alpha)\]</div>
+<p>We’ll want to inspect the individual <span class="math notranslate nohighlight">\(R\)</span> matrices before averaging them for diagnostic purposes. So we’ll write code for the averaging piece during evaluation. The function below simply draws an <span class="math notranslate nohighlight">\(R\)</span> matrix given a <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> and the fixed <span class="math notranslate nohighlight">\(\alpha\)</span> stored in the PMF object.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Estimate R from the given values of U and V.&quot;&quot;&quot;</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">sample_R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">std</span><span class="p">)</span>
+    <span class="c1"># bound ratings</span>
+    <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span>
+    <span class="n">sample_R</span><span class="p">[</span><span class="n">sample_R</span> <span class="o">&lt;</span> <span class="n">low</span><span class="p">]</span> <span class="o">=</span> <span class="n">low</span>
+    <span class="n">sample_R</span><span class="p">[</span><span class="n">sample_R</span> <span class="o">&gt;</span> <span class="n">high</span><span class="p">]</span> <span class="o">=</span> <span class="n">high</span>
+    <span class="k">return</span> <span class="n">sample_R</span>
+
+
+<span class="n">PMF</span><span class="o">.</span><span class="n">predict</span> <span class="o">=</span> <span class="n">_predict</span>
+</pre></div>
+</div>
+</div>
+<p>One final thing to note: the dot products in this model are often constrained using a logistic function <span class="math notranslate nohighlight">\(g(x) = 1/(1 + exp(-x))\)</span>, that bounds the predictions to the range [0, 1]. To facilitate this bounding, the ratings are also mapped to the range [0, 1] using <span class="math notranslate nohighlight">\(t(x) = (x + min) / range\)</span>. The authors of PMF also introduced a constrained version which performs better on users with less ratings [3]. Both models are generally improvements upon the basic model presented here. However, in
+the interest of time and space, these will not be implemented here.</p>
+</div>
+<div class="section" id="Evaluation">
+<h2>Evaluation<a class="headerlink" href="#Evaluation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Metrics">
+<h3>Metrics<a class="headerlink" href="#Metrics" title="Permalink to this headline">¶</a></h3>
+<p>In order to understand how effective our models are, we’ll need to be able to evaluate them. We’ll be evaluating in terms of root mean squared error (RMSE), which looks like this:</p>
+<div class="math notranslate nohighlight">
+\[RMSE = \sqrt{ \frac{ \sum_{i=1}^N \sum_{j=1}^M I_{ij} (R_{ij} - R_{ij}^*)^2 }
+                   { \sum_{i=1}^N \sum_{j=1}^M I_{ij} } }\]</div>
+<p>In this case, the RMSE can be thought of as the standard deviation of our predictions from the actual user preferences.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Define our evaluation function.</span>
+<span class="k">def</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">predicted</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate root mean squared error.</span>
+<span class="sd">    Ignoring missing values in the test data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>  <span class="c1"># indicator for missing values</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">I</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># number of non-missing values</span>
+    <span class="n">sqerror</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">test_data</span> <span class="o">-</span> <span class="n">predicted</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># squared error array</span>
+    <span class="n">mse</span> <span class="o">=</span> <span class="n">sqerror</span><span class="p">[</span><span class="n">I</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># mean squared error</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mse</span><span class="p">)</span>  <span class="c1"># RMSE</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Training-Data-vs. Test-Data">
+<h3>Training Data vs. Test Data<a class="headerlink" href="#Training-Data-vs. Test-Data" title="Permalink to this headline">¶</a></h3>
+<p>The next thing we need to do is split our data into a training set and a test set. Matrix factorization techniques use <a class="reference external" href="http://en.wikipedia.org/wiki/Transduction_%28machine_learning%29">transductive learning</a> rather than inductive learning. So we produce a test set by taking a random sample of the cells in the full <span class="math notranslate nohighlight">\(N \times M\)</span> data matrix. The values selected as test samples are replaced with <code class="docutils literal notranslate"><span class="pre">nan</span></code> values in a copy of the original data matrix to produce the training set. Since we’ll
+be producing random splits, let’s also write out the train/test sets generated. This will allow us to replicate our results. We’d like to be able to idenfity which split is which, so we’ll take a hash of the indices selected for testing and use that to save the data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Define a function for splitting train/test data.</span>
+<span class="k">def</span> <span class="nf">split_train_test</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">percent_test</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Split the data into train/test sets.</span>
+<span class="sd">    :param int percent_test: Percentage of data to use for testing. Default 10.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># # users, # movies</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">m</span>  <span class="c1"># # cells in matrix</span>
+
+    <span class="c1"># Prepare train/test ndarrays.</span>
+    <span class="n">train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="c1"># Draw random sample of training data to use for testing.</span>
+    <span class="n">tosample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">train</span><span class="p">))</span>  <span class="c1"># ignore nan values in data</span>
+    <span class="n">idx_pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">tosample</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tosample</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># tuples of row/col index pairs</span>
+
+    <span class="n">test_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_pairs</span><span class="p">)</span> <span class="o">*</span> <span class="n">percent_test</span><span class="p">)</span>  <span class="c1"># use 10% of data as test set</span>
+    <span class="n">train_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_pairs</span><span class="p">)</span> <span class="o">-</span> <span class="n">test_size</span>  <span class="c1"># and remainder for training</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_pairs</span><span class="p">))</span>  <span class="c1"># indices of index pairs</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">test_size</span><span class="p">)</span>
+
+    <span class="c1"># Transfer random sample from train set to test set.</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+        <span class="n">idx_pair</span> <span class="o">=</span> <span class="n">idx_pairs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">test</span><span class="p">[</span><span class="n">idx_pair</span><span class="p">]</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="n">idx_pair</span><span class="p">]</span>  <span class="c1"># transfer to test set</span>
+        <span class="n">train</span><span class="p">[</span><span class="n">idx_pair</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># remove from train set</span>
+
+    <span class="c1"># Verify everything worked properly</span>
+    <span class="k">assert</span> <span class="n">train_size</span> <span class="o">==</span> <span class="n">N</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">train</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">test_size</span> <span class="o">==</span> <span class="n">N</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">test</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="c1"># Return train set and test set</span>
+    <span class="k">return</span> <span class="n">train</span><span class="p">,</span> <span class="n">test</span>
+
+
+<span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="n">split_train_test</span><span class="p">(</span><span class="n">dense_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Results">
+<h2>Results<a class="headerlink" href="#Results" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Let&#39;s see the results:</span>
+<span class="n">baselines</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">baseline_methods</span><span class="p">:</span>
+    <span class="n">Method</span> <span class="o">=</span> <span class="n">baseline_methods</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">Method</span><span class="p">(</span><span class="n">train</span><span class="p">)</span>
+    <span class="n">baselines</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">rmse</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> RMSE:</span><span class="se">\t</span><span class="si">{:.5f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">baselines</span><span class="p">[</span><span class="n">name</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Uniform Random Baseline RMSE:   1.69769
+Global Mean Baseline RMSE:      1.12359
+Mean Of Means Baseline RMSE:    1.01168
+</pre></div></div>
+</div>
+<p>As expected: the uniform random baseline is the worst by far, the global mean baseline is next best, and the mean of means method is our best baseline. Now let’s see how PMF stacks up.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># We use a fixed precision for the likelihood.</span>
+<span class="c1"># This reflects uncertainty in the dot product.</span>
+<span class="c1"># We choose 2 in the footsteps Salakhutdinov</span>
+<span class="c1"># Mnihof.</span>
+<span class="n">ALPHA</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># The dimensionality D; the number of latent factors.</span>
+<span class="c1"># We can adjust this higher to try to capture more subtle</span>
+<span class="c1"># characteristics of each movie. However, the higher it is,</span>
+<span class="c1"># the more expensive our inference procedures will be.</span>
+<span class="c1"># Specifically, we have D(N + M) latent variables. For our</span>
+<span class="c1"># Movielens dataset, this means we have D(2625), so for 5</span>
+<span class="c1"># dimensions, we are sampling 13125 latent variables.</span>
+<span class="n">DIM</span> <span class="o">=</span> <span class="mi">10</span>
+
+
+<span class="n">pmf</span> <span class="o">=</span> <span class="n">PMF</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">DIM</span><span class="p">,</span> <span class="n">ALPHA</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:root:building the PMF model
+/env/miniconda3/lib/python3.7/site-packages/theano/tensor/subtensor.py:2197: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+  rval = inputs[0].__getitem__(inputs[1:])
+INFO:root:done building the PMF model
+</pre></div></div>
+</div>
+<div class="section" id="Predictions-Using-MAP">
+<h3>Predictions Using MAP<a class="headerlink" href="#Predictions-Using-MAP" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Find MAP for PMF.</span>
+<span class="n">pmf</span><span class="o">.</span><span class="n">find_map</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:root:finding PMF MAP using L-BFGS-B optimization...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='1264' class='' max='1264' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [1264/1264 01:40<00:00 logp = -1.537e+05, ||grad|| = 0.8563]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/env/miniconda3/lib/python3.7/site-packages/theano/tensor/subtensor.py:2197: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+  rval = inputs[0].__getitem__(inputs[1:])
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:root:found PMF MAP in 111 seconds
+</pre></div></div>
+</div>
+<p>Excellent. The first thing we want to do is make sure the MAP estimate we obtained is reasonable. We can do this by computing RMSE on the predicted ratings obtained from the MAP values of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span>. First we define a function for generating the predicted ratings <span class="math notranslate nohighlight">\(R\)</span> from <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span>. We ensure the actual rating bounds are enforced by setting all values below 1 to 1 and all values above 5 to 5. Finally, we compute RMSE for both the training set and the test set. We
+expect the test RMSE to be higher. The difference between the two gives some idea of how much we have overfit. Some difference is always expected, but a very low RMSE on the training set with a high RMSE on the test set is a definite sign of overfitting.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">eval_map</span><span class="p">(</span><span class="n">pmf_model</span><span class="p">,</span> <span class="n">train</span><span class="p">,</span> <span class="n">test</span><span class="p">):</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">pmf_model</span><span class="o">.</span><span class="n">map</span><span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">]</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">pmf_model</span><span class="o">.</span><span class="n">map</span><span class="p">[</span><span class="s2">&quot;V&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Make predictions and calculate RMSE on train &amp; test sets.</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">pmf_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>
+    <span class="n">train_rmse</span> <span class="o">=</span> <span class="n">rmse</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+    <span class="n">test_rmse</span> <span class="o">=</span> <span class="n">rmse</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+    <span class="n">overfit</span> <span class="o">=</span> <span class="n">test_rmse</span> <span class="o">-</span> <span class="n">train_rmse</span>
+
+    <span class="c1"># Print report.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PMF MAP training RMSE: </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">train_rmse</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PMF MAP testing RMSE:  </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">test_rmse</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train/test difference: </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">overfit</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">test_rmse</span>
+
+
+<span class="c1"># Add eval function to PMF class.</span>
+<span class="n">PMF</span><span class="o">.</span><span class="n">eval_map</span> <span class="o">=</span> <span class="n">eval_map</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Evaluate PMF MAP estimates.</span>
+<span class="n">pmf_map_rmse</span> <span class="o">=</span> <span class="n">pmf</span><span class="o">.</span><span class="n">eval_map</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span>
+<span class="n">pmf_improvement</span> <span class="o">=</span> <span class="n">baselines</span><span class="p">[</span><span class="s2">&quot;mom&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">pmf_map_rmse</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PMF MAP Improvement:   </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">pmf_improvement</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PMF MAP training RMSE: 1.01333
+PMF MAP testing RMSE:  1.13761
+Train/test difference: 0.12427
+PMF MAP Improvement:   -0.12593
+</pre></div></div>
+</div>
+<p>We actually see a decrease in performance between the MAP estimate and the mean of means performance. We also have a fairly large difference in the RMSE values between the train and the test sets. This indicates that the point estimates for <span class="math notranslate nohighlight">\(\alpha_U\)</span> and <span class="math notranslate nohighlight">\(\alpha_V\)</span> that we calculated from our data are not doing a great job of controlling model complexity.</p>
+<p>Let’s see if we can improve our estimates by approximating our posterior distribution with MCMC sampling. We’ll draw 500 samples, with 500 tuning samples.</p>
+</div>
+<div class="section" id="Predictions-using-MCMC">
+<h3>Predictions using MCMC<a class="headerlink" href="#Predictions-using-MCMC" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Draw MCMC samples.</span>
+<span class="n">pmf</span><span class="o">.</span><span class="n">draw_samples</span><span class="p">(</span>
+    <span class="n">draws</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">tune</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+INFO:pymc3:Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+INFO:pymc3:Initializing NUTS using jitter+adapt_diag...
+/env/miniconda3/lib/python3.7/site-packages/theano/tensor/subtensor.py:2197: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+  rval = inputs[0].__getitem__(inputs[1:])
+Sequential sampling (1 chains in 1 job)
+INFO:pymc3:Sequential sampling (1 chains in 1 job)
+NUTS: [V, U]
+INFO:pymc3:NUTS: [V, U]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='1000' class='' max='1000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [1000/1000 46:06<00:00 Sampling chain 0, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 1 chain for 500 tune and 500 draw iterations (500 + 500 draws total) took 2766 seconds.
+INFO:pymc3:Sampling 1 chain for 500 tune and 500 draw iterations (500 + 500 draws total) took 2766 seconds.
+/env/miniconda3/lib/python3.7/site-packages/theano/tensor/subtensor.py:2197: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+  rval = inputs[0].__getitem__(inputs[1:])
+Only one chain was sampled, this makes it impossible to run some convergence checks
+INFO:pymc3:Only one chain was sampled, this makes it impossible to run some convergence checks
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Diagnostics-and-Posterior-Predictive-Check">
+<h3>Diagnostics and Posterior Predictive Check<a class="headerlink" href="#Diagnostics-and-Posterior-Predictive-Check" title="Permalink to this headline">¶</a></h3>
+<p>The next step is to check how many samples we should discard as burn-in. Normally, we’d do this using a traceplot to get some idea of where the sampled variables start to converge. In this case, we have high-dimensional samples, so we need to find a way to approximate them. One way was proposed by <a class="reference external" href="https://www.cs.toronto.edu/~amnih/papers/bpmf.pdf">Salakhutdinov and Mnih, p.886</a>. We can calculate the Frobenius norms of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> at each step and monitor those for convergence.
+This essentially gives us some idea when the average magnitude of the latent variables is stabilizing. The equations for the Frobenius norms of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> are shown below. We will use <code class="docutils literal notranslate"><span class="pre">numpy</span></code>’s <code class="docutils literal notranslate"><span class="pre">linalg</span></code> package to calculate these.</p>
+<div class="math notranslate nohighlight">
+\[\|U\|_{Fro}^2 = \sqrt{\sum_{i=1}^N \sum_{d=1}^D |U_{id}|^2}, \hspace{40pt} \|V\|_{Fro}^2 = \sqrt{\sum_{j=1}^M \sum_{d=1}^D |V_{jd}|^2}\]</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">_norms</span><span class="p">(</span><span class="n">pmf_model</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">),</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return norms of latent variables at each step in the</span>
+<span class="sd">    sample trace. These can be used to monitor convergence</span>
+<span class="sd">    of the sampler.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">monitor</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">)</span>
+    <span class="n">norms</span> <span class="o">=</span> <span class="p">{</span><span class="n">var</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">monitor</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">pmf_model</span><span class="o">.</span><span class="n">trace</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">monitor</span><span class="p">:</span>
+            <span class="n">norms</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="nb">ord</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">norms</span>
+
+
+<span class="k">def</span> <span class="nf">_traceplot</span><span class="p">(</span><span class="n">pmf_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot Frobenius norms of U and V as a function of sample #.&quot;&quot;&quot;</span>
+    <span class="n">trace_norms</span> <span class="o">=</span> <span class="n">pmf_model</span><span class="o">.</span><span class="n">norms</span><span class="p">()</span>
+    <span class="n">u_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">trace_norms</span><span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">])</span>
+    <span class="n">v_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">trace_norms</span><span class="p">[</span><span class="s2">&quot;V&quot;</span><span class="p">])</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+    <span class="n">u_series</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$\|U\|_</span><span class="si">{Fro}</span><span class="s2">^2$ at Each Sample&quot;</span><span class="p">)</span>
+    <span class="n">v_series</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$\|V\|_</span><span class="si">{Fro}</span><span class="s2">^2$ at Each Sample&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Sample Number&quot;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Sample Number&quot;</span><span class="p">)</span>
+
+
+<span class="n">PMF</span><span class="o">.</span><span class="n">norms</span> <span class="o">=</span> <span class="n">_norms</span>
+<span class="n">PMF</span><span class="o">.</span><span class="n">traceplot</span> <span class="o">=</span> <span class="n">_traceplot</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pmf</span><span class="o">.</span><span class="n">traceplot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_probabilistic_matrix_factorization_46_0.png" src="../_images/notebooks_probabilistic_matrix_factorization_46_0.png" />
+</div>
+</div>
+<p>It appears we get convergence of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> after about the default tuning. When testing for convergence, we also want to see convergence of the particular statistics we are looking for, since different characteristics of the posterior may converge at different rates. Let’s also do a traceplot of the RSME. We’ll compute RMSE for both the train and the test set, even though the convergence is indicated by RMSE on the training set alone. In addition, let’s compute a running RMSE on
+the train/test sets to see how aggregate performance improves or decreases as we continue to sample.</p>
+<p>Notice here that we are sampling from 1 chain only, which makes the convergence statisitcs like <span class="math notranslate nohighlight">\(\hat{r}\)</span> impossible (we can still compute the split-rhat but the purpose is different). The reason of not sampling multiple chain is that PMF might not have unique solution. Thus without constraints, the solutions are at best symmetrical, at worse identical under any rotation, in any case subject to label switching. In fact if we sample from multiple chains we will see large <span class="math notranslate nohighlight">\(\hat{r}\)</span>
+indicating the sampler is exploring different solutions in different part of parameter space.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">_running_rmse</span><span class="p">(</span><span class="n">pmf_model</span><span class="p">,</span> <span class="n">test_data</span><span class="p">,</span> <span class="n">train_data</span><span class="p">,</span> <span class="n">burn_in</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate RMSE for each step of the trace to monitor convergence.&quot;&quot;&quot;</span>
+    <span class="n">burn_in</span> <span class="o">=</span> <span class="n">burn_in</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pmf_model</span><span class="o">.</span><span class="n">trace</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">burn_in</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;per-step-train&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;running-train&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;per-step-test&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;running-test&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pmf_model</span><span class="o">.</span><span class="n">trace</span><span class="p">[</span><span class="n">burn_in</span><span class="p">:]):</span>
+        <span class="n">sample_R</span> <span class="o">=</span> <span class="n">pmf_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;U&quot;</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;V&quot;</span><span class="p">])</span>
+        <span class="n">R</span> <span class="o">+=</span> <span class="n">sample_R</span>
+        <span class="n">running_R</span> <span class="o">=</span> <span class="n">R</span> <span class="o">/</span> <span class="p">(</span><span class="n">cnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;per-step-train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmse</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">sample_R</span><span class="p">))</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;running-train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmse</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">running_R</span><span class="p">))</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;per-step-test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmse</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">sample_R</span><span class="p">))</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;running-test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmse</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">running_R</span><span class="p">))</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;line&quot;</span><span class="p">,</span>
+            <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Per-step and Running RMSE From Posterior Predictive&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Return the final predictions, and the RMSE calculations</span>
+    <span class="k">return</span> <span class="n">running_R</span><span class="p">,</span> <span class="n">results</span>
+
+
+<span class="n">PMF</span><span class="o">.</span><span class="n">running_rmse</span> <span class="o">=</span> <span class="n">_running_rmse</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">predicted</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">pmf</span><span class="o">.</span><span class="n">running_rmse</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_probabilistic_matrix_factorization_49_0.png" src="../_images/notebooks_probabilistic_matrix_factorization_49_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># And our final RMSE?</span>
+<span class="n">final_test_rmse</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;running-test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">final_train_rmse</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;running-train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Posterior predictive train RMSE: </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">final_train_rmse</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Posterior predictive test RMSE:  </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">final_test_rmse</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train/test difference:           </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">final_test_rmse</span> <span class="o">-</span> <span class="n">final_train_rmse</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Improvement from MAP:            </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pmf_map_rmse</span> <span class="o">-</span> <span class="n">final_test_rmse</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Improvement from Mean of Means:  </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">baselines</span><span class="p">[</span><span class="s2">&quot;mom&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">final_test_rmse</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Posterior predictive train RMSE: 0.78030
+Posterior predictive test RMSE:  0.91377
+Train/test difference:           0.13347
+Improvement from MAP:            0.22384
+Improvement from Mean of Means:  0.09791
+</pre></div></div>
+</div>
+<p>We have some interesting results here. As expected, our MCMC sampler provides lower error on the training set. However, it seems it does so at the cost of overfitting the data. This results in a decrease in test RMSE as compared to the MAP, even though it is still much better than our best baseline. So why might this be the case? Recall that we used point estimates for our precision paremeters <span class="math notranslate nohighlight">\(\alpha_U\)</span> and <span class="math notranslate nohighlight">\(\alpha_V\)</span> and we chose a fixed precision <span class="math notranslate nohighlight">\(\alpha\)</span>. It is quite likely
+that by doing this, we constrained our posterior in a way that biased it towards the training data. In reality, the variance in the user ratings and the movie ratings is unlikely to be equal to the means of sample variances we used. Also, the most reasonable observation precision <span class="math notranslate nohighlight">\(\alpha\)</span> is likely different as well.</p>
+<p>We have some interesting results here. As expected, our MCMC sampler provides lower error on the training set. However, it seems it does so at the cost of overfitting the data. This results in a decrease in test RMSE as compared to the MAP, even though it is still much better than our best baseline. So why might this be the case? Recall that we used point estimates for our precision paremeters <span class="math notranslate nohighlight">\(\alpha_U\)</span> and <span class="math notranslate nohighlight">\(\alpha_V\)</span> and we chose a fixed precision <span class="math notranslate nohighlight">\(\alpha\)</span>. It is quite likely
+that by doing this, we constrained our posterior in a way that biased it towards the training data. In reality, the variance in the user ratings and the movie ratings is unlikely to be equal to the means of sample variances we used. Also, the most reasonable observation precision <span class="math notranslate nohighlight">\(\alpha\)</span> is likely different as well.</p>
+<p>We have some interesting results here. As expected, our MCMC sampler provides lower error on the training set. However, it seems it does so at the cost of overfitting the data. This results in a decrease in test RMSE as compared to the MAP, even though it is still much better than our best baseline. So why might this be the case? Recall that we used point estimates for our precision paremeters <span class="math notranslate nohighlight">\(\alpha_U\)</span> and <span class="math notranslate nohighlight">\(\alpha_V\)</span> and we chose a fixed precision <span class="math notranslate nohighlight">\(\alpha\)</span>. It is quite likely
+that by doing this, we constrained our posterior in a way that biased it towards the training data. In reality, the variance in the user ratings and the movie ratings is unlikely to be equal to the means of sample variances we used. Also, the most reasonable observation precision <span class="math notranslate nohighlight">\(\alpha\)</span> is likely different as well.</p>
+</div>
+<div class="section" id="Summary-of-Results">
+<h3>Summary of Results<a class="headerlink" href="#Summary-of-Results" title="Permalink to this headline">¶</a></h3>
+<p>Let’s summarize our results.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">size</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># RMSE doesn&#39;t really change after 100th sample anyway.</span>
+<span class="n">all_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;uniform random&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">baselines</span><span class="p">[</span><span class="s2">&quot;ur&quot;</span><span class="p">],</span> <span class="n">size</span><span class="p">),</span>
+        <span class="s2">&quot;global means&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">baselines</span><span class="p">[</span><span class="s2">&quot;gm&quot;</span><span class="p">],</span> <span class="n">size</span><span class="p">),</span>
+        <span class="s2">&quot;mean of means&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">baselines</span><span class="p">[</span><span class="s2">&quot;mom&quot;</span><span class="p">],</span> <span class="n">size</span><span class="p">),</span>
+        <span class="s2">&quot;PMF MAP&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">pmf_map_rmse</span><span class="p">,</span> <span class="n">size</span><span class="p">),</span>
+        <span class="s2">&quot;PMF MCMC&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;running-test&quot;</span><span class="p">][:</span><span class="n">size</span><span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">all_results</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;RMSE for all methods&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Number of Samples&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;RMSE&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_probabilistic_matrix_factorization_55_0.png" src="../_images/notebooks_probabilistic_matrix_factorization_55_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Summary">
+<h2>Summary<a class="headerlink" href="#Summary" title="Permalink to this headline">¶</a></h2>
+<p>We set out to predict user preferences for unseen movies. First we discussed the intuitive notion behind the user-user and item-item neighborhood approaches to collaborative filtering. Then we formalized our intuitions. With a firm understanding of our problem context, we moved on to exploring our subset of the Movielens data. After discovering some general patterns, we defined three baseline methods: uniform random, global mean, and mean of means. With the goal of besting our baseline methods,
+we implemented the basic version of Probabilistic Matrix Factorization (PMF) using <code class="docutils literal notranslate"><span class="pre">pymc3</span></code>.</p>
+<p>Our results demonstrate that the mean of means method is our best baseline on our prediction task. As expected, we are able to obtain a significant decrease in RMSE using the PMF MAP estimate obtained via Powell optimization. We illustrated one way to monitor convergence of an MCMC sampler with a high-dimensionality sampling space using the Frobenius norms of the sampled variables. The traceplots using this method seem to indicate that our sampler converged to the posterior. Results using this
+posterior showed that attempting to improve the MAP estimation using MCMC sampling actually overfit the training data and increased test RMSE. This was likely caused by the constraining of the posterior via fixed precision parameters <span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\alpha_U\)</span>, and <span class="math notranslate nohighlight">\(\alpha_V\)</span>.</p>
+<p>As a followup to this analysis, it would be interesting to also implement the logistic and constrained versions of PMF. We expect both models to outperform the basic PMF model. We could also implement the <a class="reference external" href="https://www.cs.toronto.edu/~amnih/papers/bpmf.pdf">fully Bayesian version of PMF</a> (BPMF), which places hyperpriors on the model parameters to automatically learn ideal mean and precision parameters for <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span>. This would likely resolve the issue we faced in this analysis.
+We would expect BPMF to improve upon the MAP estimation produced here by learning more suitable hyperparameters and parameters. For a basic (but working!) implementation of BPMF in <code class="docutils literal notranslate"><span class="pre">pymc3</span></code>, see <a class="reference external" href="https://gist.github.com/macks22/00a17b1d374dfc267a9a">this gist</a>.</p>
+<p>If you made it this far, then congratulations! You now have some idea of how to build a basic recommender system. These same ideas and methods can be used on many different recommendation tasks. Items can be movies, products, advertisements, courses, or even other people. Any time you can build yourself a user-item matrix with user preferences in the cells, you can use these types of collaborative filtering algorithms to predict the missing values. If you want to learn more about recommender
+systems, the first reference is a good place to start.</p>
+</div>
+<div class="section" id="References">
+<h2>References<a class="headerlink" href="#References" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><ol class="upperalpha simple" start="25">
+<li><p>Koren, R. Bell, and C. Volinsky, “Matrix Factorization Techniques for Recommender Systems,” Computer, vol. 42, no. 8, pp. 30–37, Aug. 2009.</p></li>
+</ol>
+</li>
+<li><ol class="upperalpha simple" start="11">
+<li><p>Goldberg, T. Roeder, D. Gupta, and C. Perkins, “Eigentaste: A constant time collaborative filtering algorithm,” Information Retrieval, vol. 4, no. 2, pp. 133–151, 2001.</p></li>
+</ol>
+</li>
+<li><ol class="upperalpha simple">
+<li><p>Mnih and R. Salakhutdinov, “Probabilistic matrix factorization,” in Advances in neural information processing systems, 2007, pp. 1257–1264.</p></li>
+</ol>
+</li>
+<li><ol class="upperalpha simple" start="19">
+<li><ol class="upperalpha simple" start="10">
+<li><p>Nowlan and G. E. Hinton, “Simplifying Neural Networks by Soft Weight-sharing,” Neural Comput., vol. 4, no. 4, pp. 473–493, Jul. 1992.</p></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><ol class="upperalpha simple" start="18">
+<li><p>Salakhutdinov and A. Mnih, “Bayesian Probabilistic Matrix Factorization Using Markov Chain Monte Carlo,” in Proceedings of the 25th International Conference on Machine Learning, New York, NY, USA, 2008, pp. 880–887.</p></li>
+</ol>
+</li>
+</ol>
+<p>The model discussed in this analysis was developed by Ruslan Salakhutdinov and Andriy Mnih. Code and supporting text are the original work of <a class="reference external" href="https://www.linkedin.com/in/macksweeney">Mack Sweeney</a> with changes made to adapt the code and text for the Movielens dataset by Colin Carroll and Rob Zinkov.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> watermark
+<span class="o">%</span><span class="k">watermark</span> -n -u -v -iv -w
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+theano  1.0.4
+numpy   1.18.5
+pymc3   3.9.0
+logging 0.5.1.2
+scipy   1.4.1
+pandas  1.0.4
+last updated: Mon Jun 15 2020
+
+CPython 3.7.7
+IPython 7.15.0
+watermark 2.0.2
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

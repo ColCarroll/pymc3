@@ -1,0 +1,1798 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Model building and expansion for golf putting &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">io</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">st</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running on PyMC3 v</span><span class="si">{</span><span class="n">pm</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Running on PyMC3 v3.9.0
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;axes.prop_cycle&quot;</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">cycler</span><span class="p">(</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;#000000&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;#1b6989&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;#e69f00&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;#009e73&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;#f0e442&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;#50b4e9&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;#d55e00&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;#cc79a7&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;figure.figsize&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">12.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
+        <span class="s2">&quot;font.serif&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;Palatino&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Palatino Linotype&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Palatino LT STD&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Book Antiqua&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Georgia&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;DejaVu Serif&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;serif&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;figure.facecolor&quot;</span><span class="p">:</span> <span class="s2">&quot;#fffff8&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;figure.constrained_layout.use&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;font.size&quot;</span><span class="p">:</span> <span class="mf">14.0</span><span class="p">,</span>
+        <span class="s2">&quot;hist.bins&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lines.linewidth&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+        <span class="s2">&quot;lines.markeredgewidth&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="s2">&quot;lines.markerfacecolor&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lines.markersize&quot;</span><span class="p">:</span> <span class="mf">8.0</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Model-building-and-expansion-for-golf-putting">
+<h1>Model building and expansion for golf putting<a class="headerlink" href="#Model-building-and-expansion-for-golf-putting" title="Permalink to this headline">¶</a></h1>
+<p><strong>This uses and closely follows</strong><a class="reference external" href="https://mc-stan.org/users/documentation/case-studies/golf.html">the case study from Andrew Gelman</a><strong>, written in Stan. There are some new visualizations and I steered away from using improper priors, but much credit to him and to the Stan group for the wonderful case study and software.</strong></p>
+<p>We use a data set from “Statistics: A Bayesian Perspective”, by Don Berry (1995). The dataset describes the outcome of professional golfers putting from a number of distances, and is small enough that we can just print and load it inline, instead of doing any special <code class="docutils literal notranslate"><span class="pre">csv</span></code> reading.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># golf putting data from berry (1996)</span>
+<span class="n">golf_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;distance tries successes</span>
+<span class="s2">2 1443 1346</span>
+<span class="s2">3 694 577</span>
+<span class="s2">4 455 337</span>
+<span class="s2">5 353 208</span>
+<span class="s2">6 272 149</span>
+<span class="s2">7 256 136</span>
+<span class="s2">8 240 111</span>
+<span class="s2">9 217 69</span>
+<span class="s2">10 200 67</span>
+<span class="s2">11 237 75</span>
+<span class="s2">12 202 52</span>
+<span class="s2">13 192 46</span>
+<span class="s2">14 174 54</span>
+<span class="s2">15 167 28</span>
+<span class="s2">16 201 27</span>
+<span class="s2">17 195 31</span>
+<span class="s2">18 191 33</span>
+<span class="s2">19 147 20</span>
+<span class="s2">20 152 24&quot;&quot;&quot;</span>
+
+
+<span class="n">golf_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">golf_data</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">plot_golf_data</span><span class="p">(</span><span class="n">golf_data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility function to standardize a pretty plotting of the golf data.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">bg_color</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_facecolor</span><span class="p">()</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">golf_data</span><span class="o">.</span><span class="n">successes</span><span class="p">,</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">tries</span> <span class="o">-</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">successes</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">golf_data</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="o">*</span><span class="n">rv</span><span class="o">.</span><span class="n">interval</span><span class="p">(</span><span class="mf">0.68</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">golf_data</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">successes</span> <span class="o">/</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">tries</span><span class="p">,</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="n">bg_color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Distance from hole&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Percent of putts made&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span>
+
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_golf_data</span><span class="p">(</span><span class="n">golf_data</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Overview of data from Berry (1995)&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_4_0.png" src="../_images/notebooks_putting_workflow_4_0.png" />
+</div>
+</div>
+<p>After plotting, we see that generally golfers are less accurate from further away. Note that this data is pre-aggregated: we may be able to do more interesting work with granular putt-by-putt data. This data set appears to have been binned to the nearest foot.</p>
+<p>We might think about doing prediction with this data: fitting a curve to this data would allow us to make reasonable guesses at intermediate distances, as well as perhaps to extrapolate to longer distances.</p>
+<div class="section" id="Logit-model">
+<h2>Logit model<a class="headerlink" href="#Logit-model" title="Permalink to this headline">¶</a></h2>
+<p>First we will fit a traditional logit-binomial model. We model the number of successes directly, with</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}a, b \sim \mathcal{N}(0, 1) \\
+p(\text{success}) = \operatorname{logit}^{-1}(a \cdot \text{distance} + b) \\
+\text{num. successes} \sim \operatorname{Binomial}(\text{tries}, p(\text{success}))\end{split}\]</div>
+<p>Here is how to write that model in PyMC3. We wrap our models in functions to avoid polluting the namespace, and to let us swap out the data later, when we will work with a newer data set.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">logit_model</span><span class="p">(</span><span class="n">golf_data</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">logit_binomial</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>
+
+        <span class="n">success</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Binomial</span><span class="p">(</span>
+            <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+            <span class="n">n</span><span class="o">=</span><span class="n">golf_data</span><span class="o">.</span><span class="n">tries</span><span class="p">,</span>
+            <span class="n">p</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">invlogit</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">distance</span> <span class="o">+</span> <span class="n">b</span><span class="p">),</span>
+            <span class="n">observed</span><span class="o">=</span><span class="n">golf_data</span><span class="o">.</span><span class="n">successes</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">logit_binomial</span>
+
+
+<span class="n">pm</span><span class="o">.</span><span class="n">model_to_graphviz</span><span class="p">(</span><span class="n">logit_model</span><span class="p">(</span><span class="n">golf_data</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_7_0.svg" src="../_images/notebooks_putting_workflow_7_0.svg" /></div>
+</div>
+<p>We have some intuition that <span class="math notranslate nohighlight">\(a\)</span> should be negative, and also that <span class="math notranslate nohighlight">\(b\)</span> should be positive (since when <span class="math notranslate nohighlight">\(\text{distance} = 0\)</span>, we expect to make nearly 100% of putts). We are not putting that into the model, though. We are using this as a baseline, and we may as well wait and see if we need to add stronger priors.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">logit_model</span><span class="p">(</span><span class="n">golf_data</span><span class="p">):</span>
+    <span class="n">logit_trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+
+<span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [b, a]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='8000' class='' max='8000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [8000/8000 00:08<00:00 Sampling 4 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 10 seconds.
+The acceptance probability does not match the target. It is 0.8835381150026076, but should be close to 0.8. Try to increase the number of tuning steps.
+The acceptance probability does not match the target. It is 0.8833160780005165, but should be close to 0.8. Try to increase the number of tuning steps.
+The number of effective samples is smaller than 25% for some parameters.
+/dependencies/arviz/arviz/data/io_pymc3.py:89: FutureWarning: Using `from_pymc3` without the model will be deprecated in a future release. Not using the model will return less accurate and less useful results. Make sure you use the model argument or call from_pymc3 within a model context.
+  FutureWarning,
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_mean</th>
+      <th>ess_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>a</th>
+      <td>-0.255</td>
+      <td>0.007</td>
+      <td>-0.269</td>
+      <td>-0.244</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>899.0</td>
+      <td>895.0</td>
+      <td>906.0</td>
+      <td>982.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>b</th>
+      <td>2.224</td>
+      <td>0.060</td>
+      <td>2.112</td>
+      <td>2.338</td>
+      <td>0.002</td>
+      <td>0.001</td>
+      <td>930.0</td>
+      <td>925.0</td>
+      <td>931.0</td>
+      <td>935.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>We see <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span> have the signs we expected. There were no bad warnings emitted from the sampler. Looking at the summary, the number of effective samples is reasonable, and the rhat is close to 1. This is a small model, so we are not being too careful about inspecting the fit.</p>
+<p>We plot 50 posterior draws of <span class="math notranslate nohighlight">\(p(\text{success})\)</span> along with the expected value. Also, we draw 500 points from the posterior predictive to plot:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Draw posterior predictive samples</span>
+<span class="k">with</span> <span class="n">logit_model</span><span class="p">(</span><span class="n">golf_data</span><span class="p">):</span>
+    <span class="c1"># hard to plot more than 500 sensibly</span>
+    <span class="n">logit_ppc</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_posterior_predictive</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="n">logit_ppc_success</span> <span class="o">=</span> <span class="n">logit_ppc</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">tries</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Plotting</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_golf_data</span><span class="p">(</span><span class="n">golf_data</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">),</span> <span class="mi">50</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">t</span><span class="p">,</span>
+        <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">expit</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">logit_trace</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">]),</span>
+        <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span>
+    <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">expit</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">logit_trace</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">),</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C2&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">golf_data</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="n">logit_ppc_success</span><span class="p">,</span> <span class="s2">&quot;k.&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Logit mean and posterior predictive&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/dependencies/pymc3/pymc3/sampling.py:1618: UserWarning: samples parameter is smaller than nchains times ndraws, some draws and/or chains may not be represented in the returned posterior predictive sample
+  &#34;samples parameter is smaller than nchains times ndraws, some draws &#34;
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='500' class='' max='500' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [500/500 00:02<00:00]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_11_2.png" src="../_images/notebooks_putting_workflow_11_2.png" />
+</div>
+</div>
+<p>The fit is ok, but not great! It is a good start for a baseline, and lets us answer curve-fitting type questions. We may not trust much extrapolation beyond the end of the data, especially given how the curve does not fit the last four values very well. For example, putts from 50 feet are expected to be made with probability:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mi">100</span> <span class="o">*</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">expit</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">50</span> <span class="o">+</span> <span class="n">logit_trace</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.00280%
+</pre></div></div>
+</div>
+<div class="section" id="Aside:-Calculating-expectations-with-traces">
+<h3>Aside: Calculating expectations with traces<a class="headerlink" href="#Aside:-Calculating-expectations-with-traces" title="Permalink to this headline">¶</a></h3>
+<p>An interesting thing to note about calculating the posterior expectation – a strength of Bayesian models is that you can get strong correlations between parameters, which often show up particularly in regression models:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">plot_pair</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">correlate</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">],</span> <span class="n">logit_trace</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Correlation: </span><span class="si">{</span><span class="n">corr</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/dependencies/arviz/arviz/data/io_pymc3.py:89: FutureWarning: Using `from_pymc3` without the model will be deprecated in a future release. Not using the model will return less accurate and less useful results. Make sure you use the model argument or call from_pymc3 within a model context.
+  FutureWarning,
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_15_1.png" src="../_images/notebooks_putting_workflow_15_1.png" />
+</div>
+</div>
+<p>The lesson from this is that</p>
+<div class="math notranslate nohighlight">
+\[\mathbb{E}[f(\theta)] \ne f(\mathbb{E}[\theta]).\]</div>
+<p>this appeared here in using</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Right!</span>
+<span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">expit</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">50</span> <span class="o">+</span> <span class="n">logit_trace</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>rather than</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Wrong!</span>
+<span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">expit</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="mi">50</span> <span class="o">+</span> <span class="n">logit_trace</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>to calculate our expectation at 50 feet.</p>
+</div>
+</div>
+<div class="section" id="Geometry-based-model">
+<h2>Geometry-based model<a class="headerlink" href="#Geometry-based-model" title="Permalink to this headline">¶</a></h2>
+<p>As a second pass at modelling this data, both to improve fit and to increase confidence in extrapolation, we think about the geometry of the situation. We suppose professional golfers can hit the ball in a certain direction, with some small(?) error. Specifically, the angle the ball actually travels is normally distributed around 0, with some variance that we will try to learn.</p>
+<p>Then the ball goes in whenever the error in angle is small enough that the ball still hits the cup. This is intuitively nice! A longer putt will admit a smaller error in angle, and so a lower success rate than for shorter putts.</p>
+<p>I am skipping a derivation of the probability of making a putt given the accuracy variance and distance to the hole, but it is a fun exercise in geometry, and turns out to be</p>
+<div class="math notranslate nohighlight">
+\[p(\text{success} | \sigma_{\text{angle}}, \text{distance}) = 2 \Phi\left( \frac{ \arcsin (R - r) / \text{distance}}{\sigma_{\text{angle}}}\right),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Phi\)</span> is the normal cumulative density function, <span class="math notranslate nohighlight">\(R\)</span> is the radius of the cup (turns out 2.125 inches), and <span class="math notranslate nohighlight">\(r\)</span> is the radius of the golf ball (around 0.84 inches).</p>
+<p>To get a feeling for this model, let’s look at a few manually plotted values for <span class="math notranslate nohighlight">\(\sigma_{\text{angle}}\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">BALL_RADIUS</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.68</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span>
+<span class="n">CUP_RADIUS</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.25</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span>
+
+
+<span class="k">def</span> <span class="nf">forward_angle_model</span><span class="p">(</span><span class="n">variance_of_shot</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">variance_of_shot</span><span class="p">)</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">((</span><span class="n">CUP_RADIUS</span> <span class="o">-</span> <span class="n">BALL_RADIUS</span><span class="p">)</span> <span class="o">/</span> <span class="n">t</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_golf_data</span><span class="p">(</span><span class="n">golf_data</span><span class="p">)</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">variance_of_shot</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">forward_angle_model</span><span class="p">(</span><span class="n">variance_of_shot</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;variance=</span><span class="si">{</span><span class="n">variance_of_shot</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Model prediction for selected amounts of variance&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_18_0.png" src="../_images/notebooks_putting_workflow_18_0.png" />
+</div>
+</div>
+<p>This looks like a promising approach! A variance of 0.02 radians looks like it will be close to the right answer. The model also predicted that putts from 0 feet all go in, which is a nice side effect. We might think about whether a golfer misses putts symmetrically. It is plausible that a right handed putter and a left handed putter might have a different bias to their shots. ### Fitting the model</p>
+<p>PyMC3 has <span class="math notranslate nohighlight">\(\Phi\)</span> implemented, but it is pretty hidden (<code class="docutils literal notranslate"><span class="pre">pm.distributions.dist_math.normal_lcdf</span></code>), and it is worthwhile to implement it ourselves anyways, using an identity with the <a class="reference external" href="https://en.wikipedia.org/wiki/Error_function">error function</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">theano.tensor</span> <span class="k">as</span> <span class="nn">tt</span>
+
+
+<span class="k">def</span> <span class="nf">Phi</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates the standard normal cumulative distribution function.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">tt</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">tt</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">angle_model</span><span class="p">(</span><span class="n">golf_data</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">angle_model</span><span class="p">:</span>
+        <span class="n">variance_of_shot</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">)</span>
+        <span class="n">p_goes_in</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span>
+            <span class="s2">&quot;p_goes_in&quot;</span><span class="p">,</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">Phi</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">arcsin</span><span class="p">((</span><span class="n">CUP_RADIUS</span> <span class="o">-</span> <span class="n">BALL_RADIUS</span><span class="p">)</span> <span class="o">/</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">distance</span><span class="p">)</span> <span class="o">/</span> <span class="n">variance_of_shot</span><span class="p">)</span>
+            <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Binomial</span><span class="p">(</span>
+            <span class="s2">&quot;success&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">golf_data</span><span class="o">.</span><span class="n">tries</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p_goes_in</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">golf_data</span><span class="o">.</span><span class="n">successes</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">angle_model</span>
+
+
+<span class="n">pm</span><span class="o">.</span><span class="n">model_to_graphviz</span><span class="p">(</span><span class="n">angle_model</span><span class="p">(</span><span class="n">golf_data</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_20_0.svg" src="../_images/notebooks_putting_workflow_20_0.svg" /></div>
+</div>
+<div class="section" id="Prior-Predictive-Checks">
+<h3>Prior Predictive Checks<a class="headerlink" href="#Prior-Predictive-Checks" title="Permalink to this headline">¶</a></h3>
+<p>We often wish to sample from the prior, especially if we have some idea of what the observations would look like, but not a lot of intuition for the prior parameters. We have an angle-based model here, but it might not be intuitive if the <em>variance</em> of the angle is given, how that effects the accuracy of a shot. Let’s check!</p>
+<p>Sometimes a custom visualization or dashboard is useful for a prior predictive check. Here, we plot our prior distribution of putts from 20 feet away.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">angle_model</span><span class="p">(</span><span class="n">golf_data</span><span class="p">):</span>
+    <span class="n">angle_prior</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_prior_predictive</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="n">angle_of_shot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">angle_prior</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">])</span>  <span class="c1"># radians</span>
+<span class="n">distance</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># feet</span>
+
+<span class="n">end_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle_of_shot</span><span class="p">),</span> <span class="n">distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle_of_shot</span><span class="p">)])</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">endx</span><span class="p">,</span> <span class="n">endy</span> <span class="ow">in</span> <span class="n">end_positions</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">endx</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">endy</span><span class="p">],</span> <span class="s2">&quot;k-o&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;go&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Start&quot;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;ro&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Goal&quot;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prior distribution of putts from </span><span class="si">{</span><span class="n">distance</span><span class="si">}</span><span class="s2">ft away&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_22_0.png" src="../_images/notebooks_putting_workflow_22_0.png" />
+</div>
+</div>
+<p>This is a little funny! Most obviously, it should probably be not this common to putt the ball <em>backwards</em>. This also leads us to worry that we are using a normal distribution to model an angle. The <a class="reference external" href="https://en.wikipedia.org/wiki/Von_Mises_distribution">von Mises</a> distribution may be appropriate here. Also, the golfer needs to stand somewhere, so perhaps adding some bounds to the von Mises would be appropriate. We will find that this model learns from the data quite well, though, and these
+additions are not necessary.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">angle_model</span><span class="p">(</span><span class="n">golf_data</span><span class="p">):</span>
+    <span class="n">angle_trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [variance_of_shot]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='8000' class='' max='8000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [8000/8000 00:06<00:00 Sampling 4 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 7 seconds.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_golf_data</span><span class="p">(</span><span class="n">golf_data</span><span class="p">)</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">angle_trace</span><span class="p">),</span> <span class="mi">50</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">forward_angle_model</span><span class="p">(</span><span class="n">angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">][</span><span class="n">idx</span><span class="p">],</span> <span class="n">t</span><span class="p">),</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span>
+    <span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span> <span class="n">forward_angle_model</span><span class="p">(</span><span class="n">angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Geometry-based model&quot;</span>
+<span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span>
+    <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">expit</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">logit_trace</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Logit-binomial model&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Comparing the fit of geometry-based and logit-binomial model&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_25_0.png" src="../_images/notebooks_putting_workflow_25_0.png" />
+</div>
+</div>
+<p>This new model appears to fit much better, and by modelling the geometry of the situation, we may have a bit more confidence in extrapolating the data. This model suggests that a 50 foot putt has much higher chance of going in:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mi">100</span> <span class="o">*</span> <span class="n">forward_angle_model</span><span class="p">(</span><span class="n">angle_trace</span><span class="p">[</span><span class="s1">&#39;variance_of_shot&#39;</span><span class="p">],</span> <span class="mi">50</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">% vs </span><span class="si">{</span><span class="mi">100</span> <span class="o">*</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">expit</span><span class="p">(</span><span class="n">logit_trace</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">50</span> <span class="o">+</span> <span class="n">logit_trace</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">%&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+6.41% vs 0.00280%
+</pre></div></div>
+</div>
+<p>We can also recreate our prior predictive plot, giving us some confidence that the prior was not leading to unreasonable situations in the posterior distribution: the variance in angle is quite small!</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">angle_of_shot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="mi">500</span><span class="p">)</span>
+<span class="p">)</span>  <span class="c1"># radians</span>
+<span class="n">distance</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># feet</span>
+
+<span class="n">end_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle_of_shot</span><span class="p">),</span> <span class="n">distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle_of_shot</span><span class="p">)])</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">endx</span><span class="p">,</span> <span class="n">endy</span> <span class="ow">in</span> <span class="n">end_positions</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">endx</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">endy</span><span class="p">],</span> <span class="s2">&quot;k-o&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;go&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Start&quot;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;ro&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Goal&quot;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">21</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">21</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Posterior distribution of putts from </span><span class="si">{</span><span class="n">distance</span><span class="si">}</span><span class="s2">ft.&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_29_0.png" src="../_images/notebooks_putting_workflow_29_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="New-Data!">
+<h2>New Data!<a class="headerlink" href="#New-Data!" title="Permalink to this headline">¶</a></h2>
+<p>Mark Broadie used new summary data on putting to fit a new model. We will use this new data to refine our model:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#  golf putting data from Broadie (2018)</span>
+<span class="n">new_golf_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;distance tries successes</span>
+<span class="s2">0.28 45198 45183</span>
+<span class="s2">0.97 183020 182899</span>
+<span class="s2">1.93 169503 168594</span>
+<span class="s2">2.92 113094 108953</span>
+<span class="s2">3.93 73855 64740</span>
+<span class="s2">4.94 53659 41106</span>
+<span class="s2">5.94 42991 28205</span>
+<span class="s2">6.95 37050 21334</span>
+<span class="s2">7.95 33275 16615</span>
+<span class="s2">8.95 30836 13503</span>
+<span class="s2">9.95 28637 11060</span>
+<span class="s2">10.95 26239 9032</span>
+<span class="s2">11.95 24636 7687</span>
+<span class="s2">12.95 22876 6432</span>
+<span class="s2">14.43 41267 9813</span>
+<span class="s2">16.43 35712 7196</span>
+<span class="s2">18.44 31573 5290</span>
+<span class="s2">20.44 28280 4086</span>
+<span class="s2">21.95 13238 1642</span>
+<span class="s2">24.39 46570 4767</span>
+<span class="s2">28.40 38422 2980</span>
+<span class="s2">32.39 31641 1996</span>
+<span class="s2">36.39 25604 1327</span>
+<span class="s2">40.37 20366 834</span>
+<span class="s2">44.38 15977 559</span>
+<span class="s2">48.37 11770 311</span>
+<span class="s2">52.36 8708 231</span>
+<span class="s2">57.25 8878 204</span>
+<span class="s2">63.23 5492 103</span>
+<span class="s2">69.18 3087 35</span>
+<span class="s2">75.19 1742 24&quot;&quot;&quot;</span>
+
+<span class="n">new_golf_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_golf_data</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">)</span>
+<span class="n">plot_golf_data</span><span class="p">(</span><span class="n">golf_data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">new_golf_data</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">forward_angle_model</span><span class="p">(</span><span class="n">angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">t</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Comparing the new data set to the old data set, and</span><span class="se">\n</span><span class="s2">considering the old model fit&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_32_0.png" src="../_images/notebooks_putting_workflow_32_0.png" />
+</div>
+</div>
+<p>This new data set represents ~200 times the number of putt attempts as the old data, and includes putts up to 75ft, compared to 20ft for the old data set. It also seems that the new data represents a different population from the old data: while the two have different bins, the new data suggests higher success for most data. This may be from a different method of collecting the data, or golfers improving in the intervening years.</p>
+</div>
+<div class="section" id="Fitting-the-model-on-the-new-data">
+<h2>Fitting the model on the new data<a class="headerlink" href="#Fitting-the-model-on-the-new-data" title="Permalink to this headline">¶</a></h2>
+<p>Since we think these may be two different populations, the easiest solution would be to refit our model. This goes worse than earlier: there are divergences, and it takes much longer to run. This may indicate a problem with the model: Andrew Gelman calls this the “folk theorem of statistical computing”.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">angle_model</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">):</span>
+    <span class="n">new_angle_trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [variance_of_shot]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='8000' class='' max='8000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [8000/8000 00:15<00:00 Sampling 4 chains, 186 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 16 seconds.
+There were 11 divergences after tuning. Increase `target_accept` or reparameterize.
+There were 143 divergences after tuning. Increase `target_accept` or reparameterize.
+There were 13 divergences after tuning. Increase `target_accept` or reparameterize.
+There were 19 divergences after tuning. Increase `target_accept` or reparameterize.
+The rhat statistic is larger than 1.05 for some parameters. This indicates slight problems during sampling.
+The estimated number of effective samples is smaller than 200 for some parameters.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_golf_data</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">)</span>
+<span class="n">plot_golf_data</span><span class="p">(</span><span class="n">golf_data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">new_golf_data</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span>
+    <span class="n">forward_angle_model</span><span class="p">(</span><span class="n">angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">t</span><span class="p">),</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Trained on original data&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span>
+    <span class="n">forward_angle_model</span><span class="p">(</span><span class="n">new_angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">t</span><span class="p">),</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Trained on new data&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Retraining the model on new data&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_36_0.png" src="../_images/notebooks_putting_workflow_36_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="A-model-incorporating-distance-to-hole">
+<h2>A model incorporating distance to hole<a class="headerlink" href="#A-model-incorporating-distance-to-hole" title="Permalink to this headline">¶</a></h2>
+<p>We might assume that, in addition to putting in the right direction, a golfer may need to hit the ball the right distance. Specifically, we assume:</p>
+<ol class="arabic">
+<li><p>If a put goes short <em>or</em> more than 3 feet past the hole, it will not go in.</p></li>
+<li><p>Golfers aim for 1 foot past the hole</p></li>
+<li><p>The distance the ball goes, <span class="math notranslate nohighlight">\(u\)</span>, is distributed according to</p>
+<div class="math notranslate nohighlight">
+\[u \sim \mathcal{N}\left(1 + \text{distance}, \sigma_{\text{distance}} (1 + \text{distance})\right),\]</div>
+<p>where we will learn <span class="math notranslate nohighlight">\(\sigma_{\text{distance}}\)</span>.</p>
+</li>
+</ol>
+<p>Again, this is a geometry and algebra problem to work the probability that the ball goes in from any given distance:</p>
+<div class="math notranslate nohighlight">
+\[P(\text{good distance}) = P(\text{distance} &lt; u &lt; \text{distance} + 3)\]</div>
+<p>it uses <code class="docutils literal notranslate"><span class="pre">Phi</span></code>, the cumulative normal density function we implemented earlier.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">OVERSHOT</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">DISTANCE_TOLERANCE</span> <span class="o">=</span> <span class="mf">3.0</span>
+
+
+<span class="k">def</span> <span class="nf">distance_angle_model</span><span class="p">(</span><span class="n">golf_data</span><span class="p">):</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">distance_angle_model</span><span class="p">:</span>
+        <span class="n">variance_of_shot</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">)</span>
+        <span class="n">variance_of_distance</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;variance_of_distance&quot;</span><span class="p">)</span>
+        <span class="n">p_good_angle</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span>
+            <span class="s2">&quot;p_good_angle&quot;</span><span class="p">,</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">Phi</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">arcsin</span><span class="p">((</span><span class="n">CUP_RADIUS</span> <span class="o">-</span> <span class="n">BALL_RADIUS</span><span class="p">)</span> <span class="o">/</span> <span class="n">distances</span><span class="p">)</span> <span class="o">/</span> <span class="n">variance_of_shot</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">p_good_distance</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span>
+            <span class="s2">&quot;p_good_distance&quot;</span><span class="p">,</span>
+            <span class="n">Phi</span><span class="p">((</span><span class="n">DISTANCE_TOLERANCE</span> <span class="o">-</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="n">distances</span> <span class="o">+</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">*</span> <span class="n">variance_of_distance</span><span class="p">))</span>
+            <span class="o">-</span> <span class="n">Phi</span><span class="p">(</span><span class="o">-</span><span class="n">OVERSHOT</span> <span class="o">/</span> <span class="p">((</span><span class="n">distances</span> <span class="o">+</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">*</span> <span class="n">variance_of_distance</span><span class="p">)),</span>
+        <span class="p">)</span>
+
+        <span class="n">success</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Binomial</span><span class="p">(</span>
+            <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+            <span class="n">n</span><span class="o">=</span><span class="n">golf_data</span><span class="o">.</span><span class="n">tries</span><span class="p">,</span>
+            <span class="n">p</span><span class="o">=</span><span class="n">p_good_angle</span> <span class="o">*</span> <span class="n">p_good_distance</span><span class="p">,</span>
+            <span class="n">observed</span><span class="o">=</span><span class="n">golf_data</span><span class="o">.</span><span class="n">successes</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">distance_angle_model</span>
+
+
+<span class="n">pm</span><span class="o">.</span><span class="n">model_to_graphviz</span><span class="p">(</span><span class="n">distance_angle_model</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_38_0.svg" src="../_images/notebooks_putting_workflow_38_0.svg" /></div>
+</div>
+<p>This model still has only 2 dimensions to fit. We might think about checking on <code class="docutils literal notranslate"><span class="pre">OVERSHOT</span></code> and <code class="docutils literal notranslate"><span class="pre">DISTANCE_TOLERANCE</span></code>. Checking the first might involve a call to a local golf course, and the second might require a trip to a green and some time experimenting. We might also think about adding some explicit correlations: it is plausible that less control over angle would correspond to less control over distance, or that longer putts lead to more variance in the angle.</p>
+</div>
+<div class="section" id="Fitting-the-distance-angle-model">
+<h2>Fitting the distance angle model<a class="headerlink" href="#Fitting-the-distance-angle-model" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">distance_angle_model</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">):</span>
+    <span class="n">distance_angle_trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [variance_of_distance, variance_of_shot]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='8000' class='' max='8000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [8000/8000 00:05<00:00 Sampling 4 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 6 seconds.
+The acceptance probability does not match the target. It is 0.8798848192814278, but should be close to 0.8. Try to increase the number of tuning steps.
+The acceptance probability does not match the target. It is 0.8892228299255789, but should be close to 0.8. Try to increase the number of tuning steps.
+The number of effective samples is smaller than 25% for some parameters.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">forward_distance_angle_model</span><span class="p">(</span><span class="n">variance_of_shot</span><span class="p">,</span> <span class="n">variance_of_distance</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="n">rv</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">angle_prob</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rv</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">((</span><span class="n">CUP_RADIUS</span> <span class="o">-</span> <span class="n">BALL_RADIUS</span><span class="p">)</span> <span class="o">/</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">variance_of_shot</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="n">distance_prob_one</span> <span class="o">=</span> <span class="n">rv</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">DISTANCE_TOLERANCE</span> <span class="o">-</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="n">t</span> <span class="o">+</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">*</span> <span class="n">variance_of_distance</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">distance_prob_two</span> <span class="o">=</span> <span class="n">rv</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="o">-</span><span class="n">OVERSHOT</span> <span class="o">/</span> <span class="p">((</span><span class="n">t</span> <span class="o">+</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">*</span> <span class="n">variance_of_distance</span><span class="p">))</span>
+    <span class="n">distance_prob</span> <span class="o">=</span> <span class="n">distance_prob_one</span> <span class="o">-</span> <span class="n">distance_prob_two</span>
+
+    <span class="k">return</span> <span class="n">angle_prob</span> <span class="o">*</span> <span class="n">distance_prob</span>
+
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_golf_data</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">new_golf_data</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">200</span><span class="p">)</span>
+
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">forward_angle_model</span><span class="p">(</span><span class="n">new_angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">t</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Just angle&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span>
+    <span class="n">forward_distance_angle_model</span><span class="p">(</span>
+        <span class="n">distance_angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+        <span class="n">distance_angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_distance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+        <span class="n">t</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Distance and angle&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Comparing fits of models on new data&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_42_0.png" src="../_images/notebooks_putting_workflow_42_0.png" />
+</div>
+</div>
+<p>This new model looks better, and fit much more quickly with fewer sampling problems compared to the old model.There is some mismatch between 10 and 40 feet, but it seems generally good. We can come to this same conclusion by taking posterior predictive samples, and looking at the residuals. Here, we see that the fit is being driven by the first 4 bins, which contain ~40% of the data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">distance_angle_model</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">):</span>
+    <span class="n">ppc</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_posterior_predictive</span><span class="p">(</span><span class="n">distance_angle_trace</span><span class="p">)</span>
+
+<span class="n">residuals</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">new_golf_data</span><span class="o">.</span><span class="n">successes</span> <span class="o">-</span> <span class="n">ppc</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">/</span> <span class="n">new_golf_data</span><span class="o">.</span><span class="n">tries</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">new_golf_data</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="n">residuals</span><span class="p">,</span> <span class="s2">&quot;o-&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Distance from hole&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Absolute error in expected</span><span class="se">\n</span><span class="s2">percent of success&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Residuals of new model&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='4000' class='' max='4000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [4000/4000 00:07<00:00]
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_44_1.png" src="../_images/notebooks_putting_workflow_44_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="A-new-model">
+<h2>A new model<a class="headerlink" href="#A-new-model" title="Permalink to this headline">¶</a></h2>
+<p>It is reasonable to stop at this point, but if we want to improve the fit everywhere, we may want to choose a different likelihood from the <code class="docutils literal notranslate"><span class="pre">Binomial</span></code>, which cares deeply about those points with many observations. One thing we could do is add some independent extra error to each data point. We could do this in a few ways: 1. The <code class="docutils literal notranslate"><span class="pre">Binomial</span></code> distribution in usually parametrized by <span class="math notranslate nohighlight">\(n\)</span>, the number of observations, and <span class="math notranslate nohighlight">\(p\)</span>, the probability of an individual success. We could instead
+parametrize it by mean (<span class="math notranslate nohighlight">\(np\)</span>) and variance (<span class="math notranslate nohighlight">\(np(1-p)\)</span>), and add error independent of <span class="math notranslate nohighlight">\(n\)</span> to the likelihood. 2. Use a <code class="docutils literal notranslate"><span class="pre">BetaBinomial</span></code> distribution, though the error there would still be (roughly) proportional to the number observations 3. Approximate the Binomial with a Normal distribution of the probability of success. This is actually equivalent to the first approach, but does not require a custom distribution. Note that we will use <span class="math notranslate nohighlight">\(p\)</span> as the mean, and
+<span class="math notranslate nohighlight">\(p(1-p) / n\)</span> as the variance. Once we add some dispersion <span class="math notranslate nohighlight">\(\epsilon\)</span>, the variance becomes <span class="math notranslate nohighlight">\(p(1-p)/n + \epsilon\)</span>.</p>
+<p>We follow approach 3, as in the Stan case study, and leave 1 as an exercise.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">disp_distance_angle_model</span><span class="p">(</span><span class="n">golf_data</span><span class="p">):</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">distance_angle_model</span><span class="p">:</span>
+        <span class="n">variance_of_shot</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">)</span>
+        <span class="n">variance_of_distance</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;variance_of_distance&quot;</span><span class="p">)</span>
+        <span class="n">dispersion</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;dispersion&quot;</span><span class="p">)</span>
+
+        <span class="n">p_good_angle</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span>
+            <span class="s2">&quot;p_good_angle&quot;</span><span class="p">,</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">Phi</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">arcsin</span><span class="p">((</span><span class="n">CUP_RADIUS</span> <span class="o">-</span> <span class="n">BALL_RADIUS</span><span class="p">)</span> <span class="o">/</span> <span class="n">distances</span><span class="p">)</span> <span class="o">/</span> <span class="n">variance_of_shot</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">p_good_distance</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span>
+            <span class="s2">&quot;p_good_distance&quot;</span><span class="p">,</span>
+            <span class="n">Phi</span><span class="p">((</span><span class="n">DISTANCE_TOLERANCE</span> <span class="o">-</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="n">distances</span> <span class="o">+</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">*</span> <span class="n">variance_of_distance</span><span class="p">))</span>
+            <span class="o">-</span> <span class="n">Phi</span><span class="p">(</span><span class="o">-</span><span class="n">OVERSHOT</span> <span class="o">/</span> <span class="p">((</span><span class="n">distances</span> <span class="o">+</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">*</span> <span class="n">variance_of_distance</span><span class="p">)),</span>
+        <span class="p">)</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p_good_angle</span> <span class="o">*</span> <span class="n">p_good_distance</span>
+        <span class="n">p_success</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span>
+            <span class="s2">&quot;p_success&quot;</span><span class="p">,</span>
+            <span class="n">mu</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+            <span class="n">sd</span><span class="o">=</span><span class="n">tt</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(((</span><span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">))</span> <span class="o">/</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">tries</span><span class="p">)</span> <span class="o">+</span> <span class="n">dispersion</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">observed</span><span class="o">=</span><span class="n">golf_data</span><span class="o">.</span><span class="n">successes</span> <span class="o">/</span> <span class="n">golf_data</span><span class="o">.</span><span class="n">tries</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">distance_angle_model</span>
+
+
+<span class="n">pm</span><span class="o">.</span><span class="n">model_to_graphviz</span><span class="p">(</span><span class="n">disp_distance_angle_model</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_46_0.svg" src="../_images/notebooks_putting_workflow_46_0.svg" /></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">disp_distance_angle_model</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">):</span>
+    <span class="n">disp_distance_angle_trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+    <span class="n">disp_ppc</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_posterior_predictive</span><span class="p">(</span><span class="n">disp_distance_angle_trace</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [dispersion, variance_of_distance, variance_of_shot]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='8000' class='' max='8000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [8000/8000 00:05<00:00 Sampling 4 chains, 0 divergences]
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 6 seconds.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+    <style>
+        /* Turns off some styling */
+        progress {
+            /* gets rid of default border in Firefox and Opera. */
+            border: none;
+            /* Needs to be in here for Safari polyfill so background images work as expected. */
+            background-size: auto;
+        }
+        .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+            background: #F44336;
+        }
+    </style>
+  <progress value='4000' class='' max='4000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [4000/4000 00:14<00:00]
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_golf_data</span><span class="p">(</span><span class="n">new_golf_data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">new_golf_data</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">200</span><span class="p">)</span>
+
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span>
+    <span class="n">forward_distance_angle_model</span><span class="p">(</span>
+        <span class="n">distance_angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+        <span class="n">distance_angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_distance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+        <span class="n">t</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Distance and angle&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span>
+    <span class="n">forward_distance_angle_model</span><span class="p">(</span>
+        <span class="n">disp_distance_angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+        <span class="n">disp_distance_angle_trace</span><span class="p">[</span><span class="s2">&quot;variance_of_distance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+        <span class="n">t</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Dispersed model&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Comparing dispersed model with binomial distance/angle model&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_48_0.png" src="../_images/notebooks_putting_workflow_48_0.png" />
+</div>
+</div>
+<p>This new model does better between 10 and 30 feet, as we can also see using the residuals plot - note that this model does marginally worse for very short putts:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">old_residuals</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">new_golf_data</span><span class="o">.</span><span class="n">successes</span> <span class="o">-</span> <span class="n">ppc</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">/</span> <span class="n">new_golf_data</span><span class="o">.</span><span class="n">tries</span>
+
+<span class="n">residuals</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span>
+    <span class="n">new_golf_data</span><span class="o">.</span><span class="n">successes</span> <span class="o">/</span> <span class="n">new_golf_data</span><span class="o">.</span><span class="n">tries</span> <span class="o">-</span> <span class="n">disp_ppc</span><span class="p">[</span><span class="s2">&quot;p_success&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">new_golf_data</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="n">residuals</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Dispersed model&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">new_golf_data</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="n">old_residuals</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Distance and angle model&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Distance from hole&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Absolute error in expected</span><span class="se">\n</span><span class="s2">percent of success&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Residuals of dispersed model vs distance/angle model&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_50_0.png" src="../_images/notebooks_putting_workflow_50_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Beyond-prediction">
+<h2>Beyond prediction<a class="headerlink" href="#Beyond-prediction" title="Permalink to this headline">¶</a></h2>
+<p>We want to use Bayesian analysis because we care about quantifying uncertainty in our parameters. We have a beautiful geometric model that not only gives us predictions, but gives us posterior distributions over our parameters. We can use this to back out how where our putts may end up, if not in the hole!</p>
+<p>First, we can try to visualize how 10,000 putts from a professional golfer might look. We:</p>
+<ol class="arabic simple">
+<li><p>Set the number of simulations to 10,000</p></li>
+<li><p>Draw 10,000 random <em>joint</em> samples from <code class="docutils literal notranslate"><span class="pre">variance_of_shot</span></code> and <code class="docutils literal notranslate"><span class="pre">variance_of_distance</span></code></p></li>
+<li><p>For each of those, draw an angle and a distance from normal distributions</p></li>
+<li><p>Plot the point, unless it would have gone in the hole</p></li>
+</ol>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">simulate_from_distance</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">distance_to_hole</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">10_000</span><span class="p">):</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">trials</span><span class="p">)</span>
+    <span class="n">variance_of_shot</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">][</span><span class="n">idxs</span><span class="p">]</span>
+    <span class="n">variance_of_distance</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="s2">&quot;variance_of_distance&quot;</span><span class="p">][</span><span class="n">idxs</span><span class="p">]</span>
+
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">variance_of_shot</span><span class="p">)</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+        <span class="n">distance_to_hole</span> <span class="o">+</span> <span class="n">OVERSHOT</span><span class="p">,</span> <span class="p">(</span><span class="n">distance_to_hole</span> <span class="o">+</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">*</span> <span class="n">variance_of_distance</span>
+    <span class="p">)</span>
+
+    <span class="n">final_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)])</span>
+
+    <span class="n">made_it</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">((</span><span class="n">CUP_RADIUS</span> <span class="o">-</span> <span class="n">BALL_RADIUS</span><span class="p">)</span> <span class="o">/</span> <span class="n">distance_to_hole</span><span class="p">)</span>
+    <span class="n">made_it</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">made_it</span>
+        <span class="o">*</span> <span class="p">(</span><span class="n">final_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">distance_to_hole</span><span class="p">)</span>
+        <span class="o">*</span> <span class="p">(</span><span class="n">final_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">distance_to_hole</span> <span class="o">+</span> <span class="n">DISTANCE_TOLERANCE</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;k.&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">250</span> <span class="o">/</span> <span class="n">distance_to_hole</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="o">*</span><span class="n">final_position</span><span class="p">[:,</span> <span class="o">~</span><span class="n">made_it</span><span class="p">],</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">250</span> <span class="o">/</span> <span class="n">distance_to_hole</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mf">0.5</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">distance_to_hole</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;ko&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">350</span> <span class="o">/</span> <span class="n">distance_to_hole</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s2">&quot;#e6ffdb&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Final position of </span><span class="si">{</span><span class="n">trials</span><span class="si">:</span><span class="s2">,d</span><span class="si">}</span><span class="s2"> putts from </span><span class="si">{</span><span class="n">distance_to_hole</span><span class="si">}</span><span class="s2">ft.</span><span class="se">\n</span><span class="s2">(</span><span class="si">{</span><span class="mi">100</span> <span class="o">*</span> <span class="n">made_it</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% made)&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span>
+
+
+<span class="n">simulate_from_distance</span><span class="p">(</span><span class="n">distance_angle_trace</span><span class="p">,</span> <span class="n">distance_to_hole</span><span class="o">=</span><span class="mi">50</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_52_0.png" src="../_images/notebooks_putting_workflow_52_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">simulate_from_distance</span><span class="p">(</span><span class="n">distance_angle_trace</span><span class="p">,</span> <span class="n">distance_to_hole</span><span class="o">=</span><span class="mi">7</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_53_0.png" src="../_images/notebooks_putting_workflow_53_0.png" />
+</div>
+</div>
+<p>We can then use this to work out how many putts a player may need to take from a given distance. This can influence strategic decisions like trying to reach the green in fewer shots, which may lead to a longer first putt, vs. a more conservative approach. We do this by simulating putts until they have all gone in.</p>
+<p>Note that this is again something we might check experimentally. In particular, a highly unscientific search around the internet finds claims that professionals only 3-putt from 20-25ft around 3% of the time. Our model puts the chance of 3 or more putts from 22.5 feet at 2.8%, which seems suspiciously good.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">expected_num_putts</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">distance_to_hole</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">100_000</span><span class="p">):</span>
+    <span class="n">distance_to_hole</span> <span class="o">=</span> <span class="n">distance_to_hole</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">trials</span><span class="p">)</span>
+
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">trials</span><span class="p">)</span>
+    <span class="n">variance_of_shot</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="s2">&quot;variance_of_shot&quot;</span><span class="p">][</span><span class="n">idxs</span><span class="p">]</span>
+    <span class="n">variance_of_distance</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="s2">&quot;variance_of_distance&quot;</span><span class="p">][</span><span class="n">idxs</span><span class="p">]</span>
+    <span class="n">n_shots</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="n">distance_to_hole</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">variance_of_shot</span><span class="p">)</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+            <span class="n">distance_to_hole</span> <span class="o">+</span> <span class="n">OVERSHOT</span><span class="p">,</span> <span class="p">(</span><span class="n">distance_to_hole</span> <span class="o">+</span> <span class="n">OVERSHOT</span><span class="p">)</span> <span class="o">*</span> <span class="n">variance_of_distance</span>
+        <span class="p">)</span>
+
+        <span class="n">final_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">distance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)])</span>
+
+        <span class="n">made_it</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">((</span><span class="n">CUP_RADIUS</span> <span class="o">-</span> <span class="n">BALL_RADIUS</span><span class="p">)</span> <span class="o">/</span> <span class="n">distance_to_hole</span><span class="p">)</span>
+        <span class="n">made_it</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">made_it</span>
+            <span class="o">*</span> <span class="p">(</span><span class="n">final_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">distance_to_hole</span><span class="p">)</span>
+            <span class="o">*</span> <span class="p">(</span><span class="n">final_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">distance_to_hole</span> <span class="o">+</span> <span class="n">DISTANCE_TOLERANCE</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">distance_to_hole</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">final_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">distance_to_hole</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">final_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)[</span><span class="o">~</span><span class="n">made_it</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">variance_of_shot</span> <span class="o">=</span> <span class="n">variance_of_shot</span><span class="p">[</span><span class="o">~</span><span class="n">made_it</span><span class="p">]</span>
+        <span class="n">variance_of_distance</span> <span class="o">=</span> <span class="n">variance_of_distance</span><span class="p">[</span><span class="o">~</span><span class="n">made_it</span><span class="p">]</span>
+        <span class="n">n_shots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">made_it</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">n_shots</span><span class="p">)</span> <span class="o">/</span> <span class="n">trials</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">distances</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">distance</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">ravel</span><span class="p">()):</span>
+    <span class="n">made</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">expected_num_putts</span><span class="p">(</span><span class="n">disp_distance_angle_trace</span><span class="p">,</span> <span class="n">distance</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">made</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">made</span><span class="p">)),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">made</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">distance</span><span class="si">}</span><span class="s2"> feet&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Percent of attempts&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Number of putts&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">5.6</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Simulated number of putts from</span><span class="se">\n</span><span class="s2">a few distances&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_putting_workflow_56_0.png" src="../_images/notebooks_putting_workflow_56_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> watermark
+<span class="o">%</span><span class="k">watermark</span> -n -u -v -iv -w
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pymc3  3.9.0
+scipy  1.4.1
+pandas 1.0.4
+numpy  1.18.5
+last updated: Mon Jun 15 2020
+
+CPython 3.7.7
+IPython 7.15.0
+watermark 2.0.2
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

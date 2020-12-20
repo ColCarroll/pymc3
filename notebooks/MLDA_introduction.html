@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MLDA sampler: Introduction and resources &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="MLDA-sampler:-Introduction-and-resources">
+<h1>MLDA sampler: Introduction and resources<a class="headerlink" href="#MLDA-sampler:-Introduction-and-resources" title="Permalink to this headline">¶</a></h1>
+<p>This notebook contains an introduction to the Multi-Level Delayed Acceptance MCMC algorithm (MLDA) proposed in [1]. It explains the main idea behind the method, gives an overview of the problems it is good for and points to specific notebooks with examples of how to use it within PyMC3.</p>
+<p>[1] Dodwell, Tim &amp; Ketelsen, Chris &amp; Scheichl, Robert &amp; Teckentrup, Aretha. (2019). Multilevel Markov Chain Monte Carlo. SIAM Review. 61. 509-545. <a class="reference external" href="https://doi.org/10.1137/19M126966X">https://doi.org/10.1137/19M126966X</a></p>
+<div class="section" id="The-MLDA-sampler">
+<h2>The MLDA sampler<a class="headerlink" href="#The-MLDA-sampler" title="Permalink to this headline">¶</a></h2>
+<p>The MLDA sampler is designed to deal with computationally intensive problems where we have access not only to the desired (fine) posterior distribution but also to a set of approximate (coarse) posteriors of decreasing accuracy and decreasing computational cost (we need at least one of those).</p>
+<p>Its main idea is to run multiple chains, where each chain samples from a different version of the posterior (the lower the level, the coarser the posterior). Each chain generates a number of samples and the last of them is passed as a proposal to the chain one level up. The latter accepts or rejects the sample and then gives back control to the first chain. This strategy is applied recursively so that each chain uses the chain below as a source of proposed samples.</p>
+<p>MLDA improves the effective sample size of the finest chain compared to standard samplers (e.g. Metropolis) and this allows us to reduce the number of expensive fine-chain likelihood evaluations while still exploring the posterior adequately. Note that the bottom level sampler is a standard MCMC sampler like Metropolis or DEMetropolisZ.</p>
+</div>
+<div class="section" id="Problems-it-is-good-for">
+<h2>Problems it is good for<a class="headerlink" href="#Problems-it-is-good-for" title="Permalink to this headline">¶</a></h2>
+<p>In many real-world problems, we use models to represent spatially or temporally varying quantities. We often have the ability to modify the spatial and/or temporal granularity of the models. For example, when representing a high-resolution image, we can use a coarse 64x64 grid but we can also use a much finer 512x512 grid, which is more accurate and more computationally demanding when working with it. In those cases it is often possible to apply multilevel modeling to infer unknown quantities in
+the model. In multilevel modeling, a hierarchy of models of increasing accuracy/resolution and increasing computational cost are used together to perform inference more efficiently than doing inference using the finest model only.</p>
+<p>Example applications include inverse problems for physical, natural or other systems, e.g. subsurface fluid transportation, predator-prey models in ecology, impedance imaging, ultrasound imaging, emission tomography, flow field of ocean circulation.</p>
+<p>In many of those inverse problems, evaluating the Bayesian likelihood requires solving a partial differential equation (PDE) numerically. Doing this on a fine-resolution model can be orders of magnitude slower than doing it on a coarse-resolution model. This is the ideal scenario for multilevel modeling and MLDA as MLDA allows us to get away with only calculating a fraction of the expensive fine-resolution likelihoods in exchange for many cheap coarse-resolution likelihoods.</p>
+</div>
+<div class="section" id="PyMC3-implementation">
+<h2>PyMC3 implementation<a class="headerlink" href="#PyMC3-implementation" title="Permalink to this headline">¶</a></h2>
+<p>MLDA is one of the MCMC inference methods available in PyMC3. You can instantiate an MLDA sampler using the <code class="docutils literal notranslate"><span class="pre">pm.MLDA(coarse_models=...)</span></code>, where you need to pass at least one coarse model within a list.</p>
+<p>The PyMC3 implementation of MLDA supports any number of levels, tuning parameterization for the bottom-level sampler, separate subsampling rates for each level, choice between blocked and compound sampling for the bottom-level sampler, two types of bottom-level samplers (Metropolis, DEMetropolisZ), adaptive error correction and variance reduction.</p>
+<p>For more details about the MLDA sampler and the way it should be used and parameterised, the user can refer to the docstrings in the code and to the other example notebooks (links below) which deal with more complex problem settings and more advanced MLDA features.</p>
+<p>Please note that the MLDA sampler is new in PyMC3. The user should be extra critical about the results and report any problems as issues in the PyMC3’s github repository.</p>
+</div>
+<div class="section" id="Notebooks-with-example-code">
+<h2>Notebooks with example code<a class="headerlink" href="#Notebooks-with-example-code" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="MLDA_simple_linear_regression.html"><span class="doc">Simple linear regression</span></a>: This notebook demonstrates the workflow for using MLDA within PyMC3. It employes a very simple toy model.</p>
+<p><a class="reference internal" href="MLDA_gravity_surveying.html"><span class="doc">Gravity surveying</span></a>: In this notebook, we use MLDA to solve a 2-dimensional gravity surveying inverse problem. Evaluating the likelihood requires solving a PDE, which we do using <a class="reference external" href="https://www.scipy.org/">scipy</a>. We also compare the performance of MLDA with other PyMC3 samplers (Metropolis, DEMetropolisZ).</p>
+<p><a class="reference internal" href="MLDA_variance_reduction_linear_regression.html"><span class="doc">Variance reduction 1</span></a> and <a class="reference external" href="https://github.com/alan-turing-institute/pymc3/blob/mlda_all_notebooks/docs/source/notebooks/MLDA_variance_reduction_groundwater.ipynb">Variance reduction 2</a> (external link): Those two notebooks demonstrate the variance reduction feature in a linear regression model and a groundwater flow model. This feature allows the user to define a quantity of interest that they need to estimate using the MCMC samples. It
+then collects those quantities of interest, as well as differences of these quantities between levels, during MLDA sampling. The collected quentities can then be used to produce an estimate which has lower variance than a standard estimate that uses samples from the fine chain only. The first notebook does not have external dependencies, while the second one requires FEniCS. Note that the second notebook is outside the core PyMC3 repository because FEniCS is not a PyMC3 dependency.</p>
+<p><a class="reference external" href="https://github.com/alan-turing-institute/pymc3/blob/mlda_all_notebooks/docs/source/notebooks/MLDA_adaptive_error_model.ipynb">Adaptive error model</a> (external link): In this notebook we use MLDA to tackle another inverse problem; groundwarer flow modeling. The aim is to infer the posterior distribution of model parameters (hydraulic conductivity) given data (measurements of hydraulic head). In this example we make use of Theano Ops in order to define a “black box” likelihood, i.e. a
+likelihood that uses external code. Specifically, our likelihood uses the <a class="reference external" href="https://fenicsproject.org/">FEniCS</a> library to solve a PDE. This is a common scenario, as PDEs of this type are slow to solve with scipy or other standard libraries. Note that this notebook is outside the core PyMC3 repository because FEniCS is not a PyMC3 dependency. We employ the adaptive error model (AEM) feature and compare the performance of basic MLDA with AEM-enhanced MLDA. The idea of Adaptive Error Model (AEM)
+is to estimate the mean and variance of the forward-model error between adjacent levels, i.e. estimate the bias of the coarse forward model compared to the fine forward model, and use those estimates to correct the coarse model. Using the technique should improve ESS/sec on the fine level.</p>
+<p><a class="reference external" href="https://github.com/alan-turing-institute/pymc3/blob/mlda_all_notebooks/docs/source/notebooks/MLDA_benchmarks_tuning.ipynb">Benchmarks and tuning</a> (external link): In this notebook we benchmark MLDA against other samplers using different parameterizations of the groundwater flow model. We also give some advice on tuning MLDA. Note that this notebook is outside the core PyMC3 repository because FEniCS is not a PyMC3 dependency.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> watermark
+<span class="o">%</span><span class="k">watermark</span> -n -u -v -iv -w
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+last updated: Sat Oct 10 2020
+
+CPython 3.6.9
+IPython 7.16.1
+watermark 2.0.2
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  <div class="section" id="module-pymc3.data">
+<span id="data"></span><h1>Data<a class="headerlink" href="#module-pymc3.data" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pymc3.data.Data">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.data.</code><code class="sig-name descname">Data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">dims</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">export_index_as_coords</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.data.Data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data container class that wraps the theano <code class="docutils literal notranslate"><span class="pre">SharedVariable</span></code> class
+and lets the model be aware of its inputs and outputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name: str</strong></dt><dd><p>The name for this variable</p>
+</dd>
+<dt><strong>value: {List, np.ndarray, pd.Series, pd.Dataframe}</strong></dt><dd><p>A value to associate with this variable</p>
+</dd>
+<dt><strong>dims: {str, tuple of str}, optional, default=None</strong></dt><dd><p>Dimension names of the random variables (as opposed to the shapes of these
+random variables). Use this when <cite>value</cite> is a pandas Series or DataFrame. The
+<cite>dims</cite> will then be the name of the Series / DataFrame’s columns. See ArviZ
+documentation for more information about dimensions and coordinates:
+<a class="reference external" href="https://arviz-devs.github.io/arviz/notebooks/Introduction.html">https://arviz-devs.github.io/arviz/notebooks/Introduction.html</a></p>
+</dd>
+<dt><strong>export_index_as_coords: bool, optional, default=False</strong></dt><dd><p>If True, the <cite>Data</cite> container will try to infer what the coordinates should be
+if there is an index in <cite>value</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># We generate 10 datasets</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">true_mu</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observed_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">mu</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="k">for</span> <span class="n">mu</span> <span class="ow">in</span> <span class="n">true_mu</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">data</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">observed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate one trace for each dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">traces</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">data_vals</span> <span class="ow">in</span> <span class="n">observed_data</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">with</span> <span class="n">model</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="c1"># Switch out the observed dataset</span>
+<span class="gp">... </span>        <span class="n">pm</span><span class="o">.</span><span class="n">set_data</span><span class="p">({</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">data_vals</span><span class="p">})</span>
+<span class="gp">... </span>        <span class="n">traces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>To set the value of the data container variable, check out
+<a class="reference internal" href="model.html#pymc3.model.set_data" title="pymc3.model.set_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">pymc3.model.set_data()</span></code></a>.</p>
+<p>For more information, take a look at this example notebook
+<a class="reference external" href="https://docs.pymc.io/notebooks/data_container.html">https://docs.pymc.io/notebooks/data_container.html</a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.data.GeneratorAdapter">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.data.</code><code class="sig-name descname">GeneratorAdapter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">generator</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.data.GeneratorAdapter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper class that helps to infer data type of generator with looking
+at the first item, preserving the order of the resulting generator</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="pymc3.data.Minibatch">
+<em class="property">class </em><code class="sig-prename descclassname">pymc3.data.</code><code class="sig-name descname">Minibatch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">broadcastable</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'Minibatch'</span></em>, <em class="sig-param"><span class="n">random_seed</span><span class="o">=</span><span class="default_value">42</span></em>, <em class="sig-param"><span class="n">update_shared_f</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">in_memory_size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.data.Minibatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multidimensional minibatch that is pure TensorVariable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: np.ndarray</strong></dt><dd><p>initial data</p>
+</dd>
+<dt><strong>batch_size: ``int`` or ``List[int|tuple(size, random_seed)]``</strong></dt><dd><p>batch size for inference, random seed is needed
+for child random generators</p>
+</dd>
+<dt><strong>dtype: ``str``</strong></dt><dd><p>cast data to specific type</p>
+</dd>
+<dt><strong>broadcastable: tuple[bool]</strong></dt><dd><p>change broadcastable pattern that defaults to <code class="docutils literal notranslate"><span class="pre">(False,</span> <span class="pre">)</span> <span class="pre">*</span> <span class="pre">ndim</span></code></p>
+</dd>
+<dt><strong>name: ``str``</strong></dt><dd><p>name for tensor, defaults to “Minibatch”</p>
+</dd>
+<dt><strong>random_seed: ``int``</strong></dt><dd><p>random seed that is used by default</p>
+</dd>
+<dt><strong>update_shared_f: ``callable``</strong></dt><dd><p>returns <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code> that will be carefully
+stored to underlying shared variable
+you can use it to change source of
+minibatches programmatically</p>
+</dd>
+<dt><strong>in_memory_size: ``int`` or ``List[int|slice|Ellipsis]``</strong></dt><dd><p>data size for storing in <code class="docutils literal notranslate"><span class="pre">theano.shared</span></code></p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Below is a common use case of Minibatch with variational inference.
+Importantly, we need to make PyMC3 “aware” that a minibatch is being used in inference.
+Otherwise, we will get the wrong <span class="math notranslate nohighlight">\(logp\)</span> for the model.
+the density of the model <code class="docutils literal notranslate"><span class="pre">logp</span></code> that is affected by Minibatch. See more in the examples below.
+To do so, we need to pass the <code class="docutils literal notranslate"><span class="pre">total_size</span></code> parameter to the observed node, which correctly scales
+the density of the model <code class="docutils literal notranslate"><span class="pre">logp</span></code> that is affected by Minibatch. See more in the examples below.</p>
+<p class="rubric">Examples</p>
+<p>Consider we have <cite>data</cite> as follows:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>if we want a 1d slice of size 10 we do</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">Minibatch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that your data is cast to <code class="docutils literal notranslate"><span class="pre">floatX</span></code> if it is not integer type
+But you still can add the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> kwarg for <a class="reference internal" href="#pymc3.data.Minibatch" title="pymc3.data.Minibatch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Minibatch</span></code></a>
+if you need more control.</p>
+<p>If we want 10 sampled rows and columns
+<code class="docutils literal notranslate"><span class="pre">[(size,</span> <span class="pre">seed),</span> <span class="pre">(size,</span> <span class="pre">seed)]</span></code> we can use</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">Minibatch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">42</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;int32&#39;</span>
+</pre></div>
+</div>
+<p>Or, more simply, we can use the default random seed = 42
+<code class="docutils literal notranslate"><span class="pre">[size,</span> <span class="pre">size]</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">Minibatch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>In the above, <cite>x</cite> is a regular <code class="xref py py-class docutils literal notranslate"><span class="pre">TensorVariable</span></code> that supports any math operations:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can pass the Minibatch <cite>x</cite> to your desired model:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Flat</span><span class="p">(</span><span class="s1">&#39;mu&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">sd</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s1">&#39;sd&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">lik</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;lik&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">total_size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Then you can perform regular Variational Inference out of the box</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">model</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">approx</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Important note: :class:<code class="docutils literal notranslate"><span class="pre">Minibatch</span></code> has <code class="docutils literal notranslate"><span class="pre">shared</span></code>, and <code class="docutils literal notranslate"><span class="pre">minibatch</span></code> attributes
+you can call later:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">laplace</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>and minibatches will be then from new storage
+it directly affects <code class="docutils literal notranslate"><span class="pre">x.shared</span></code>.
+A less convenient convenient, but more explicit, way to achieve the same
+thing:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">floatX</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">laplace</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))))</span>
+</pre></div>
+</div>
+<p>The programmatic way to change storage is as follows
+I import <code class="docutils literal notranslate"><span class="pre">partial</span></code> for simplicity
+&gt;&gt;&gt; from functools import partial
+&gt;&gt;&gt; datagen = partial(np.random.laplace, size=(100, 100))
+&gt;&gt;&gt; x = Minibatch(datagen(), batch_size=10, update_shared_f=datagen)
+&gt;&gt;&gt; x.update_shared()</p>
+<p>To be more concrete about how we create a minibatch, here is a demo:
+1. create a shared variable</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">shared</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">shared</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic" start="2">
+<li><p>take a random slice of size 10:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ridx</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">tt_rng</span><span class="p">()</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,),</span> <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">1e-10</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic" start="3">
+<li><p>take the resulting slice:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">minibatch</span> <span class="o">=</span> <span class="n">shared</span><span class="p">[</span><span class="n">ridx</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>That’s done. Now you can use this minibatch somewhere else.
+You can see that the implementation does not require a fixed shape
+for the shared variable. Feel free to use that if needed.
+<em>FIXME: What is “that” which we can use here?  A fixed shape?  Should this say
+“but feel free to put a fixed shape on the shared variable, if appropriate?”</em></p>
+<p>Suppose you need to make some replacements in the graph, e.g. change the minibatch to testdata</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">node</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># arbitrary expressions on minibatch `x`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">testdata</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">floatX</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">laplace</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">10</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>Then you should create a <cite>dict</cite> with replacements:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">replacements</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">testdata</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rnode</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">replacements</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="p">(</span><span class="n">testdata</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">==</span> <span class="n">rnode</span><span class="o">.</span><span class="n">eval</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><em>FIXME: In the following, what is the **reason*</em> to replace the Minibatch variable with
+its shared variable?  And in the following, the <cite>rnode</cite> is a <strong>new</strong> node, not a modification
+of a previously existing node, correct?*
+To replace a minibatch with its shared variable you should do
+the same things. The Minibatch variable is accessible through the <cite>minibatch</cite> attribute.
+For example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">replacements</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">minibatch</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">shared</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rnode</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">replacements</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For more complex slices some more code is needed that can seem not so clear</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">moredata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The default <code class="docutils literal notranslate"><span class="pre">total_size</span></code> that can be passed to <code class="docutils literal notranslate"><span class="pre">PyMC3</span></code> random node
+is then <code class="docutils literal notranslate"><span class="pre">(10,</span> <span class="pre">20,</span> <span class="pre">30,</span> <span class="pre">40,</span> <span class="pre">50)</span></code> but can be less verbose in some cases</p>
+<ol class="arabic">
+<li><p>Advanced indexing, <code class="docutils literal notranslate"><span class="pre">total_size</span> <span class="pre">=</span> <span class="pre">(10,</span> <span class="pre">Ellipsis,</span> <span class="pre">50)</span></code></p>
+<blockquote>
+<div><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">Minibatch</span><span class="p">(</span><span class="n">moredata</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="bp">Ellipsis</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>We take the slice only for the first and last dimension</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Skipping a particular dimension, <code class="docutils literal notranslate"><span class="pre">total_size</span> <span class="pre">=</span> <span class="pre">(10,</span> <span class="pre">None,</span> <span class="pre">30)</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">Minibatch</span><span class="p">(</span><span class="n">moredata</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Mixing both of these together, <code class="docutils literal notranslate"><span class="pre">total_size</span> <span class="pre">=</span> <span class="pre">(10,</span> <span class="pre">None,</span> <span class="pre">30,</span> <span class="pre">Ellipsis,</span> <span class="pre">50)</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">Minibatch</span><span class="p">(</span><span class="n">moredata</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="bp">Ellipsis</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>shared: shared tensor</strong></dt><dd><p>Used for storing data</p>
+</dd>
+<dt><strong>minibatch: minibatch tensor</strong></dt><dd><p>Used for training</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pymc3.data.Minibatch.clone">
+<code class="sig-name descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.data.Minibatch.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new Variable like self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Variable instance</dt><dd><p>A new Variable instance (or subclass instance) with no owner or
+index.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Tags are copied to the returned instance.</p>
+<p>Name is copied to the returned instance.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="pymc3.data.get_data">
+<code class="sig-prename descclassname">pymc3.data.</code><code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymc3.data.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a BytesIO object for a package data file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename: str</strong></dt><dd><p>file to load</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>BytesIO of the data</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

@@ -1,0 +1,1289 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lotka-Volterra with manual gradients &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="kn">import</span> <span class="nn">theano</span>
+
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">odeint</span>
+<span class="kn">from</span> <span class="nn">theano</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">THEANO_FLAGS</span> <span class="o">=</span> <span class="s2">&quot;optimizer=fast_compile&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Lotka-Volterra-with-manual-gradients">
+<h1>Lotka-Volterra with manual gradients<a class="headerlink" href="#Lotka-Volterra-with-manual-gradients" title="Permalink to this headline">¶</a></h1>
+<p>by <a class="reference external" href="https://www.mrc-bsu.cam.ac.uk/people/in-alphabetical-order/a-to-g/sanmitra-ghosh/">Sanmitra Ghosh</a></p>
+<p>Mathematical models are used ubiquitously in a variety of science and engineering domains to model the time evolution of physical variables. These mathematical models are often described as ODEs that are characterised by model structure - the functions of the dynamical variables - and model parameters. However, for the vast majority of systems of practical interest it is necessary to infer both the model parameters and an appropriate model structure from experimental observations. This
+experimental data often appears to be scarce and incomplete. Furthermore, a large variety of models described as dynamical systems show traits of sloppiness (see <a class="reference external" href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.0030189">Gutenkunst et al., 2007</a>) and have unidentifiable parameter combinations. The task of inferring model parameters and structure from experimental data is of paramount importance to reliably analyse the behaviour of dynamical systems and draw faithful
+predictions in light of the difficulties posit by their complexities. Moreover, any future model prediction should encompass and propagate variability and uncertainty in model parameters and/or structure. Thus, it is also important that the inference methods are equipped to quantify and propagate the aforementioned uncertainties from the model descriptions to model predictions. As a natural choice to handle uncertainty, at least in the parameters, Bayesian inference is increasingly used to fit
+ODE models to experimental data (<a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S030439750800501X">Mark Girolami, 2008</a>). However, due to some of the difficulties that I pointed above, fitting an ODE model using Bayesian inference is a challenging task. In this tutorial I am going to take up that challenge and will show how PyMC3 could be potentially used for this purpose.</p>
+<p>I must point out that model fitting (inference of the unknown parameters) is just one of many crucial tasks that a modeller has to complete in order to gain a deeper understanding of a physical process. However, success in this task is crucial and this is where PyMC3, and probabilistic programming (ppl) in general, is extremely useful. The modeller can take full advantage of the variety of samplers and distributions provided by PyMC3 to automate inference.</p>
+<p>In this tutorial I will focus on the fitting exercise, that is estimating the posterior distribution of the parameters given some noisy experimental time series.</p>
+<div class="section" id="Bayesian-inference-of-the-parameters-of-an-ODE">
+<h2>Bayesian inference of the parameters of an ODE<a class="headerlink" href="#Bayesian-inference-of-the-parameters-of-an-ODE" title="Permalink to this headline">¶</a></h2>
+<p>I begin by first introducing the Bayesian framework for inference in a coupled non-linear ODE defined as</p>
+<div class="math notranslate nohighlight">
+\[\frac{d X(t)}{dt}=\boldsymbol{f}\big(X(t),\boldsymbol{\theta}\big),\]</div>
+<p>where <span class="math notranslate nohighlight">\(X(t)\in\mathbb{R}^K\)</span> is the solution, at each time point, of the system composed of <span class="math notranslate nohighlight">\(K\)</span> coupled ODEs - the state vector - and <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\in\mathbb{R}^D\)</span> is the parameter vector that we wish to infer. <span class="math notranslate nohighlight">\(\boldsymbol{f}(\cdot)\)</span> is a non-linear function that describes the governing dynamics. Also, in case of an initial value problem, let the matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}(\boldsymbol{\theta}, \mathbf{x_0})\)</span> denote the solution of the above system of equations at
+some specified time points for the parameters <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> and initial conditions <span class="math notranslate nohighlight">\(\mathbf{x_0}\)</span>.</p>
+<p>Consider a set of noisy experimental observations <span class="math notranslate nohighlight">\(\boldsymbol{Y} \in \mathbb{R}^{T\times K}\)</span> observed at <span class="math notranslate nohighlight">\(T\)</span> experimental time points for the <span class="math notranslate nohighlight">\(K\)</span> states. We can obtain the likelihood <span class="math notranslate nohighlight">\(p(\boldsymbol{Y}|\boldsymbol{X})\)</span>, where I use the symbol <span class="math notranslate nohighlight">\(\boldsymbol{X}:=\boldsymbol{X}(\boldsymbol{\theta}, \mathbf{x_0})\)</span>, and combine that with a prior distribution <span class="math notranslate nohighlight">\(p(\boldsymbol{\theta})\)</span> on the parameters, using the Bayes theorem, to obtain the posterior distribution as</p>
+<div class="math notranslate nohighlight">
+\[p(\boldsymbol{\theta}|\boldsymbol{Y})=\frac{1}{Z}p(\boldsymbol{Y}|\boldsymbol{X})p(\boldsymbol{\theta}),\]</div>
+<p>where $Z=:nbsphinx-math:<cite>int `p(:nbsphinx-math:</cite>boldsymbol{Y}`|:nbsphinx-math:<cite>boldsymbol{X}</cite>)p(<span class="math">\boldsymbol{\theta}</span>) d:nbsphinx-math:<cite>boldsymbol{theta}</cite> $ is the intractable marginal likelihood. Due to this intractability we resort to approximate inference and apply MCMC.</p>
+<p>For this tutorial I have chosen two ODEs: 1. The <a class="reference external" href="http://www.scholarpedia.org/article/Predator-prey_model">Lotka-Volterra predator prey model</a> 2. The <a class="reference external" href="http://www.scholarpedia.org/article/FitzHugh-Nagumo_model">Fitzhugh-Nagumo action potential model</a></p>
+<p>I will showcase two distinctive approaches (<strong>NUTS</strong> and <strong>SMC</strong> step methods), supported by PyMC3, for the estimation of unknown parameters in these models.</p>
+</div>
+<div class="section" id="Lotka-Volterra-predator-prey-model">
+<h2>Lotka-Volterra predator prey model<a class="headerlink" href="#Lotka-Volterra-predator-prey-model" title="Permalink to this headline">¶</a></h2>
+<p>The Lotka Volterra model depicts an ecological system that is used to describe the interaction between a predator and prey species. This ODE given by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+   \frac{d x}{dt} &amp;=\alpha x -\beta xy \\
+   \frac{d y}{dt} &amp;=-\gamma y + \delta xy,
+\end{aligned}\end{split}\]</div>
+<p>shows limit cycle behaviour and has often been used for benchmarking Bayesian inference methods. <span class="math notranslate nohighlight">\(\boldsymbol{\theta}=(\alpha,\beta,\gamma,\delta, x(0),y(0))\)</span> is the set of unknown parameters that we wish to infer from experimental observations of the state vector <span class="math notranslate nohighlight">\(X(t)=(x(t),y(t))\)</span> comprising the concentrations of the prey and the predator species respectively. <span class="math notranslate nohighlight">\(x(0), y(0)\)</span> are the initial values of the states needed to solve the ODE, which are also treated as unknown
+quantities. The predator prey model was recently used to demonstrate the applicability of the NUTS sampler, and the Stan ppl in general, for inference in ODE models. I will closely follow <a class="reference external" href="https://mc-stan.org/users/documentation/case-studies/lotka-volterra-predator-prey.html">this</a> Stan tutorial and thus I will setup this model and associated inference problem (including the data) exactly as was done for the Stan tutorial. Let me first write down the code to solve this ODE using the SciPy’s
+<code class="docutils literal notranslate"><span class="pre">odeint</span></code>. Note that the methods in this tutorial is not limited or tied to <code class="docutils literal notranslate"><span class="pre">odeint</span></code>. Here I have chosen <code class="docutils literal notranslate"><span class="pre">odeint</span></code> to simply stay within PyMC3’s dependencies (SciPy in this case).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">LotkaVolterraModel</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y0</span> <span class="o">=</span> <span class="n">y0</span>
+
+    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">Xt0</span><span class="p">,</span> <span class="n">Yt0</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">rhs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="n">dX_dt</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">X</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">X</span> <span class="o">*</span> <span class="n">Y</span>
+            <span class="n">dY_dt</span> <span class="o">=</span> <span class="o">-</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">Y</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">*</span> <span class="n">X</span> <span class="o">*</span> <span class="n">Y</span>
+            <span class="k">return</span> <span class="n">dX_dt</span><span class="p">,</span> <span class="n">dY_dt</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="p">[</span><span class="n">Xt0</span><span class="p">,</span> <span class="n">Yt0</span><span class="p">],</span> <span class="n">times</span><span class="p">,</span> <span class="p">(</span><span class="n">parameters</span><span class="p">,))</span>
+        <span class="k">return</span> <span class="n">values</span>
+
+
+<span class="n">ode_model</span> <span class="o">=</span> <span class="n">LotkaVolterraModel</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Handling-ODE-gradients">
+<h2>Handling ODE gradients<a class="headerlink" href="#Handling-ODE-gradients" title="Permalink to this headline">¶</a></h2>
+<p>NUTS requires the gradient of the log of the target density w.r.t. the unknown parameters, <span class="math notranslate nohighlight">\(\nabla_{\boldsymbol{\theta}}p(\boldsymbol{\theta}|\boldsymbol{Y})\)</span>, which can be evaluated using the chain rule of differentiation as</p>
+<div class="math notranslate nohighlight">
+\[\nabla_{\boldsymbol{\theta}}p(\boldsymbol{\theta}|\boldsymbol{Y}) = \frac{\partial p(\boldsymbol{\theta}|\boldsymbol{Y})}{\partial \boldsymbol{X}}^T \frac{\partial \boldsymbol{X}}{\partial \boldsymbol{\theta}}.\]</div>
+<p>The gradient of an ODE w.r.t. its parameters, the term <span class="math notranslate nohighlight">\(\frac{\partial \boldsymbol{X}}{\partial \boldsymbol{\theta}}\)</span>, can be obtained using local sensitivity analysis, although this is not the only method to obtain gradients. However, just like solving an ODE (a non-linear one to be precise) evaluation of the gradients can only be carried out using some sort of numerical method, say for example the famous Runge-Kutta method for non-stiff ODEs. PyMC3 uses Theano as the automatic
+differentiation engine and thus all models are implemented by stitching together available primitive operations (Ops) supported by Theano. Even to extend PyMC3 we need to compose models that can be expressed as symbolic combinations of Theano’s Ops. However, if we take a step back and think about Theano then it is apparent that neither the ODE solution nor its gradient w.r.t. to the parameters can be expressed symbolically as combinations of Theano’s primitive Ops. Hence, from Theano’s
+perspective an ODE (and for that matter any other form of a non-linear differential equation) is a non-differentiable black-box function. However, one might argue that if a numerical method is coded up in Theano (using say the <code class="docutils literal notranslate"><span class="pre">scan</span></code> Op), then it is possible to symbolically express the numerical method that evaluates the ODE states, and then we can easily use Theano’s automatic differentiation engine to obtain the gradients as well by differentiating through the numerical solver itself. I like
+to point out that the former, obtaining the solution, is indeed possible this way but the obtained gradient would be error-prone. Additionally, this entails to a complete ‘re-inventing the wheel’ as one would have to implement decades old sophisticated numerical algorithms again from scratch in Theano.</p>
+<p>Thus, in this tutorial I am going to present the alternative approach which consists of defining new <a class="reference external" href="http://deeplearning.net/software/theano_versions/dev/extending/extending_theano.html">custom Theano Ops</a>, extending Theano, that will wrap both the numerical solution and the vector-Matrix product, $ <span class="math">\frac{\partial p(\boldsymbol{\theta}|\boldsymbol{Y})}{\partial \boldsymbol{X}}`^T :nbsphinx-math:</span>frac{partial boldsymbol{X}}{partial boldsymbol{theta}}`$, often known as
+the <strong>vector-Jacobian product</strong> (VJP) in automatic differentiation literature. I like to point out here that in the context of non-linear ODEs the term Jacobian is used to denote gradients of the ODE dynamics <span class="math notranslate nohighlight">\(\boldsymbol{f}\)</span> w.r.t. the ODE states <span class="math notranslate nohighlight">\(X(t)\)</span>. Thus, to avoid confusion, from now on I will use the term <strong>vector-sensitivity product</strong> (VSP) to denote the same quantity that the term VJP denotes.</p>
+<p>I will start by introducing the forward sensitivity analysis.</p>
+</div>
+<div class="section" id="ODE-sensitivity-analysis">
+<h2>ODE sensitivity analysis<a class="headerlink" href="#ODE-sensitivity-analysis" title="Permalink to this headline">¶</a></h2>
+<p>For a coupled ODE system <span class="math notranslate nohighlight">\(\frac{d X(t)}{dt} = \boldsymbol{f}(X(t),\boldsymbol{\theta})\)</span>, the local sensitivity of the solution to a parameter is defined by how much the solution would change by changes in the parameter, i.e. the sensitivity of the the <span class="math notranslate nohighlight">\(k\)</span>-th state is simply put the time evolution of its graident w.r.t. the <span class="math notranslate nohighlight">\(d\)</span>-th parameter. This quantitiy, denoted as <span class="math notranslate nohighlight">\(Z_{kd}(t)\)</span>, is given by</p>
+<div class="math notranslate nohighlight">
+\[Z_{kd}(t)=\frac{d }{d t} \left\{\frac{\partial X_k (t)}{\partial \theta_d}\right\} = \sum_{i=1}^K \frac{\partial f_k}{\partial X_i (t)}\frac{\partial X_i (t)}{\partial \theta_d} + \frac{\partial f_k}{\partial \theta_d}.\]</div>
+<p>Using forward sensitivity analysis we can obtain both the state <span class="math notranslate nohighlight">\(X(t)\)</span> and its derivative w.r.t the parameters, at each time point, as the solution to an initial value problem by augmenting the original ODE system with the sensitivity equations <span class="math notranslate nohighlight">\(Z_{kd}\)</span>. The augmented ODE system <span class="math notranslate nohighlight">\(\big(X(t), Z(t)\big)\)</span> can then be solved together using a chosen numerical method. The augmented ODE system needs the initial values for the sensitivity equations. All of these should be set to zero
+except the ones where the sensitivity of a state w.r.t. its own initial value is sought, that is $ <span class="math">\frac{\partial X_k(t)}{\partial X_k (0)}</span> =1 $. Note that in order to solve this augmented system we have to embark in the tedious process of deriving $ <span class="math">\frac{\partial f_k}{\partial X_i (t)}`$, also known as the Jacobian of an ODE, and :math:</span>frac{partial f_k}{partial theta_d}` terms. Thankfully, many ODE solvers calculate these terms and solve the augmented
+system when asked for by the user. An example would be the <a class="reference external" href="https://computation.llnl.gov/projects/sundials/cvodes">SUNDIAL CVODES solver suite</a>. A Python wrapper for CVODES can be found <a class="reference external" href="https://jmodelica.org/assimulo/">here</a>.</p>
+<p>However, for this tutorial I would go ahead and derive the terms mentioned above, manually, and solve the Lotka-Volterra ODEs alongwith the sensitivites in the following code block. The functions <code class="docutils literal notranslate"><span class="pre">jac</span></code> and <code class="docutils literal notranslate"><span class="pre">dfdp</span></code> below calculate $ <span class="math">\frac{\partial f_k}{\partial X_i (t)}`$ and :math:</span>frac{partial f_k}{partial theta_d}` respectively for the Lotka-Volterra model. For conveniance I have transformed the sensitivity equation in a matrix form. Here I extended the solver code
+snippet above to include sensitivities when asked for.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">n_states</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">n_odeparams</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">n_ivs</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<span class="k">class</span> <span class="nc">LotkaVolterraModel</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_states</span><span class="p">,</span> <span class="n">n_odeparams</span><span class="p">,</span> <span class="n">n_ivs</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_states</span> <span class="o">=</span> <span class="n">n_states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_odeparams</span> <span class="o">=</span> <span class="n">n_odeparams</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_ivs</span> <span class="o">=</span> <span class="n">n_ivs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y0</span> <span class="o">=</span> <span class="n">y0</span>
+
+    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">simulate_with_sensitivities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">sensitivities</span><span class="p">):</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">Xt0</span><span class="p">,</span> <span class="n">Yt0</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">r</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="n">dX_dt</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">X</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">X</span> <span class="o">*</span> <span class="n">Y</span>
+            <span class="n">dY_dt</span> <span class="o">=</span> <span class="o">-</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">Y</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">*</span> <span class="n">X</span> <span class="o">*</span> <span class="n">Y</span>
+            <span class="k">return</span> <span class="n">dX_dt</span><span class="p">,</span> <span class="n">dY_dt</span>
+
+        <span class="k">if</span> <span class="n">sensitivities</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">jac</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+                <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_states</span><span class="p">))</span>
+                <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">Y</span>
+                <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="n">X</span>
+                <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta</span> <span class="o">*</span> <span class="n">Y</span>
+                <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">gamma</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">*</span> <span class="n">X</span>
+                <span class="k">return</span> <span class="n">ret</span>
+
+            <span class="k">def</span> <span class="nf">dfdp</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+                <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_odeparams</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_ivs</span><span class="p">)</span>
+                <span class="p">)</span>  <span class="c1"># except the following entries</span>
+                <span class="n">ret</span><span class="p">[</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+                <span class="p">]</span> <span class="o">=</span> <span class="n">X</span>  <span class="c1"># \frac{\partial  [\alpha X - \beta XY]}{\partial \alpha}, and so on...</span>
+                <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">X</span> <span class="o">*</span> <span class="n">Y</span>
+                <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">Y</span>
+                <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">Y</span>
+
+                <span class="k">return</span> <span class="n">ret</span>
+
+            <span class="k">def</span> <span class="nf">rhs</span><span class="p">(</span><span class="n">y_and_dydp</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">y_and_dydp</span><span class="p">[</span><span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_states</span><span class="p">]</span>
+                <span class="n">dydp</span> <span class="o">=</span> <span class="n">y_and_dydp</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_states</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_odeparams</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_ivs</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">dydt</span> <span class="o">=</span> <span class="n">r</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+                <span class="n">d_dydp_dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">jac</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">dydp</span><span class="p">)</span> <span class="o">+</span> <span class="n">dfdp</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">dydt</span><span class="p">,</span> <span class="n">d_dydp_dt</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+
+            <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_odeparams</span> <span class="o">+</span> <span class="n">n_ivs</span><span class="p">))</span> <span class="o">+</span> <span class="n">n_states</span><span class="p">)</span>
+            <span class="n">y0</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># \frac{\partial  [X]}{\partial Xt0} at t==0, and same below for Y</span>
+            <span class="n">y0</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">y0</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n_states</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Xt0</span><span class="p">,</span> <span class="n">Yt0</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="p">(</span><span class="n">parameters</span><span class="p">,),</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">result</span><span class="p">[:,</span> <span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_states</span><span class="p">]</span>
+            <span class="n">dvalues_dp</span> <span class="o">=</span> <span class="n">result</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_states</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_odeparams</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_ivs</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">values</span><span class="p">,</span> <span class="n">dvalues_dp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="p">[</span><span class="n">Xt0</span><span class="p">,</span> <span class="n">Yt0</span><span class="p">],</span> <span class="n">times</span><span class="p">,</span> <span class="p">(</span><span class="n">parameters</span><span class="p">,),</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">values</span>
+
+
+<span class="n">ode_model</span> <span class="o">=</span> <span class="n">LotkaVolterraModel</span><span class="p">(</span><span class="n">n_states</span><span class="p">,</span> <span class="n">n_odeparams</span><span class="p">,</span> <span class="n">n_ivs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>For this model I have set the relative and absolute tolerances to <span class="math notranslate nohighlight">\(10^{-6}\)</span> and <span class="math notranslate nohighlight">\(10^{-5}\)</span> respectively, as was suggested in the Stan tutorial. This will produce sufficiently accurate solutions. Further reducing the tolerances will increase accuracy but at the cost of increasing the computational time. A thorough discussion on the choice and use of a numerical method for solving the ODE is out of the scope of this tutorial. However, I must point out that the inaccuracies of the ODE
+solver do affect the likelihood and as a result the inference. This is more so the case for stiff systems. I would recommend interested readers to this nice blog article where this effect is discussed thoroughly for a <a class="reference external" href="https://mirams.wordpress.com/2018/10/17/ode-errors-and-optimisation/">cardiac ODE model</a>. There is also an emerging area of uncertainty quantification that attacks the problem of noise arisng from impreciseness of numerical algorithms, <a class="reference external" href="http://probabilistic-numerics.org/">probabilistic
+numerics</a>. This is indeed an elegant framework to carry out inference while taking into account the errors coming from the numeric ODE solvers.</p>
+</div>
+<div class="section" id="Custom-ODE-Op">
+<h2>Custom ODE Op<a class="headerlink" href="#Custom-ODE-Op" title="Permalink to this headline">¶</a></h2>
+<p>In order to define the custom <code class="docutils literal notranslate"><span class="pre">Op</span></code> I have written down two <code class="docutils literal notranslate"><span class="pre">theano.Op</span></code> classes <code class="docutils literal notranslate"><span class="pre">ODEGradop</span></code>, <code class="docutils literal notranslate"><span class="pre">ODEop</span></code>. <code class="docutils literal notranslate"><span class="pre">ODEop</span></code> essentially wraps the ODE solution and will be called by PyMC3. The <code class="docutils literal notranslate"><span class="pre">ODEGradop</span></code> wraps the numerical VSP and this op is then in turn used inside the <code class="docutils literal notranslate"><span class="pre">grad</span></code> method in the <code class="docutils literal notranslate"><span class="pre">ODEop</span></code> to return the VSP. Note that we pass in two functions: <code class="docutils literal notranslate"><span class="pre">state</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy_vsp</span></code> as arguments to respective Ops. I will define these functions later. These functions act as shims using which we
+connect the python code for numerical solution of sate and VSP to Theano and thus PyMC3.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">ODEGradop</span><span class="p">(</span><span class="n">theano</span><span class="o">.</span><span class="n">Op</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numpy_vsp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_vsp</span> <span class="o">=</span> <span class="n">numpy_vsp</span>
+
+    <span class="k">def</span> <span class="nf">make_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">Apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">],</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">type</span><span class="p">()])</span>
+        <span class="k">return</span> <span class="n">node</span>
+
+    <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">inputs_storage</span><span class="p">,</span> <span class="n">output_storage</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">inputs_storage</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="n">inputs_storage</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">output_storage</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_vsp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>  <span class="c1"># get the numerical VSP</span>
+
+
+<span class="k">class</span> <span class="nc">ODEop</span><span class="p">(</span><span class="n">theano</span><span class="o">.</span><span class="n">Op</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">numpy_vsp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_vsp</span> <span class="o">=</span> <span class="n">numpy_vsp</span>
+
+    <span class="k">def</span> <span class="nf">make_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">theano</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">as_tensor_variable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">theano</span><span class="o">.</span><span class="n">Apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="p">()])</span>
+
+    <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">inputs_storage</span><span class="p">,</span> <span class="n">output_storage</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">inputs_storage</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">output_storage</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># get the numerical solution of ODE states</span>
+
+    <span class="k">def</span> <span class="nf">grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">output_grads</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">output_grads</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">grad_op</span> <span class="o">=</span> <span class="n">ODEGradop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numpy_vsp</span><span class="p">)</span>  <span class="c1"># pass the VSP when asked for gradient</span>
+        <span class="n">grad_op_apply</span> <span class="o">=</span> <span class="n">grad_op</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">grad_op_apply</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>I must point out that the way I have defined the custom ODE Ops above there is the possibility that the ODE is solved twice for the same parameter values, once for the states and another time for the VSP. To avoid this behaviour I have written a helper class which stops this double evaluation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">solveCached</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">n_params</span><span class="p">,</span> <span class="n">n_outputs</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_times</span> <span class="o">=</span> <span class="n">times</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_params</span> <span class="o">=</span> <span class="n">n_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_outputs</span> <span class="o">=</span> <span class="n">n_outputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cachedParam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cachedSens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">),</span> <span class="n">n_outputs</span><span class="p">,</span> <span class="n">n_params</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cachedState</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">),</span> <span class="n">n_outputs</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cachedParam</span><span class="p">):</span>
+            <span class="n">state</span><span class="p">,</span> <span class="n">sens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cachedState</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cachedSens</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">state</span><span class="p">,</span> <span class="n">sens</span> <span class="o">=</span> <span class="n">ode_model</span><span class="o">.</span><span class="n">simulate_with_sensitivities</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">times</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">state</span><span class="p">,</span> <span class="n">sens</span>
+
+
+<span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>  <span class="c1"># number of measurement points (see below)</span>
+<span class="n">cached_solver</span> <span class="o">=</span> <span class="n">solveCached</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">n_odeparams</span> <span class="o">+</span> <span class="n">n_ivs</span><span class="p">,</span> <span class="n">n_states</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="The-ODE-state-&amp;-VSP-evaluation">
+<h3>The ODE state &amp; VSP evaluation<a class="headerlink" href="#The-ODE-state-&-VSP-evaluation" title="Permalink to this headline">¶</a></h3>
+<p>Most ODE systems of practical interest will have multiple states and thus the output of the solver, which I have denoted so far as <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span>, for a system with <span class="math notranslate nohighlight">\(K\)</span> states solved on <span class="math notranslate nohighlight">\(T\)</span> time points, would be a <span class="math notranslate nohighlight">\(T \times K\)</span>-dimensional matrix. For the Lotka-Volterra model the columns of this matrix represent the time evolution of the individual species concentrations. I flatten this matrix to a <span class="math notranslate nohighlight">\(TK\)</span>-dimensional vector <span class="math notranslate nohighlight">\(vec(\boldsymbol{X})\)</span>, and also
+rearrange the sensitivities accordingly to obtain the desired vector-matrix product. It is beneficial at this point to test the custom Op as described <a class="reference external" href="http://deeplearning.net/software/theano_versions/dev/extending/extending_theano.html#how-to-test-it">here</a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">State</span><span class="p">,</span> <span class="n">Sens</span> <span class="o">=</span> <span class="n">cached_solver</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+    <span class="n">cached_solver</span><span class="o">.</span><span class="n">_cachedState</span><span class="p">,</span> <span class="n">cached_solver</span><span class="o">.</span><span class="n">_cachedSens</span><span class="p">,</span> <span class="n">cached_solver</span><span class="o">.</span><span class="n">_cachedParam</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">State</span><span class="p">,</span>
+        <span class="n">Sens</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">State</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">State</span><span class="p">),))</span>
+
+
+<span class="k">def</span> <span class="nf">numpy_vsp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="n">numpy_sens</span> <span class="o">=</span> <span class="n">cached_solver</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">n_states</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">numpy_sens</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="The-Hudson’s-Bay-Company-data">
+<h2>The Hudson’s Bay Company data<a class="headerlink" href="#The-Hudson’s-Bay-Company-data" title="Permalink to this headline">¶</a></h2>
+<p>The Lotka-Volterra predator prey model has been used previously to successfully explain the dynamics of natural populations of predators and prey, such as the lynx and snowshoe hare data of the Hudson’s Bay Company. This is the same data (that was shared <a class="reference external" href="https://github.com/stan-dev/example-models/tree/master/knitr/lotka-volterra">here</a>) used in the Stan example and thus I will use this data-set as the experimental observations <span class="math notranslate nohighlight">\(\boldsymbol{Y}(t)\)</span> to infer the parameters.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Year</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1900</span><span class="p">,</span> <span class="mi">1921</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="c1"># fmt: off</span>
+<span class="n">Lynx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">6.1</span><span class="p">,</span> <span class="mf">9.8</span><span class="p">,</span> <span class="mf">35.2</span><span class="p">,</span> <span class="mf">59.4</span><span class="p">,</span> <span class="mf">41.7</span><span class="p">,</span> <span class="mf">19.0</span><span class="p">,</span> <span class="mf">13.0</span><span class="p">,</span> <span class="mf">8.3</span><span class="p">,</span> <span class="mf">9.1</span><span class="p">,</span> <span class="mf">7.4</span><span class="p">,</span>
+                <span class="mf">8.0</span><span class="p">,</span> <span class="mf">12.3</span><span class="p">,</span> <span class="mf">19.5</span><span class="p">,</span> <span class="mf">45.7</span><span class="p">,</span> <span class="mf">51.1</span><span class="p">,</span> <span class="mf">29.7</span><span class="p">,</span> <span class="mf">15.8</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">,</span> <span class="mf">10.1</span><span class="p">,</span> <span class="mf">8.6</span><span class="p">])</span>
+<span class="n">Hare</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">47.2</span><span class="p">,</span> <span class="mf">70.2</span><span class="p">,</span> <span class="mf">77.4</span><span class="p">,</span> <span class="mf">36.3</span><span class="p">,</span> <span class="mf">20.6</span><span class="p">,</span> <span class="mf">18.1</span><span class="p">,</span> <span class="mf">21.4</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">,</span> <span class="mf">25.4</span><span class="p">,</span>
+                 <span class="mf">27.1</span><span class="p">,</span> <span class="mf">40.3</span><span class="p">,</span> <span class="mf">57.0</span><span class="p">,</span> <span class="mf">76.6</span><span class="p">,</span> <span class="mf">52.3</span><span class="p">,</span> <span class="mf">19.5</span><span class="p">,</span> <span class="mf">11.2</span><span class="p">,</span> <span class="mf">7.6</span><span class="p">,</span> <span class="mf">14.6</span><span class="p">,</span> <span class="mf">16.2</span><span class="p">,</span> <span class="mf">24.7</span><span class="p">])</span>
+<span class="c1"># fmt: on</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">Lynx</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Lynx&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">Hare</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Hare&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">1900</span><span class="p">,</span> <span class="mi">1920</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Concentrations&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Lynx (predator) - Hare (prey): oscillatory dynamics&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_ODE_with_manual_gradients_15_0.png" src="../_images/notebooks_ODE_with_manual_gradients_15_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="The-probablistic-model">
+<h2>The probablistic model<a class="headerlink" href="#The-probablistic-model" title="Permalink to this headline">¶</a></h2>
+<p>I have now got all the ingredients needed in order to define the probabilistic model in PyMC3. As I have mentioned previously I will set up the probabilistic model with the exact same likelihood and priors used in the Stan example. The observed data is defined as follows:</p>
+<div class="math notranslate nohighlight">
+\[\log (\boldsymbol{Y(t)}) = \log (\boldsymbol{X(t)}) + \eta(t),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\eta(t)\)</span> is assumed to be zero mean i.i.d Gaussian noise with an unknown standard deviation <span class="math notranslate nohighlight">\(\sigma\)</span>, that needs to be estimated. The above multiplicative (on the natural scale) noise model encodes a lognormal distribution as the likelihood:</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{Y(t)} \sim \mathcal{L}\mathcal{N}(\log (\boldsymbol{X(t)}), \sigma^2).\]</div>
+<p>The following priors are then placed on the parameters:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+x(0), y(0) &amp;\sim  \mathcal{L}\mathcal{N}(\log(10),1),\\
+\alpha, \gamma &amp;\sim \mathcal{N}(1,0.5),\\
+\beta, \delta &amp;\sim \mathcal{N}(0.05,0.05),\\
+\sigma &amp;\sim \mathcal{L}\mathcal{N}(-1,1).
+\end{aligned}\end{split}\]</div>
+<p>For an intuitive explanation, which I am omitting for brevity, regarding the choice of priors as well as the likelihood model, I would recommend the Stan example mentioned above. The above probabilistic model is defined in PyMC3 below. Note that the flattened state vector is reshaped to match the data dimensionality.</p>
+<p>Finally, I use the <code class="docutils literal notranslate"><span class="pre">pm.sample</span></code> method to run NUTS by default and obtain <span class="math notranslate nohighlight">\(1500\)</span> post warm-up samples from the posterior.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">theano</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">exception_verbosity</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span>
+<span class="n">theano</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">floatX</span> <span class="o">=</span> <span class="s2">&quot;float64&quot;</span>
+
+
+<span class="c1"># Define the data matrix</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">Hare</span><span class="p">,</span> <span class="n">Lynx</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+<span class="c1"># Now instantiate the theano custom ODE op</span>
+<span class="n">my_ODEop</span> <span class="o">=</span> <span class="n">ODEop</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">numpy_vsp</span><span class="p">)</span>
+
+<span class="c1"># The probabilistic model</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">LV_model</span><span class="p">:</span>
+
+    <span class="c1"># Priors for unknown model parameters</span>
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;gamma&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+
+    <span class="n">xt0</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Lognormal</span><span class="p">(</span><span class="s2">&quot;xto&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">sd</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">yt0</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Lognormal</span><span class="p">(</span><span class="s2">&quot;yto&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">sd</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Lognormal</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Forward model</span>
+    <span class="n">all_params</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">xt0</span><span class="p">,</span> <span class="n">yt0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ode_sol</span> <span class="o">=</span> <span class="n">my_ODEop</span><span class="p">(</span><span class="n">all_params</span><span class="p">)</span>
+    <span class="n">forward</span> <span class="o">=</span> <span class="n">ode_sol</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># Likelihood</span>
+    <span class="n">Y_obs</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Lognormal</span><span class="p">(</span><span class="s2">&quot;Y_obs&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">forward</span><span class="p">),</span> <span class="n">sd</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">Y</span><span class="p">)</span>
+
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1500</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;adapt_diag&quot;</span><span class="p">)</span>
+<span class="n">trace</span><span class="p">[</span><span class="s2">&quot;diverging&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Auto-assigning NUTS sampler...
+Initializing NUTS using adapt_diag...
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [sigma, yto, xto, delta, gamma, beta, alpha]
+Sampling 2 chains, 0 divergences:   2%|▏         | 94/5000 [01:02&lt;59:45,  1.37draws/s]  /Users/demetri/anaconda3/envs/gsoc/lib/python3.6/site-packages/scipy/integrate/odepack.py:247: ODEintWarning: Excess work done on this call (perhaps wrong Dfun type). Run with full_output = 1 to get quantitative information.
+  warnings.warn(warning_msg, ODEintWarning)
+Sampling 2 chains, 0 divergences:   2%|▏         | 108/5000 [01:09&lt;54:44,  1.49draws/s]  /Users/demetri/anaconda3/envs/gsoc/lib/python3.6/site-packages/scipy/integrate/odepack.py:247: ODEintWarning: Excess work done on this call (perhaps wrong Dfun type). Run with full_output = 1 to get quantitative information.
+  warnings.warn(warning_msg, ODEintWarning)
+Sampling 2 chains, 0 divergences: 100%|██████████| 5000/5000 [12:57&lt;00:00,  4.16draws/s]
+The acceptance probability does not match the target. It is 0.6992852935132228, but should be close to 0.8. Try to increase the number of tuning steps.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">LV_model</span><span class="p">:</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_ODE_with_manual_gradients_18_0.png" src="../_images/notebooks_ODE_with_manual_gradients_18_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">summary</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+<span class="n">STAN_mus</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.549</span><span class="p">,</span> <span class="mf">0.028</span><span class="p">,</span> <span class="mf">0.797</span><span class="p">,</span> <span class="mf">0.024</span><span class="p">,</span> <span class="mf">33.960</span><span class="p">,</span> <span class="mf">5.949</span><span class="p">,</span> <span class="mf">0.248</span><span class="p">,</span> <span class="mf">0.252</span><span class="p">]</span>
+<span class="n">STAN_sds</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.065</span><span class="p">,</span> <span class="mf">0.004</span><span class="p">,</span> <span class="mf">0.091</span><span class="p">,</span> <span class="mf">0.004</span><span class="p">,</span> <span class="mf">2.909</span><span class="p">,</span> <span class="mf">0.533</span><span class="p">,</span> <span class="mf">0.045</span><span class="p">,</span> <span class="mf">0.044</span><span class="p">]</span>
+<span class="n">summary</span><span class="p">[</span><span class="s2">&quot;STAN_mus&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">STAN_mus</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">summary</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">summary</span><span class="p">[</span><span class="s2">&quot;STAN_sds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">STAN_sds</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">summary</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">summary</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/demetri/Documents/GitHub/pymc3/pymc3/stats.py:991: FutureWarning: The join_axes-keyword is deprecated. Use .reindex or .reindex_like on the result to achieve the same functionality.
+  axis=1, join_axes=[dforg.index])
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>mc_error</th>
+      <th>hpd_2.5</th>
+      <th>hpd_97.5</th>
+      <th>n_eff</th>
+      <th>Rhat</th>
+      <th>STAN_mus</th>
+      <th>STAN_sds</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>alpha</th>
+      <td>0.547585</td>
+      <td>0.063396</td>
+      <td>0.001855</td>
+      <td>0.424077</td>
+      <td>0.667619</td>
+      <td>1129.131061</td>
+      <td>0.999675</td>
+      <td>0.549</td>
+      <td>0.065</td>
+    </tr>
+    <tr>
+      <th>beta</th>
+      <td>0.027791</td>
+      <td>0.004173</td>
+      <td>0.000120</td>
+      <td>0.019770</td>
+      <td>0.035841</td>
+      <td>1234.460403</td>
+      <td>0.999681</td>
+      <td>0.028</td>
+      <td>0.004</td>
+    </tr>
+    <tr>
+      <th>gamma</th>
+      <td>0.799312</td>
+      <td>0.089968</td>
+      <td>0.002709</td>
+      <td>0.631930</td>
+      <td>0.979657</td>
+      <td>1058.220941</td>
+      <td>0.999788</td>
+      <td>0.797</td>
+      <td>0.091</td>
+    </tr>
+    <tr>
+      <th>delta</th>
+      <td>0.024073</td>
+      <td>0.003527</td>
+      <td>0.000106</td>
+      <td>0.017160</td>
+      <td>0.030609</td>
+      <td>1082.070068</td>
+      <td>0.999801</td>
+      <td>0.024</td>
+      <td>0.004</td>
+    </tr>
+    <tr>
+      <th>xto</th>
+      <td>34.013033</td>
+      <td>2.991276</td>
+      <td>0.061384</td>
+      <td>28.734277</td>
+      <td>40.500802</td>
+      <td>2040.864990</td>
+      <td>0.999835</td>
+      <td>33.960</td>
+      <td>2.909</td>
+    </tr>
+    <tr>
+      <th>yto</th>
+      <td>5.940363</td>
+      <td>0.540310</td>
+      <td>0.011514</td>
+      <td>4.895678</td>
+      <td>7.009835</td>
+      <td>1802.717906</td>
+      <td>1.001373</td>
+      <td>5.949</td>
+      <td>0.533</td>
+    </tr>
+    <tr>
+      <th>sigma__0</th>
+      <td>0.248527</td>
+      <td>0.044718</td>
+      <td>0.001088</td>
+      <td>0.174826</td>
+      <td>0.338598</td>
+      <td>1567.059938</td>
+      <td>0.999854</td>
+      <td>0.248</td>
+      <td>0.045</td>
+    </tr>
+    <tr>
+      <th>sigma__1</th>
+      <td>0.251432</td>
+      <td>0.042835</td>
+      <td>0.000853</td>
+      <td>0.174449</td>
+      <td>0.335463</td>
+      <td>2130.267462</td>
+      <td>1.000443</td>
+      <td>0.252</td>
+      <td>0.044</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>These estimates are almost identical to those obtained in the Stan tutorial (see the last two columns above), which is what we can expect. Posterior predictives can be drawn as below.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ppc_samples</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_posterior_predictive</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">LV_model</span><span class="p">)[</span><span class="s2">&quot;Y_obs&quot;</span><span class="p">]</span>
+<span class="n">mean_ppc</span> <span class="o">=</span> <span class="n">ppc_samples</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">CriL_ppc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">ppc_samples</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">CriU_ppc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">ppc_samples</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mf">97.5</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/demetri/Documents/GitHub/pymc3/pymc3/sampling.py:1078: UserWarning: samples parameter is smaller than nchains times ndraws, some draws and/or chains may not be represented in the returned posterior predictive sample
+  warnings.warn(&#34;samples parameter is smaller than nchains times ndraws, some draws &#34;
+100%|██████████| 1000/1000 [00:10&lt;00:00, 98.26it/s]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">5</span><span class="p">)))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">Lynx</span><span class="p">,</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mf">10.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">mean_ppc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">CriL_ppc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">CriU_ppc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">1900</span><span class="p">,</span> <span class="mi">1920</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Lynx conc&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">Hare</span><span class="p">,</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Observed&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">mean_ppc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;mean of ppc&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">CriL_ppc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;credible intervals&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">CriU_ppc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">1900</span><span class="p">,</span> <span class="mi">1920</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Hare conc&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_ODE_with_manual_gradients_22_0.png" src="../_images/notebooks_ODE_with_manual_gradients_22_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Efficient-exploration-of-the-posterior-landscape-with-SMC">
+<h1>Efficient exploration of the posterior landscape with SMC<a class="headerlink" href="#Efficient-exploration-of-the-posterior-landscape-with-SMC" title="Permalink to this headline">¶</a></h1>
+<p>It has been pointed out in several papers that the complex non-linear dynamics of an ODE results in a posterior landscape that is extremely difficult to navigate efficiently by many MCMC samplers. Thus, recently the curvature information of the posterior surface has been used to construct powerful geometrically aware samplers (<a class="reference external" href="https://rss.onlinelibrary.wiley.com/doi/epdf/10.1111/j.1467-9868.2010.00765.x">Mark Girolami and Ben Calderhead, 2011</a>) that perform extremely well in ODE inference
+problems. Another set of ideas suggest breaking down a complex inference task into a sequence of simpler tasks. In essence the idea is to use sequential-importance-sampling to sample from an artificial sequence of increasingly complex distributions where the first in the sequence is a distribution that is easy to sample from, the prior, and the last in the sequence is the actual complex target distribution. The associated importance distribution is constructed by moving the set of particles
+sampled at the previous step using a Markov kernel, say for example the MH kernel.</p>
+<p>A simple way of building the sequence of distributions is to use a temperature <span class="math notranslate nohighlight">\(\beta\)</span>, that is raised slowly from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(1\)</span>. Using this temperature variable <span class="math notranslate nohighlight">\(\beta\)</span> we can write down the annealed intermediate distribution as</p>
+<div class="math notranslate nohighlight">
+\[p_{\beta}(\boldsymbol{\theta}|\boldsymbol{y})\propto p(\boldsymbol{y}|\boldsymbol{\theta})^{\beta} p(\boldsymbol{\theta}).\]</div>
+<p>Samplers that carry out sequential-importance-sampling from these artificial sequence of distributions, to avoid the difficult task of sampling directly from <span class="math notranslate nohighlight">\(p(\boldsymbol{\theta}|\boldsymbol{y})\)</span>, are known as Sequential Monte Carlo (SMC) samplers (<a class="reference external" href="https://rss.onlinelibrary.wiley.com/doi/full/10.1111/j.1467-9868.2006.00553.x">P Del Moral et al., 2006</a>). The performance of these samplers are sensitive to the choice of the temperature schedule, that is the set of user-defined
+increasing values of <span class="math notranslate nohighlight">\(\beta\)</span> between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>. Fortunately, PyMC3 provides a version of the SMC sampler (<a class="reference external" href="https://ascelibrary.org/doi/10.1061/%28ASCE%290733-9399%282007%29133%3A7%28816%29">Jianye Ching and Yi-Chu Chen, 2007</a>) that automatically figures out this temperature schedule. Moreover, the PyMC3’s SMC sampler does not require the gradient of the log target density. As a result it is extremely easy to use this sampler for inference in ODE models. In the next example
+I will apply this SMC sampler to estimate the parameters of the Fitzhugh-Nagumo model.</p>
+<div class="section" id="The-Fitzhugh-Nagumo-model">
+<h2>The Fitzhugh-Nagumo model<a class="headerlink" href="#The-Fitzhugh-Nagumo-model" title="Permalink to this headline">¶</a></h2>
+<p>The Fitzhugh-Nagumo model given by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{dV}{dt}&amp;=(V - \frac{V^3}{3} + R)c\\
+\frac{dR}{dt}&amp;=\frac{-(V-a+bR)}{c},
+\end{aligned}\end{split}\]</div>
+<p>consisting of a membrane voltage variable <span class="math notranslate nohighlight">\(V(t)\)</span> and a recovery variable <span class="math notranslate nohighlight">\(R(t)\)</span> is a two-dimensional simplification of the <a class="reference external" href="http://www.scholarpedia.org/article/Conductance-based_models">Hodgkin-Huxley</a> model of spike (action potential) generation in squid giant axons and where <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span>, <span class="math notranslate nohighlight">\(c\)</span> are the model parameters. This model produces a rich dynamics and as a result a complex geometry of the posterior surface that often leads to poor performance of many MCMC
+samplers. As a result this model was used to test the efficacy of the discussed geometric MCMC scheme and since then has been used to benchmark other novel MCMC methods. Following <a class="reference external" href="https://rss.onlinelibrary.wiley.com/doi/epdf/10.1111/j.1467-9868.2010.00765.x">Mark Girolami and Ben Calderhead, 2011</a> I will also use artificially generated data from this model to setup the inference task for estimating <span class="math notranslate nohighlight">\(\boldsymbol{\theta}=(a,b,c)\)</span>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">FitzhughNagumoModel</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_times</span> <span class="o">=</span> <span class="n">times</span>
+
+    <span class="k">def</span> <span class="nf">_simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">rhs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">V</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="n">dV_dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">V</span> <span class="o">-</span> <span class="n">V</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">R</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span>
+            <span class="n">dR_dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">V</span> <span class="o">-</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span> <span class="o">/</span> <span class="o">-</span><span class="n">c</span>
+            <span class="k">return</span> <span class="n">dV_dt</span><span class="p">,</span> <span class="n">dR_dt</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y0</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="p">(</span><span class="n">parameters</span><span class="p">,),</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">values</span>
+
+    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_times</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Simulated-Data">
+<h2>Simulated Data<a class="headerlink" href="#Simulated-Data" title="Permalink to this headline">¶</a></h2>
+<p>For this example I am going to use simulated data that is I will generate noisy traces from the forward model defined above with parameters <span class="math notranslate nohighlight">\(\theta\)</span> set to <span class="math notranslate nohighlight">\((0.2,0.2,3)\)</span> respectively and corrupted by i.i.d Gaussian noise with a standard deviation <span class="math notranslate nohighlight">\(\sigma=0.5\)</span>. The initial values are set to <span class="math notranslate nohighlight">\(V(0)=-1\)</span> and <span class="math notranslate nohighlight">\(R(0)=1\)</span> respectively. Again following <a class="reference external" href="https://rss.onlinelibrary.wiley.com/doi/epdf/10.1111/j.1467-9868.2010.00765.x">Mark Girolami and Ben Calderhead, 2011</a> I
+will assume that the initial values are known. These parameter values pushes the model into the oscillatory regime.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">n_states</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">n_times</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">true_params</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]</span>
+<span class="n">noise_sigma</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">FN_solver_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">n_times</span><span class="p">)</span>
+<span class="n">ode_model</span> <span class="o">=</span> <span class="n">FitzhughNagumoModel</span><span class="p">(</span><span class="n">FN_solver_times</span><span class="p">)</span>
+<span class="n">sim_data</span> <span class="o">=</span> <span class="n">ode_model</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">true_params</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">Y_sim</span> <span class="o">=</span> <span class="n">sim_data</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_times</span><span class="p">,</span> <span class="n">n_states</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise_sigma</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">FN_solver_times</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;darkblue&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$V(t)$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">FN_solver_times</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;darkgreen&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$R(t)$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">FN_solver_times</span><span class="p">,</span> <span class="n">Y_sim</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;darkblue&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mf">4.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Noisy traces&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">FN_solver_times</span><span class="p">,</span> <span class="n">Y_sim</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;darkgreen&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mf">4.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Values&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Fitzhugh-Nagumo Action Potential Model&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_ODE_with_manual_gradients_27_0.png" src="../_images/notebooks_ODE_with_manual_gradients_27_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Define-a-non-differentiable-black-box-op-using-Theano-&#64;as_op">
+<h2>Define a non-differentiable black-box op using Theano &#64;as_op<a class="headerlink" href="#Define-a-non-differentiable-black-box-op-using-Theano-@as_op" title="Permalink to this headline">¶</a></h2>
+<p>Remember that I told SMC sampler does not require gradients, this is by the way the case for other samplers such as the Metropolis-Hastings, Slice sampler that are also supported in PyMC3. For all these gradient-free samplers I will show a simple and quick way of wrapping the forward model i.e. the ODE solution in Theano. All we have to do is to simply to use the decorator <code class="docutils literal notranslate"><span class="pre">as_op</span></code> that converts a python function into a basic Theano Op. We also tell Theano using the <code class="docutils literal notranslate"><span class="pre">as_op</span></code> decorator that we
+have three parameters each being a Theano scalar. The output then is a Theano matrix whose columns are the state vectors.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">theano.tensor</span> <span class="k">as</span> <span class="nn">tt</span>
+
+<span class="kn">from</span> <span class="nn">theano.compile.ops</span> <span class="kn">import</span> <span class="n">as_op</span>
+
+
+<span class="nd">@as_op</span><span class="p">(</span><span class="n">itypes</span><span class="o">=</span><span class="p">[</span><span class="n">tt</span><span class="o">.</span><span class="n">dscalar</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">dscalar</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">dscalar</span><span class="p">],</span> <span class="n">otypes</span><span class="o">=</span><span class="p">[</span><span class="n">tt</span><span class="o">.</span><span class="n">dmatrix</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">th_forward_model</span><span class="p">(</span><span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">,</span> <span class="n">param3</span><span class="p">):</span>
+
+    <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">,</span> <span class="n">param3</span><span class="p">]</span>
+    <span class="n">th_states</span> <span class="o">=</span> <span class="n">ode_model</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">th_states</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Generative-model">
+<h2>Generative model<a class="headerlink" href="#Generative-model" title="Permalink to this headline">¶</a></h2>
+<p>Since I have corrupted the original traces with i.i.d Gaussian thus the likelihood is given by</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{Y} = \prod_{i=1}^T \mathcal{N}(\boldsymbol{X}(t_i)), \sigma^2\mathbb{I}),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbb{I}\in \mathbb{R}^{K \times K}\)</span>. We place a Gamma, Normal, Uniform prior on <span class="math notranslate nohighlight">\((a,b,c)\)</span> and a HalfNormal prior on <span class="math notranslate nohighlight">\(\sigma\)</span> as follows:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+    a &amp; \sim \mathcal{Gamma}(2,1),\\
+    b &amp; \sim \mathcal{N}(0,1),\\
+    c &amp; \sim \mathcal{U}(0.1,1),\\
+    \sigma &amp; \sim \mathcal{H}(1).
+\end{aligned}\end{split}\]</div>
+<p>Notice how I have used the <code class="docutils literal notranslate"><span class="pre">start</span></code> argument for this example. Just like <code class="docutils literal notranslate"><span class="pre">pm.sample</span></code> <code class="docutils literal notranslate"><span class="pre">pm.sample_smc</span></code> has a number of settings, but I found the default ones good enough for simple models such as this one.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">draws</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">FN_model</span><span class="p">:</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">forward</span> <span class="o">=</span> <span class="n">th_forward_model</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span>
+
+    <span class="n">Y_obs</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">MvNormal</span><span class="p">(</span><span class="s2">&quot;Y_obs&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">forward</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">Y_sim</span><span class="p">)</span>
+
+    <span class="n">startsmc</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">draws</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">FN_model</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">}</span>
+
+    <span class="n">trace_FN</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_smc</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">startsmc</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Sample initial stage: ...
+Stage: 0 Beta: 0.009 Steps: 25
+Stage: 1 Beta: 0.015 Steps: 8
+Stage: 2 Beta: 0.020 Steps: 4
+Stage: 3 Beta: 0.030 Steps: 13
+Stage: 4 Beta: 0.049 Steps: 3
+Stage: 5 Beta: 0.089 Steps: 10
+Stage: 6 Beta: 0.178 Steps: 3
+Stage: 7 Beta: 0.368 Steps: 8
+Stage: 8 Beta: 0.782 Steps: 3
+Stage: 9 Beta: 1.000 Steps: 7
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pm</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">trace_FN</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;hist&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;seagreen&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Inference-summary">
+<h2>Inference summary<a class="headerlink" href="#Inference-summary" title="Permalink to this headline">¶</a></h2>
+<p>With <code class="docutils literal notranslate"><span class="pre">pm.SMC</span></code>, do I get similar performance to geometric MCMC samplers (see <a class="reference external" href="https://rss.onlinelibrary.wiley.com/doi/epdf/10.1111/j.1467-9868.2010.00765.x">Mark Girolami and Ben Calderhead, 2011</a>)? I think so !</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">trace_FN</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]),</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">trace_FN</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]),</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">trace_FN</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]),</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">trace_FN</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;sigma&quot;</span><span class="p">]),</span>
+<span class="p">]</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">true_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">noise_sigma</span><span class="p">)</span>
+<span class="n">results</span><span class="p">[</span><span class="s2">&quot;True values&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">true_params</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">results</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">true_params</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<span class="n">results</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Reconstruction-of-the-phase-portrait">
+<h2>Reconstruction of the phase portrait<a class="headerlink" href="#Reconstruction-of-the-phase-portrait" title="Permalink to this headline">¶</a></h2>
+<p>Its good to check that we can reconstruct the (famous) pahse portrait for this model based on the obtained samples.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">trace_FN</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">),</span> <span class="n">trace_FN</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">),</span> <span class="n">trace_FN</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
+<span class="n">params</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">new_values</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)):</span>
+    <span class="n">ppc_sol</span> <span class="o">=</span> <span class="n">ode_model</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
+    <span class="n">new_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ppc_sol</span><span class="p">)</span>
+<span class="n">new_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_values</span><span class="p">)</span>
+<span class="n">mean_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">new_values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">mean_values</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="n">mean_values</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+    <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Inferred (mean of sampled) phase portrait&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">sim_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sim_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#ff7f0e&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;True phase portrait&quot;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$V(t)$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$R(t)$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Perspectives">
+<h1>Perspectives<a class="headerlink" href="#Perspectives" title="Permalink to this headline">¶</a></h1>
+<p>I have tried to keep everything as general as possible. So, my custom ODE Op, the state and VSP evaluator as well as the cached solver are not tied to a specific ODE model. Thus, to use any other ODE model one only needs to implement a <code class="docutils literal notranslate"><span class="pre">simulate_with_sensitivities</span></code> method according to their own specific ODE model.</p>
+<p>I hope the two examples have elucidated the applicability of PyMC3 in regards to fitting ODE models. Although ODEs are the most fundamental constituent of a mathematical model, there are indeed other forms of dynamical systems such as a delay differential equation (DDE), a differential algebraic equation (DAE) and the partial differential equation (PDE) whose parameter estimation is equally important. The SMC and for that matter any other non-gradient sampler supported by PyMC3 can be used to
+fit all these forms of differential equation, of course using the <code class="docutils literal notranslate"><span class="pre">as_op</span></code>. However, just like an ODE we can solve augmented systems of DDE/DAE along with their sensitivity equations. The sensitivity equations for a DDE and a DAE can be found in this recent paper, <a class="reference external" href="https://arxiv.org/abs/1812.01892">C Rackauckas et al., 2018</a> (Equation 9 and 10). Thus we can easily apply NUTS sampler to these models.</p>
+<p>Well there are many problems where I believe SMC sampler would be more suitable than NUTS and thus its good to have that option.</p>
+<p>Most ODE inference literature since <a class="reference external" href="https://academic.oup.com/bioinformatics/article/24/6/833/192524">Vladislav Vyshemirsky and Mark Girolami, 2008</a> recommend the usage of Bayes factor for the purpose of model selection/comparison. This involves the calculation of the marginal likelihood which is a much more nuanced topic and I would refrain from any discussion about that. Fortunately, the SMC sampler calculates the marginal likelihood as a by product so this can be used for obtaining Bayes
+factors. Follow PyMC3’s other tutorials for further information regarding how to obtain the marginal likelihood after running the SMC sampler.</p>
+<p>Since we generally frame the ODE inference as a regression problem (along with the i.i.d measurement noise assumption in most cases) we can straight away use any of the supported information criterion, such as the widely available information criterion (WAIC), irrespective of what sampler is used for inference. See the PyMC3’s API for further information regarding WAIC.</p>
+<p>Although this is a slight digression nonetheless I would still like to point out my observations on this issue. The approach that I have presented here for embedding an ODE (also extends to DDE/DAE) as a custom Op can be trivially carried forward to other AD packages such as TensorFlow and PyTorch. I had been able to use TensorFlow’s <a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/py_func">py_func</a> to build a custom TensorFlow ODE Op and then use that in the <a class="reference external" href="http://edwardlib.org/">Edward</a>
+ppl. I would recommend <a class="reference external" href="https://pytorch.org/tutorials/advanced/numpy_extensions_tutorial.html">this</a> tutorial, for writing PyTorch extensions, to those who are interested in using the <a class="reference external" href="http://pyro.ai/">Pyro</a> ppl.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> watermark
+<span class="o">%</span><span class="k">watermark</span> -n -u -v -iv -w
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pymc3   3.8
+arviz   0.7.0
+pandas  0.25.3
+seaborn 0.9.0
+numpy   1.17.5
+last updated: Wed Apr 22 2020
+
+CPython 3.8.0
+IPython 7.11.0
+watermark 2.0.2
+</pre></div></div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>

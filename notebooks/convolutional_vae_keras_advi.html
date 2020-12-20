@@ -1,0 +1,946 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Convolutional variational autoencoder with PyMC3 and Keras &#8212; PyMC3 3.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/semantic-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script src="../_static/highlight.min.js"></script>
+    <script src="../_static/semantic.min.js"></script>
+    <link rel="shortcut icon" href="../_static/PyMC3.ico"/>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-176578023-1']);
+  _gaq.push(['_trackPageview']);
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+
+  </head><body>
+<div class="ui vertical center aligned">
+
+    <div class="ui container">
+        <div class="ui large secondary pointing menu">
+            <a class="item" href="/">
+                <img class="ui bottom aligned tiny image" src="https://cdn.rawgit.com/pymc-devs/pymc3/master/docs/logos/svg/PyMC3_banner.svg" />
+            </a>
+             <a href="../nb_tutorials/index.html" class="item">Tutorials</a> <a href="../nb_examples/index.html" class="item">Examples</a> <a href="../learn.html" class="item">Books + Videos</a> <a href="../api.html" class="item">API</a> <a href="../developer_guide.html" class="item">Developer Guide</a> <a href="../about.html" class="item">About PyMC3</a>
+            
+            <div class="right menu">
+                <div class="item">
+                    <form class="ui icon input" action="../search.html" method="get">
+                        <input type="text" placeholder="Search..." name="q" />
+                        <i class="search link icon"></i>
+                    </form>
+                </div>
+                <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="ui container" role="main">
+    
+
+    <div class="ui vertical segment">
+        
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Convolutional-variational-autoencoder-with-PyMC3-and-Keras">
+<h1>Convolutional variational autoencoder with PyMC3 and Keras<a class="headerlink" href="#Convolutional-variational-autoencoder-with-PyMC3-and-Keras" title="Permalink to this headline">¶</a></h1>
+<p>In this document, I will show how autoencoding variational Bayes (AEVB) works in PyMC3’s automatic differentiation variational inference (ADVI). The example here is borrowed from <a class="reference external" href="https://github.com/fchollet/keras/blob/master/examples/variational_autoencoder_deconv.py">Keras example</a>, where convolutional variational autoencoder is applied to the MNIST dataset. The network architecture of the encoder and decoder are the same. However, PyMC3 allows us to define a probabilistic model, which
+combines the encoder and decoder, in the same way as other probabilistic models (e.g., generalized linear models), rather than directly implementing of Monte Carlo sampling and the loss function, as is done in the Keras example. Thus the framework of AEVB in PyMC3 can be extended to more complex models such as <a class="reference external" href="https://taku-y.github.io/notebook/20160928/lda-advi-ae.html">latent dirichlet allocation</a>.</p>
+<ul class="simple">
+<li><p>Notebook Written by Taku Yoshioka (c) 2016</p></li>
+</ul>
+<p>To use Keras with PyMC3, we need to choose <a class="reference external" href="http://deeplearning.net/software/theano/">Theano</a> as the backend for Keras.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">autosave</span> 0
+<span class="o">%</span><span class="k">env</span> KERAS_BACKEND=theano
+<span class="o">%</span><span class="k">env</span> THEANO_FLAGS=device=cuda3,floatX=float32,optimizer=fast_run
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">arviz</span> <span class="k">as</span> <span class="nn">az</span>
+<span class="kn">import</span> <span class="nn">keras</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="k">as</span> <span class="nn">gridspec</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="kn">import</span> <span class="nn">theano.tensor</span> <span class="k">as</span> <span class="nn">tt</span>
+
+<span class="kn">from</span> <span class="nn">keras</span> <span class="kn">import</span> <span class="n">backend</span> <span class="k">as</span> <span class="n">K</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Activation</span><span class="p">,</span>
+    <span class="n">BatchNormalization</span><span class="p">,</span>
+    <span class="n">Conv2D</span><span class="p">,</span>
+    <span class="n">Deconv2D</span><span class="p">,</span>
+    <span class="n">Dense</span><span class="p">,</span>
+    <span class="n">Flatten</span><span class="p">,</span>
+    <span class="n">InputLayer</span><span class="p">,</span>
+    <span class="n">Reshape</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">theano</span> <span class="kn">import</span> <span class="n">clone</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">pp</span><span class="p">,</span> <span class="n">shared</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running on PyMC3 v</span><span class="si">{</span><span class="n">pm</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="output_javascript"></div>
+<script type="text/javascript">
+var element = document.currentScript.previousSibling.previousSibling;
+IPython.notebook.set_autosave_interval(0)
+</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Autosave disabled
+env: KERAS_BACKEND=theano
+env: THEANO_FLAGS=device=cuda3,floatX=float32,optimizer=fast_run
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Using Theano backend.
+ERROR (theano.gpuarray): pygpu was configured but could not be imported or is too old (version 0.7 or higher required)
+NoneType: None
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">config</span> InlineBackend.figure_format = &#39;retina&#39;
+<span class="n">az</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;arviz-darkgrid&quot;</span><span class="p">)</span>
+<span class="n">K</span><span class="o">.</span><span class="n">set_image_dim_ordering</span><span class="p">(</span><span class="s2">&quot;th&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Load-images">
+<h2>Load images<a class="headerlink" href="#Load-images" title="Permalink to this headline">¶</a></h2>
+<p>MNIST dataset can be obtained by <a class="reference external" href="http://scikit-learn.org/stable/datasets/">scikit-learn API</a> or from <a class="reference external" href="https://keras.io/datasets/">Keras datasets</a>. The dataset contains images of digits.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">keras.datasets</span> <span class="kn">import</span> <span class="n">mnist</span>
+
+<span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">floatX</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">))</span>
+<span class="n">data</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Downloading data from https://s3.amazonaws.com/img-datasets/mnist.npz
+11493376/11490434 [==============================] - 13s 1us/step
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Use-Keras">
+<h2>Use Keras<a class="headerlink" href="#Use-Keras" title="Permalink to this headline">¶</a></h2>
+<p>We define a utility function to get parameters from Keras models. Since we have set the backend to Theano, parameter objects are obtained as shared variables of Theano.</p>
+<p>In the code, ‘updates’ are expected to include update objects (dictionary of pairs of shared variables and update equation) of scaling parameters of batch normalization. While not using batch normalization in this example, if we want to use it, we need to pass these update objects as an argument of <code class="docutils literal notranslate"><span class="pre">theano.function()</span></code> inside the PyMC3 ADVI function. The current version of PyMC3 does not support it, it is easy to modify (I want to send PR in future).</p>
+<p>The learning phase below is used for Keras to known the learning phase, training or test. This information is important also for batch normalization.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">BatchNormalization</span><span class="p">,</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+
+
+<span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get parameters and updates from Keras model&quot;&quot;&quot;</span>
+    <span class="n">shared_in_updates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">updates</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+        <span class="c1"># Updates</span>
+        <span class="k">if</span> <span class="s2">&quot;updates&quot;</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="n">updates</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">updates</span><span class="p">)</span>
+            <span class="n">shared_in_updates</span> <span class="o">+=</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">l</span><span class="o">.</span><span class="n">updates</span><span class="p">]</span>
+
+        <span class="c1"># Shared variables</span>
+        <span class="k">for</span> <span class="n">attr_str</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">attr_str</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">tt</span><span class="o">.</span><span class="n">compile</span><span class="o">.</span><span class="n">SharedVariable</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">attr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">model</span><span class="o">.</span><span class="n">get_input_at</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
+                    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">shared_in_updates</span><span class="p">)),</span> <span class="n">updates</span>
+
+
+<span class="c1"># This code is required when using BatchNormalization layer</span>
+<span class="n">keras</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">theano_backend</span><span class="o">.</span><span class="n">_LEARNING_PHASE</span> <span class="o">=</span> <span class="n">shared</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;keras_learning_phase&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Encoder-and-decoder">
+<h2>Encoder and decoder<a class="headerlink" href="#Encoder-and-decoder" title="Permalink to this headline">¶</a></h2>
+<p>First, we define the convolutional neural network for encoder using the Keras API. This function returns a CNN model given the shared variable representing observations (images of digits), the dimension of latent space, and the parameters of the model architecture.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">cnn_enc</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">latent_dim</span><span class="p">,</span> <span class="n">nb_filters</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">nb_conv</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">intermediate_dim</span><span class="o">=</span><span class="mi">128</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a CNN model of Keras.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xs : theano.TensorVariable</span>
+<span class="sd">        Input tensor.</span>
+<span class="sd">    latent_dim : int</span>
+<span class="sd">        Dimension of latent vector.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">input_layer</span> <span class="o">=</span> <span class="n">InputLayer</span><span class="p">(</span><span class="n">input_tensor</span><span class="o">=</span><span class="n">xs</span><span class="p">,</span> <span class="n">batch_input_shape</span><span class="o">=</span><span class="n">xs</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">input_layer</span><span class="p">)</span>
+
+    <span class="n">cp1</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;padding&quot;</span><span class="p">:</span> <span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="s2">&quot;relu&quot;</span><span class="p">}</span>
+    <span class="n">cp2</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;padding&quot;</span><span class="p">:</span> <span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="s2">&quot;relu&quot;</span><span class="p">,</span> <span class="s2">&quot;strides&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)}</span>
+    <span class="n">cp3</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;padding&quot;</span><span class="p">:</span> <span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="s2">&quot;relu&quot;</span><span class="p">,</span> <span class="s2">&quot;strides&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)}</span>
+    <span class="n">cp4</span> <span class="o">=</span> <span class="n">cp3</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="o">**</span><span class="n">cp1</span><span class="p">))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="n">nb_filters</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="o">**</span><span class="n">cp2</span><span class="p">))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="n">nb_filters</span><span class="p">,</span> <span class="p">(</span><span class="n">nb_conv</span><span class="p">,</span> <span class="n">nb_conv</span><span class="p">),</span> <span class="o">**</span><span class="n">cp3</span><span class="p">))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="n">nb_filters</span><span class="p">,</span> <span class="p">(</span><span class="n">nb_conv</span><span class="p">,</span> <span class="n">nb_conv</span><span class="p">),</span> <span class="o">**</span><span class="n">cp4</span><span class="p">))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Flatten</span><span class="p">())</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">intermediate_dim</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">latent_dim</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">model</span>
+</pre></div>
+</div>
+</div>
+<p>Then we define a utility class for encoders. This class does not depend on the architecture of the encoder except for input shape (<code class="docutils literal notranslate"><span class="pre">tensor4</span></code> for images), so we can use this class for various encoding networks.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">Encoder</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Encode observed images to variational parameters (mean/std of Gaussian).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xs : theano.tensor.sharedvar.TensorSharedVariable</span>
+<span class="sd">        Placeholder of input images.</span>
+<span class="sd">    dim_hidden : int</span>
+<span class="sd">        The number of hidden variables.</span>
+<span class="sd">    net : Function</span>
+<span class="sd">        Returns</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">dim_hidden</span><span class="p">,</span> <span class="n">net</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">dim_hidden</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xs</span> <span class="o">=</span> <span class="n">xs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_output_at</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">means</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[:,</span> <span class="p">:</span><span class="n">dim_hidden</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rhos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">[:,</span> <span class="n">dim_hidden</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">updates</span> <span class="o">=</span> <span class="n">get_params</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enc_func</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_hidden</span> <span class="o">=</span> <span class="n">dim_hidden</span>
+
+    <span class="k">def</span> <span class="nf">_get_enc_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enc_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">xs</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">tensor4</span><span class="p">()</span>
+            <span class="n">means</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">means</span><span class="p">,</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">:</span> <span class="n">xs</span><span class="p">})</span>
+            <span class="n">rhos</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rhos</span><span class="p">,</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">:</span> <span class="n">xs</span><span class="p">})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enc_func</span> <span class="o">=</span> <span class="n">function</span><span class="p">([</span><span class="n">xs</span><span class="p">],</span> <span class="p">[</span><span class="n">means</span><span class="p">,</span> <span class="n">rhos</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">enc_func</span>
+
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">):</span>
+        <span class="c1"># Used in test phase</span>
+        <span class="n">keras</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">theano_backend</span><span class="o">.</span><span class="n">_LEARNING_PHASE</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="n">enc_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_enc_func</span><span class="p">()</span>
+        <span class="n">means</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">enc_func</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">means</span>
+
+    <span class="k">def</span> <span class="nf">draw_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draw samples of hidden variables based on variational parameters encoded.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xs : numpy.ndarray, shape=(n_images, 1, height, width)</span>
+<span class="sd">            Images.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Used in test phase</span>
+        <span class="n">keras</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">theano_backend</span><span class="o">.</span><span class="n">_LEARNING_PHASE</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="n">enc_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_enc_func</span><span class="p">()</span>
+        <span class="n">means</span><span class="p">,</span> <span class="n">rhos</span> <span class="o">=</span> <span class="n">enc_func</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">means</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">rhos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">rhos</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_hidden</span><span class="p">)</span>
+        <span class="n">zs</span> <span class="o">=</span> <span class="n">means</span> <span class="o">+</span> <span class="n">pm</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">dist_math</span><span class="o">.</span><span class="n">rho2sd</span><span class="p">(</span><span class="n">rhos</span><span class="p">)</span> <span class="o">*</span> <span class="n">ns</span>
+
+        <span class="k">return</span> <span class="n">zs</span>
+</pre></div>
+</div>
+</div>
+<p>In a similar way, we define the decoding network and a utility class for decoders.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">cnn_dec</span><span class="p">(</span><span class="n">zs</span><span class="p">,</span> <span class="n">nb_filters</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">nb_conv</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">output_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a CNN model of Keras.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    zs : theano.tensor.var.TensorVariable</span>
+<span class="sd">        Input tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">minibatch_size</span><span class="p">,</span> <span class="n">dim_hidden</span> <span class="o">=</span> <span class="n">zs</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">input_layer</span> <span class="o">=</span> <span class="n">InputLayer</span><span class="p">(</span><span class="n">input_tensor</span><span class="o">=</span><span class="n">zs</span><span class="p">,</span> <span class="n">batch_input_shape</span><span class="o">=</span><span class="n">zs</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">input_layer</span><span class="p">)</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">dim_hidden</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">nb_filters</span> <span class="o">*</span> <span class="mi">14</span> <span class="o">*</span> <span class="mi">14</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">))</span>
+
+    <span class="n">cp1</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;padding&quot;</span><span class="p">:</span> <span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="s2">&quot;relu&quot;</span><span class="p">,</span> <span class="s2">&quot;strides&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)}</span>
+    <span class="n">cp2</span> <span class="o">=</span> <span class="n">cp1</span>
+    <span class="n">cp3</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;padding&quot;</span><span class="p">:</span> <span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="s2">&quot;relu&quot;</span><span class="p">,</span> <span class="s2">&quot;strides&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)}</span>
+    <span class="n">cp4</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;padding&quot;</span><span class="p">:</span> <span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="s2">&quot;activation&quot;</span><span class="p">:</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">}</span>
+
+    <span class="n">output_shape_</span> <span class="o">=</span> <span class="p">(</span><span class="n">minibatch_size</span><span class="p">,</span> <span class="n">nb_filters</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Reshape</span><span class="p">(</span><span class="n">output_shape_</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Deconv2D</span><span class="p">(</span><span class="n">nb_filters</span><span class="p">,</span> <span class="p">(</span><span class="n">nb_conv</span><span class="p">,</span> <span class="n">nb_conv</span><span class="p">),</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;channels_first&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">cp1</span><span class="p">))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Deconv2D</span><span class="p">(</span><span class="n">nb_filters</span><span class="p">,</span> <span class="p">(</span><span class="n">nb_conv</span><span class="p">,</span> <span class="n">nb_conv</span><span class="p">),</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;channels_first&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">cp2</span><span class="p">))</span>
+    <span class="n">output_shape_</span> <span class="o">=</span> <span class="p">(</span><span class="n">minibatch_size</span><span class="p">,</span> <span class="n">nb_filters</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">29</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Deconv2D</span><span class="p">(</span><span class="n">nb_filters</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">data_format</span><span class="o">=</span><span class="s2">&quot;channels_first&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">cp3</span><span class="p">))</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="o">**</span><span class="n">cp4</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">model</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">Decoder</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Decode hidden variables to images.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    zs : Theano tensor</span>
+<span class="sd">        Hidden variables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span> <span class="n">net</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">zs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zs</span> <span class="o">=</span> <span class="n">zs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_output_at</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">updates</span> <span class="o">=</span> <span class="n">get_params</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dec_func</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_get_dec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dec_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">zs</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">matrix</span><span class="p">()</span>
+            <span class="n">xs</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zs</span><span class="p">:</span> <span class="n">zs</span><span class="p">})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dec_func</span> <span class="o">=</span> <span class="n">function</span><span class="p">([</span><span class="n">zs</span><span class="p">],</span> <span class="n">xs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dec_func</span>
+
+    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Decode hidden variables to images.</span>
+
+<span class="sd">        An image consists of the mean parameters of the observation noise.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        zs : numpy.ndarray, shape=(n_samples, dim_hidden)</span>
+<span class="sd">            Hidden variables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Used in test phase</span>
+        <span class="n">keras</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">theano_backend</span><span class="o">.</span><span class="n">_LEARNING_PHASE</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dec_func</span><span class="p">()(</span><span class="n">zs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Generative-model">
+<h2>Generative model<a class="headerlink" href="#Generative-model" title="Permalink to this headline">¶</a></h2>
+<p>We can construct the generative model with the PyMC3 API and the functions and classes defined above. We set the size of mini-batches to 100 and the dimension of the latent space to 2 for visualization.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Constants</span>
+<span class="n">minibatch_size</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">dim_hidden</span> <span class="o">=</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<p>We require a placeholder for images, into which mini-batches of images will be placed during ADVI inference. It is also the input for the encoder. Below, <code class="docutils literal notranslate"><span class="pre">enc.model</span></code> is a Keras model of the encoder network and we can check the model architecture using the method <code class="docutils literal notranslate"><span class="pre">summary()</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Placeholder of images</span>
+<span class="n">xs_t</span> <span class="o">=</span> <span class="n">tt</span><span class="o">.</span><span class="n">tensor4</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;xs_t&quot;</span><span class="p">)</span>
+<span class="n">xs_t</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">test_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">minibatch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
+<span class="c1"># Encoder</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span><span class="n">xs_t</span><span class="p">,</span> <span class="n">dim_hidden</span><span class="p">,</span> <span class="n">net</span><span class="o">=</span><span class="n">cnn_enc</span><span class="p">)</span>
+<span class="n">enc</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+conv2d_1 (Conv2D)            (100, 1, 28, 28)          5
+_________________________________________________________________
+conv2d_2 (Conv2D)            (100, 64, 14, 14)         320
+_________________________________________________________________
+conv2d_3 (Conv2D)            (100, 64, 14, 14)         36928
+_________________________________________________________________
+conv2d_4 (Conv2D)            (100, 64, 14, 14)         36928
+_________________________________________________________________
+flatten_1 (Flatten)          (100, 12544)              0
+_________________________________________________________________
+dense_1 (Dense)              (100, 128)                1605760
+_________________________________________________________________
+dense_2 (Dense)              (100, 4)                  516
+=================================================================
+Total params: 1,680,457
+Trainable params: 1,680,457
+Non-trainable params: 0
+_________________________________________________________________
+</pre></div></div>
+</div>
+<p>The probabilistic model involves only two random variables; latent variable <span class="math notranslate nohighlight">\(\mathbf{z}\)</span> and observation <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>. We put a Normal prior on <span class="math notranslate nohighlight">\(\mathbf{z}\)</span>, decode the variational parameters of <span class="math notranslate nohighlight">\(q(\mathbf{z}|\mathbf{x})\)</span> and define the likelihood of the observation <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Hidden variables</span>
+    <span class="n">zs</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span>
+        <span class="s2">&quot;zs&quot;</span><span class="p">,</span>
+        <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">minibatch_size</span><span class="p">,</span> <span class="n">dim_hidden</span><span class="p">),</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">,</span>
+        <span class="n">total_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Decoder and its parameters</span>
+    <span class="n">dec</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">zs</span><span class="p">,</span> <span class="n">net</span><span class="o">=</span><span class="n">cnn_dec</span><span class="p">)</span>
+
+    <span class="c1"># Observation model</span>
+    <span class="n">xs_</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span>
+        <span class="s2">&quot;xs_&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">dec</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">xs_t</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="n">total_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In the generative model above, we do not know how the decoded variational parameters are passed to <span class="math notranslate nohighlight">\(q(\mathbf{z}|\mathbf{x})\)</span>. To do this, we will set the argument <code class="docutils literal notranslate"><span class="pre">local_RVs</span></code> in the ADVI function of PyMC3.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">local_RVs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span><span class="n">zs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">enc</span><span class="o">.</span><span class="n">means</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="n">enc</span><span class="o">.</span><span class="n">rhos</span><span class="p">)})</span>
+</pre></div>
+</div>
+</div>
+<p>This argument is an <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> whose keys are random variables to which the decoded variational parameters are set (<code class="docutils literal notranslate"><span class="pre">zs</span></code> in this model). Each value of the dictionary contains two Theano expressions representing variational mean (<code class="docutils literal notranslate"><span class="pre">enc.means</span></code>) and rhos (<code class="docutils literal notranslate"><span class="pre">enc.rhos</span></code>). A scaling constant (<code class="docutils literal notranslate"><span class="pre">len(data)</span> <span class="pre">/</span> <span class="pre">float(minibatch_size)</span></code>) is set automatically (as we specified it in the model saying what’s the <code class="docutils literal notranslate"><span class="pre">total_size</span></code>) to compensate for the size of mini-batches of the corresponding log
+probability terms in the evidence lower bound (ELBO), the objective of the variational inference.</p>
+<p>The scaling constant for the observed random variables is set in the same way.</p>
+<p>We can also check the architecture of the decoding network, as we did for the encoding network.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dec</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense_3 (Dense)              (100, 2)                  6
+_________________________________________________________________
+dense_4 (Dense)              (100, 12544)              37632
+_________________________________________________________________
+reshape_1 (Reshape)          (100, 64, 14, 14)         0
+_________________________________________________________________
+conv2d_transpose_1 (Conv2DTr (100, 64, 14, 14)         36928
+_________________________________________________________________
+conv2d_transpose_2 (Conv2DTr (100, 64, 14, 14)         36928
+_________________________________________________________________
+conv2d_transpose_3 (Conv2DTr (100, 64, 28, 28)         16448
+_________________________________________________________________
+conv2d_5 (Conv2D)            (100, 1, 28, 28)          257
+=================================================================
+Total params: 128,199
+Trainable params: 128,199
+Non-trainable params: 0
+_________________________________________________________________
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Inference">
+<h2>Inference<a class="headerlink" href="#Inference" title="Permalink to this headline">¶</a></h2>
+<p>Let’s use ADVI to fit the model.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># In memory Minibatches for better speed</span>
+<span class="n">xs_t_minibatch</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Minibatch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">minibatch_size</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">approx</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+        <span class="mi">15000</span><span class="p">,</span>
+        <span class="n">local_rv</span><span class="o">=</span><span class="n">local_RVs</span><span class="p">,</span>
+        <span class="n">more_obj_params</span><span class="o">=</span><span class="n">enc</span><span class="o">.</span><span class="n">params</span> <span class="o">+</span> <span class="n">dec</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+        <span class="n">obj_optimizer</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">rmsprop</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.001</span><span class="p">),</span>
+        <span class="n">more_replacements</span><span class="o">=</span><span class="p">{</span><span class="n">xs_t</span><span class="p">:</span> <span class="n">xs_t_minibatch</span><span class="p">},</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/twiecki/working/projects/pymc/pymc3/data.py:244: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+  self.shared = theano.shared(data[in_memory_slc])
+Average Loss = 31,566: 100%|██████████| 15000/15000 [3:35:45&lt;00:00,  1.16it/s]
+Finished [100%]: Average Loss = 31,552
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Results">
+<h2>Results<a class="headerlink" href="#Results" title="Permalink to this headline">¶</a></h2>
+<p>We can plot the trace of the negative ELBO obtained during optimization, to verify convergence.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">approx</span><span class="o">.</span><span class="n">hist</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_convolutional_vae_keras_advi_34_0.png" src="../_images/notebooks_convolutional_vae_keras_advi_34_0.png" />
+</div>
+</div>
+<p>Finally, we can plot the distribution of the images in the latent space. To do this, we make a 2-dimensional grid of points and feed them into the decoding network. The mean of <span class="math notranslate nohighlight">\(p(\mathbf{x}|\mathbf{z})\)</span> is the image corresponding to the samples on the grid.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">nn</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">zs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">)</span> <span class="k">for</span> <span class="n">z1</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nn</span><span class="p">)</span> <span class="k">for</span> <span class="n">z2</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nn</span><span class="p">)])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+    <span class="s2">&quot;float32&quot;</span>
+<span class="p">)</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">dec</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">zs</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bmat</span><span class="p">([[</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">j</span> <span class="o">*</span> <span class="n">nn</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nn</span><span class="p">)]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nn</span><span class="p">)])</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s2">&quot;axes&quot;</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&quot;grid&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_convolutional_vae_keras_advi_36_0.png" src="../_images/notebooks_convolutional_vae_keras_advi_36_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> watermark
+<span class="o">%</span><span class="k">watermark</span> -n -u -v -iv -w
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pymc3 3.8
+arviz 0.8.3
+numpy 1.17.5
+last updated: Thu Jun 11 2020
+
+CPython 3.8.2
+IPython 7.11.0
+watermark 2.0.2
+</pre></div></div>
+</div>
+</div>
+</div>
+
+
+    </div>
+</div>
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+        <a href="https://github.com/pymc-devs/pymc3"><i class="github icon large"></i></a>
+        <a href="https://twitter.com/pymc_devs"><i class="twitter icon large"></i></a>
+        <a href="https://discourse.pymc.io/"><i class="discourse icon large"></i></a>
+    </div>
+    <div class="ui center aligned container">This page uses <a href="https://analytics.google.com/">
+    Google Analytics</a> to collect statistics. You can disable it by blocking
+    the JavaScript coming from www.google-analytics.com.
+    <script>
+      (function() {
+        var ga = document.createElement('script');
+        ga.src = ('https:' == document.location.protocol ?
+                  'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        ga.setAttribute('async', 'true');
+        document.documentElement.firstChild.appendChild(ga);
+      })();
+    </script>
+    </div>
+    <div class="ui center aligned container">
+        <p>
+            &copy; Copyright 2018, The PyMC Development Team.
+        </p>
+        <p>
+            Created using <a href="https://sphinx-doc.org/">Sphinx</a> 3.4.0.<br />
+        </p>
+    </div>
+</div>
+  </body>
+</html>
