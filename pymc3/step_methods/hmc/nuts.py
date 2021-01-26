@@ -107,6 +107,7 @@ class NUTS(BaseHMC):
             "process_time_diff": np.float64,
             "perf_counter_diff": np.float64,
             "perf_counter_start": np.float64,
+            "variance": np.float64,
         }
     ]
 
@@ -167,6 +168,7 @@ class NUTS(BaseHMC):
         `pm.sample` to the desired number of tuning steps.
         """
         super().__init__(vars, **kwargs)
+        self.stats_dtypes[0]["variance"] = self._logp_dlogp_func.size
 
         self.max_treedepth = max_treedepth
         self.early_max_treedepth = early_max_treedepth

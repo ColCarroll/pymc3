@@ -213,6 +213,7 @@ class BaseHMC(arraystep.GradientSharedStep):
             "perf_counter_diff": perf_end - perf_start,
             "process_time_diff": process_end - process_start,
             "perf_counter_start": perf_start,
+            "variance": self.potential._var.copy(),
         }
 
         stats.update(hmc_step.stats)

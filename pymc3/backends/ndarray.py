@@ -262,7 +262,10 @@ class NDArray(base.BaseTrace):
                 data = dict()  # type: Dict[str, np.ndarray]
                 self._stats.append(data)
                 for varname, dtype in sampler.items():
-                    data[varname] = np.zeros(draws, dtype=dtype)
+                    if varname == "variance":
+                        data[varname] = np.zeros((draws, dtype), dtype=np.float64)
+                    else:
+                        data[varname] = np.zeros(draws, dtype=dtype)
         else:
             for data, vars in zip(self._stats, sampler_vars):
                 if vars.keys() != data.keys():

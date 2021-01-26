@@ -52,10 +52,11 @@ class HamiltonianMC(BaseHMC):
             "process_time_diff": np.float64,
             "perf_counter_diff": np.float64,
             "perf_counter_start": np.float64,
+            "variance": np.float64,
         }
     ]
 
-    def __init__(self, vars=None, path_length=2.0, max_steps=1024, **kwargs):
+    def __init__(self, vars=None, path_length=2.0, max_steps=1024, n_leapfrog_steps=None, **kwargs):
         """Set up the Hamiltonian Monte Carlo sampler.
 
         Parameters
@@ -109,12 +110,17 @@ class HamiltonianMC(BaseHMC):
         kwargs.setdefault("step_rand", unif)
         kwargs.setdefault("target_accept", 0.65)
         super().__init__(vars, **kwargs)
+        self.stats_dtypes[0]["variance"] = self._logp_dlogp_func.size
         self.path_length = path_length
+        self.n_leapfrog_steps = n_leapfrog_steps
         self.max_steps = max_steps
 
     def _hamiltonian_step(self, start, p0, step_size):
-        n_steps = max(1, int(self.path_length / step_size))
-        n_steps = min(self.max_steps, n_steps)
+        if self.n_leapfrog_steps is None:
+            n_steps = max(1, int(self.path_length / step_size))
+            n_steps = min(self.max_steps, n_steps)
+        else:
+            n_steps = self.n_leapfrog_steps
 
         energy_change = -np.inf
         state = start
